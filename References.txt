@@ -1,0 +1,13 @@
+References:
+
+Chess.com: Official website providing chess tutorials, resources, and game analysis. URL: https://www.chess.com. Accessed: 11/30/24.
+
+Lichess: Free and open-source online chess platform used for learning strategies and practicing games. URL: https://lichess.org. Accessed: 11/30/24.
+
+GeeksforGeeks: "Chess Game Algorithm and Implementation Guide." A programming resource for understanding chess algorithms. URL: https://www.geeksforgeeks.org. Accessed: 11/30/24.
+
+FIDE (Fédération Internationale des Échecs): Official governing body of chess for game rules and regulations. URL: https://www.fide.com. Accessed: 11/30/24.
+
+YouTube - Chess Notations: "Chess Notations Tutorial" by [Author/Channel Name], explaining the standard chess notation system. URL: https://www.youtube.com/watch?v=b6PR885Rgb8. Accessed: 11/30/24.
+
+Green Chess - Images: Chess piece images and visual resources provided by Green Chess. URL: https://greenchess.net/info.php?item=downloads. Accessed: 11/30/24.
