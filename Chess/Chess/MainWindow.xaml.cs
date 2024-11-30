@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,6 +10,7 @@ namespace Chess
 {
     public partial class MainWindow : Window
     {
+        bool FirstPlayerSelectedColorWhite = true;
         public MainWindow()
         {
             InitializeComponent();
@@ -18,13 +20,18 @@ namespace Chess
         private void InitializeBoard()
         {
             string[] pieces = { "rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook" };
-            string imageFolderPath = "..\\..\\Images";
+            if (!FirstPlayerSelectedColorWhite)
+            {
+                pieces = new string[] { "rook", "knight", "bishop", "king", "queen", "bishop", "knight", "rook" };
+            }
+            string imageFolderPath = "..\\..\\Images", color;
             Image image;
 
             // Placing pieces
             for (int row = 0; row < 8; row += 7) // Row 0 (White) and 7 (Black)
             {
-                string color = (row == 0) ? "white" : "black";
+                if(FirstPlayerSelectedColorWhite) color = (row == 0) ? "black" : "white";
+                else color = (row == 0) ? "white" : "black";
 
                 for (int col = 0; col < 8; col++)
                 {
@@ -49,7 +56,11 @@ namespace Chess
             // Placing pawns
             for (int row = 1; row <= 6; row += 5) // Rows 1 (White) and 6 (Black)
             {
-                string color = (row == 1) ? "white" : "black";
+                if(FirstPlayerSelectedColorWhite)
+                    color = (row == 1) ? "black" : "white";
+                else
+                    color = (row == 1) ? "white" : "black";
+
                 string piece = "pawn";
 
                 for (int col = 0; col < 8; col++)
@@ -68,6 +79,47 @@ namespace Chess
                     Grid.SetColumn(image, col);
                     ChessGrid.Children.Add(image);
                 }
+            }
+            AddRanksAndFilesLabels();
+        }
+
+        private void AddRanksAndFilesLabels()
+        {
+            string[] ranks = { "8", "7", "6", "5", "4", "3", "2", "1" };
+            string[] files = { "a", "b", "c", "d", "e", "f", "g", "h" };
+            if (!FirstPlayerSelectedColorWhite)
+            {
+                ranks = ranks.Reverse().ToArray();
+                files = files.Reverse().ToArray();
+            }
+            for (int i = 0; i < 8; i++)
+            {
+                TextBlock rankTextBlock = new TextBlock
+                {
+                    Text = ranks[i],
+                    Foreground = Brushes.SaddleBrown,
+                    HorizontalAlignment = HorizontalAlignment.Left,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new Thickness(5, 0, 0, 0),
+                    FontWeight = FontWeights.Bold,
+                    FontSize = 13
+                };
+                Grid.SetRow(rankTextBlock, i);
+                Grid.SetColumn(rankTextBlock, 0);
+                ChessGrid.Children.Add(rankTextBlock);
+                TextBlock fileTextBlock = new TextBlock
+                {
+                    Text = files[i],
+                    Foreground = Brushes.SaddleBrown,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Bottom,
+                    Margin = new Thickness(0, 0, 5, 0),
+                    FontWeight = FontWeights.Bold,
+                    FontSize = 13
+                };
+                Grid.SetRow(fileTextBlock, 8);
+                Grid.SetColumn(fileTextBlock, i);
+                ChessGrid.Children.Add(fileTextBlock);
             }
         }
 
