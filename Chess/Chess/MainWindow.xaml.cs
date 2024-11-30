@@ -45,7 +45,8 @@ namespace Chess
                         Height = 53,
                         Margin = new Thickness(5),
                         Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
-                        IsHitTestVisible = false
+                        IsHitTestVisible = false,
+                        Name = $"{piece}"
                     };
                     Grid.SetRow(image, row);
                     Grid.SetColumn(image, col);
@@ -73,7 +74,8 @@ namespace Chess
                         Height = 53,
                         Margin = new Thickness(5),
                         Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
-                        IsHitTestVisible = false // Prevent image from capturing click events
+                        IsHitTestVisible = false,
+                        Name = $"{piece}"
                     };
                     Grid.SetRow(image, row);
                     Grid.SetColumn(image, col);
@@ -137,10 +139,11 @@ namespace Chess
                     if (Grid.GetRow(element) == row && Grid.GetColumn(element) == col && element is Image)
                     {
                         hasImage = true;
+                        Console.Write((element as Image).Name);
+                        Console.WriteLine(" " + row.ToString()  + col.ToString());
                         break;
                     }
                 }
-
                 HandleSquareClick(row, col, hasImage);
             }
         }

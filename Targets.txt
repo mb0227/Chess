@@ -1,0 +1,11 @@
+Implement All Possible Moves
+Human vs Human
+Human vs Computer
+Analysis ?
+PGN Implementation ?
+Implement Notation for All types of simple and Complex Moves ?
+Hint ?
+Undo ?
+Redo ?
+Time Controls ?
+Chess 960 ?
