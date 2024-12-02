@@ -2,5 +2,8 @@
 {
     public class Computer : Player
     {
+        public Computer(PlayerColor color) : base(color)
+        {
+        }
     }
 }

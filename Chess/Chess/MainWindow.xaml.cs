@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Chess.GL;
+using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,10 +12,12 @@ namespace Chess
     public partial class MainWindow : Window
     {
         bool FirstPlayerSelectedColorWhite = true;
+        Board board = new Board();
         public MainWindow()
         {
             InitializeComponent();
             InitializeBoard();
+            board.DisplayBoard();
         }
 
         private void InitializeBoard()
