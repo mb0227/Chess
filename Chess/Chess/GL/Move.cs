@@ -2,6 +2,7 @@
 {
     public class Move
     {
+        private static Board Board;
         private Player PlayerMoved;
         private Block StartBlock;
         private Block EndBlock;
@@ -16,19 +17,49 @@
         private bool IsCheck;
         private bool IsCheckMate;
 
-        public Move(Player player, Player playerTwo, Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, string notation)
+        public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled)
         {
-            PlayerMoved = player;
             StartBlock = startBlock;
             EndBlock = endBlock;
             PieceMoved = pieceMoved;
             PieceKilled = pieceKilled;
-            Notation = notation;
+            MakeNotation();
             IsCastling = false;
             IsEnPassant = false;
             IsPromotion = false;
             IsCheck = false;
             IsCheckMate = false;
+        }
+
+        public override string ToString()
+        {
+           string details = "Start: " + StartBlock.ToString() + " End: " + EndBlock.ToString() + " Piece Moved Details: " + PieceMoved.ToString();
+           if (PieceKilled != null) details += "Piece Killed: " + PieceKilled.ToString();
+           details += "\n Notation: " + Notation; 
+           return details;
+        }
+
+        public void MakeNotation()
+        {
+            Notation = GetPieceMovedString() + GetFileString(StartBlock.GetFile());
+            if (PieceKilled != null) Notation += "x";
+            Notation += Board.TranslateRank(EndBlock.GetRank());
+            // Additional rules like castling, promotion, or checkmate
+        }
+
+        private string GetPieceMovedString()
+        {
+            if (PieceMoved.GetPieceType() == PieceType.King) return "K";
+            else if (PieceMoved.GetPieceType() == PieceType.Queen) return "Q";
+            else if (PieceMoved.GetPieceType() == PieceType.Knight) return "N";
+            else if (PieceMoved.GetPieceType() == PieceType.Rook) return "R";
+            else if (PieceMoved.GetPieceType() == PieceType.Bishop) return "B";
+            return "";
+        }
+
+        private string GetFileString(int file)
+        {
+            return Board.TranslateFile(file).ToString();
         }
 
         public Player GetPlayerMoved()
@@ -86,6 +117,11 @@
             return Notation;
         }
 
+        public void SetPlayerMoved(Player player)
+        {
+            PlayerMoved = player;
+        }
+
         // setters for bool methods
         public void SetIsCastling(bool isCastling)
         {
@@ -110,6 +146,11 @@
         public void SetIsCheckMate(bool isCheckMate)
         {
             IsCheckMate = isCheckMate;
+        }
+
+        public static void SetBoard(Board board)
+        {
+            Board = board;
         }
     }
 }

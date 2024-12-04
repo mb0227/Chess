@@ -6,20 +6,34 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Collections.Generic;
 
 namespace Chess
 {
     public partial class MainWindow : Window
     {
         bool FirstPlayerSelectedColorWhite = true;
-        Board board;
+        bool IsMoving = false;
+        int SelectedRow, SelectedCol;
+        Game game;
         public MainWindow()
         {
             InitializeComponent();
             InitializeBoard();
-            PlayerColor PlayerColor = FirstPlayerSelectedColorWhite ? PlayerColor.White : PlayerColor.Black;
-            board = new Board(PlayerColor);
-            board.DisplayBoard();
+            PlayerColor FirstPlayerColor, SecondPlayerColor;
+            if (FirstPlayerSelectedColorWhite)
+            {
+                FirstPlayerColor = PlayerColor.White;
+                SecondPlayerColor = PlayerColor.Black;
+            }
+            else
+            {
+                FirstPlayerColor = PlayerColor.Black;
+                SecondPlayerColor = PlayerColor.White;
+            }
+            game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
+            game.GetBoard().DisplayBoard();
+            Move.SetBoard(game.GetBoard());
         }
 
         private void InitializeBoard()
@@ -135,35 +149,56 @@ namespace Chess
             var clickedElement = sender as Border;
             if (clickedElement != null)
             {
+
                 int row = Grid.GetRow(clickedElement);
                 int col = Grid.GetColumn(clickedElement);
-
+                if (IsMoving)
+                {
+                    RemoveHighlights();
+                    IsMoving = false;
+                    MakeMove(SelectedRow, SelectedCol, row, col);
+                    return;
+                }
+                SelectedRow = row;
+                SelectedCol = col;
                 bool hasImage = false;
                 foreach (UIElement element in ChessGrid.Children)
                 {
-                    if (Grid.GetRow(element) == row && Grid.GetColumn(element) == col && element is Image)
+                    if (Grid.GetRow(element) == SelectedRow && Grid.GetColumn(element) == SelectedCol && element is Image)
                     {
                         hasImage = true;
-                        Block block = board.GetBlock(row, col);
+                        Block block = game.GetBoard().GetBlock(SelectedRow, SelectedCol);
                         Console.WriteLine(block.GetPiece());
                         if (block.GetPiece() != null)
                         {
-                            Console.Write("Piece: " + board.GetBlock(row, col).GetPiece().GetPieceType().ToString());
-                            Console.WriteLine(" Color: " + board.GetBlock(row, col).GetPiece().GetColor().ToString());
+                            Console.Write("Piece: " + game.GetBoard().GetBlock(SelectedRow, SelectedCol).GetPiece().GetPieceType().ToString());
+                            Console.WriteLine(" Color: " + game.GetBoard().GetBlock(SelectedRow, SelectedCol).GetPiece().GetColor().ToString());
                             if(block.GetPiece().GetPieceType() == PieceType.Pawn)
                             {
                                 Pawn pawn = (Pawn)block.GetPiece();
-                                pawn.GetPossibleMoves(board);
+                                List <Move> moves = pawn.GetPossibleMoves(game.GetBoard());
+                                foreach (Move move in moves) 
+                                {
+                                    Console.WriteLine(move.ToString());
+                                }
+                                if(moves.Count > 0)
+                                {
+                                    IsMoving = true;
+                                    foreach (Move move in moves)
+                                    {
+                                        HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                                    }
+                                }
                             }
                         }
                         break;
                     }
                 }
-                HandleSquareClick(row, col, hasImage);
+                HandleSquareClick(SelectedRow, SelectedCol, hasImage);
             }
         }
-
-        void HandleSquareClick(int row, int col, bool hasImage)
+        
+        private void HandleSquareClick(int row, int col, bool hasImage)
         {
             if (hasImage)
             {
@@ -172,6 +207,62 @@ namespace Chess
             else
             {
                 ClickedBoxTextBlock.Text = $"Row: {row} Column: {col} Empty.";
+            }
+        }
+
+        private void HighlightSquares(int row, int col)
+        {
+            Border border = new Border
+            {
+                Background = Brushes.LightGreen,
+                Opacity = 0.5
+            };
+            Grid.SetRow(border, row);
+            Grid.SetColumn(border, col);
+            ChessGrid.Children.Add(border);
+        }
+
+        private void RemoveHighlights()
+        {
+            List<UIElement> elementsToRemove = new List<UIElement>();
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (element is Border border && border.Background == Brushes.LightGreen)
+                {
+                    elementsToRemove.Add(element);
+                }
+            }
+            foreach (UIElement element in elementsToRemove)
+            {
+                ChessGrid.Children.Remove(element);
+            }
+        }
+
+        private void MakeMove(int previousRow, int previousCol, int targetRow, int targetCol)
+        {
+            Image pieceToMove = null;
+
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (Grid.GetRow(element) == previousRow && Grid.GetColumn(element) == previousCol && element is Image)
+                {
+                    pieceToMove = (Image)element;
+                    break;
+                }
+            }
+
+            if (pieceToMove != null)
+            {
+                ChessGrid.Children.Remove(pieceToMove);
+
+                Grid.SetRow(pieceToMove, targetRow);
+                Grid.SetColumn(pieceToMove, targetCol);
+
+                ChessGrid.Children.Add(pieceToMove);
+            }
+            else
+            {
+                Console.WriteLine($"No piece found at Row: {previousRow}, Column: {previousCol}.");
             }
         }
     }

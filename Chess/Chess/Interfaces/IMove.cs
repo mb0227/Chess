@@ -9,6 +9,6 @@ namespace Chess.Interfaces
 {
     interface IMove
     {
-        void GetPossibleMoves(Board board);
+        List <Move> GetPossibleMoves(Board board);
     }
 }

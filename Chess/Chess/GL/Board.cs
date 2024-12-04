@@ -118,5 +118,22 @@ namespace Chess.GL
         {
             return rank >= 0 && rank < 8 && file >= 0 && file < 8;
         }
+
+        public int TranslateRank(int rank)
+        {
+            return FirstPlayerColor == PlayerColor.White ? 8 - rank : rank + 1;
+        }
+
+        public char TranslateFile(int file)
+        {
+            if (FirstPlayerColor == PlayerColor.White)
+            {
+                return ((char)('a' + file));
+            }
+            else
+            {
+                return ((char)('h' - file));
+            }
+        }
     }
 }

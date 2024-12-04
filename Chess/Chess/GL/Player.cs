@@ -17,23 +17,16 @@ namespace Chess.GL
     public class Player
     {
         private PlayerColor Color;
-        private PlayerType PlayerType;
         private LinkedList DeadPieces;
 
-        public Player(PlayerColor color, PlayerType playerType)
+        public Player(PlayerColor color)
         {
             Color = color;
-            PlayerType = playerType;
         }
 
         public PlayerColor GetColor()
         {
             return Color;
-        }
-
-        public PlayerType GetPlayerType()
-        {
-            return PlayerType;
         }
 
         public void AddDeadPiece(Piece piece)
@@ -48,7 +41,7 @@ namespace Chess.GL
 
         public override string ToString()
         {
-            return $"Color: {Color.ToString()} PlayerType: {PlayerType.ToString()}";
+            return $"Player Color: {Color.ToString()}";
         }
     }
 }

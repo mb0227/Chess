@@ -20,6 +20,12 @@
             this.File = file;
         }
 
+        public override string ToString()
+        {
+            return "Rank " + Rank + " File " + File;
+
+        }
+
         public Piece GetPiece()
         {
             return Piece;

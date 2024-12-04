@@ -75,6 +75,11 @@ namespace Chess.GL
             return Status;
         }
 
+        public Player GetCurrentPlayer()
+        {
+            return CurrentMove;
+        }
+
         public void UpdateStatus(GameStatus status)
         {
             Status = status;
