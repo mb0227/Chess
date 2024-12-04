@@ -5,10 +5,12 @@ namespace Chess.GL
     public class Board
     {
         private Block[,] Blocks;
+        private PlayerColor FirstPlayerColor;
 
         public Board(PlayerColor FirstPlayerColor)
         {
             Blocks = new Block[8, 8];
+            this.FirstPlayerColor = FirstPlayerColor;
             int blackPiecesRank, blackPawnsRank, whitePawnsRank, whitePiecesRank;
 
             if (FirstPlayerColor == PlayerColor.White)
@@ -105,6 +107,16 @@ namespace Chess.GL
                 }
                 Console.WriteLine();
             }
+        }
+
+        public PlayerColor GetFirstPlayerColor()
+        {
+            return FirstPlayerColor;
+        }
+
+        public bool WithinBounds(int rank, int file)
+        {
+            return rank >= 0 && rank < 8 && file >= 0 && file < 8;
         }
     }
 }

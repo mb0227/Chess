@@ -11,7 +11,7 @@ namespace Chess
 {
     public partial class MainWindow : Window
     {
-        bool FirstPlayerSelectedColorWhite = false;
+        bool FirstPlayerSelectedColorWhite = true;
         Board board;
         public MainWindow()
         {
@@ -144,10 +144,18 @@ namespace Chess
                     if (Grid.GetRow(element) == row && Grid.GetColumn(element) == col && element is Image)
                     {
                         hasImage = true;
-                        Console.Write((element as Image).Name);
-                        Console.WriteLine(" " + row.ToString()  + col.ToString());
-                        Console.Write("Piece: " + board.GetBlock(row, col).GetPiece().GetPieceType().ToString());
-                        Console.WriteLine(" Color: " + board.GetBlock(row, col).GetPiece().GetColor().ToString());
+                        Block block = board.GetBlock(row, col);
+                        Console.WriteLine(block.GetPiece());
+                        if (block.GetPiece() != null)
+                        {
+                            Console.Write("Piece: " + board.GetBlock(row, col).GetPiece().GetPieceType().ToString());
+                            Console.WriteLine(" Color: " + board.GetBlock(row, col).GetPiece().GetColor().ToString());
+                            if(block.GetPiece().GetPieceType() == PieceType.Pawn)
+                            {
+                                Pawn pawn = (Pawn)block.GetPiece();
+                                pawn.GetPossibleMoves(board);
+                            }
+                        }
                         break;
                     }
                 }
