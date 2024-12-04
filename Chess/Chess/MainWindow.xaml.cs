@@ -11,12 +11,14 @@ namespace Chess
 {
     public partial class MainWindow : Window
     {
-        bool FirstPlayerSelectedColorWhite = true;
-        Board board = new Board();
+        bool FirstPlayerSelectedColorWhite = false;
+        Board board;
         public MainWindow()
         {
             InitializeComponent();
             InitializeBoard();
+            PlayerColor PlayerColor = FirstPlayerSelectedColorWhite ? PlayerColor.White : PlayerColor.Black;
+            board = new Board(PlayerColor);
             board.DisplayBoard();
         }
 
@@ -144,6 +146,8 @@ namespace Chess
                         hasImage = true;
                         Console.Write((element as Image).Name);
                         Console.WriteLine(" " + row.ToString()  + col.ToString());
+                        Console.Write("Piece: " + board.GetBlock(row, col).GetPiece().GetPieceType().ToString());
+                        Console.WriteLine(" Color: " + board.GetBlock(row, col).GetPiece().GetColor().ToString());
                         break;
                     }
                 }
