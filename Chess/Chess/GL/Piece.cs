@@ -39,5 +39,18 @@
         {
             return Alive;
         }
+
+        public void Kill()
+        {
+            if (Alive)
+            {
+                Alive = false;
+            }
+        }
+
+        public override string ToString()
+        {
+            return $"Color: {Color.ToString()} PieceType: {PieceType.ToString()} Alive: {Alive}";
+        }
     }
 }
