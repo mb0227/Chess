@@ -71,7 +71,7 @@
     <Compile Include="GL\Move.cs" />
     <Compile Include="GL\Piece.cs" />
     <Compile Include="GL\Pieces\Bishop.cs" />
-    <Compile Include="GL\Pieces\Game.cs" />
+    <Compile Include="GL\Pieces\Knight.cs" />
     <Compile Include="GL\Pieces\King.cs" />
     <Compile Include="GL\Pieces\Pawn.cs" />
     <Compile Include="GL\Pieces\Queen.cs" />

@@ -42,7 +42,68 @@ namespace Chess.GL
             Moves = new Stack();
             IsGameOver = false;
             Status = GameStatus.ACTIVE;
-            CurrentMove = playerOne;
+            CurrentMove = PlayerOne.GetColor().ToString().Trim() == "White" ? PlayerOne : PlayerTwo;
+            Move.SetBoard(Board);
+        }
+
+        public void MakeMove(int prevRank, int prevFile, int newRank, int newFile)
+        {
+            if (!IsGameOver && Status == GameStatus.ACTIVE && Board.WithinBounds(prevRank, prevFile) && Board.WithinBounds(newRank, newFile))
+            {
+                if(Board.GetBlock(prevRank, prevFile).IsEmpty())
+                {
+                    Console.WriteLine("No piece at the given position.");
+                    return;
+                }
+                Block prevBlock = Board.GetBlock(prevRank, prevFile);
+                Piece pieceAtPrev = prevBlock.GetPiece();
+                Block newBlock = Board.GetBlock(newRank, newFile);
+                if(newBlock.GetPiece() != null && newBlock.GetPiece().GetColor() == pieceAtPrev.GetColor())
+                {
+                    Console.WriteLine("Cannot place pieces of same color on eachother.");
+                    return;
+                }
+                if (pieceAtPrev.GetColor().ToString().Trim() != CurrentMove.GetColor().ToString().Trim())
+                {
+                    Console.WriteLine("It is not your turn.");
+                    return;
+                }
+                Console.WriteLine("Board Before");
+                Board.DisplayBoard();
+                if (Board.GetBlock(newRank, newFile).GetPiece() == null)
+                {
+                    if(pieceAtPrev.GetPieceType() == PieceType.Pawn && (prevRank == 1 || prevRank == 6))
+                    {
+                        Pawn pawn = (Pawn)prevBlock.GetPiece();
+                        pawn.SetHasMoved();
+                    }
+                    Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
+                    Board.GetBlock(prevRank, prevFile).SetPiece(null);
+                    Moves.Push(new Move(prevBlock, newBlock, pieceAtPrev, null));
+                    DisplayMoves();
+                }
+                else
+                {
+                    Piece pieceAtNew = newBlock.GetPiece();
+                    pieceAtNew.Kill();
+                    if(CurrentMove == PlayerOne) PlayerTwo.KillPiece(pieceAtNew);
+                    else PlayerOne.KillPiece(pieceAtNew);
+                    Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
+                    Board.GetBlock(prevRank, prevFile).SetPiece(null);
+                    Moves.Push(new Move(prevBlock, newBlock, pieceAtPrev, pieceAtNew));
+                    DisplayMoves();
+                }
+                Console.WriteLine("Board After");
+                Board.DisplayBoard();
+                if (CurrentMove == PlayerOne) CurrentMove = PlayerTwo;
+                else CurrentMove = PlayerOne;
+                // handle killing functionality
+            }
+        }
+
+        public void DisplayMoves()
+        {
+            Moves.Display();
         }
 
         public Player GetPlayerOne()
@@ -88,6 +149,11 @@ namespace Chess.GL
         public void SetIsGameOver(bool isGameOver)
         {
             IsGameOver = isGameOver;
+        }
+
+        public bool IsTurn(string pieceColor)
+        {
+            return CurrentMove.GetColor().ToString().Trim() == pieceColor.Trim();
         }
     }
 }

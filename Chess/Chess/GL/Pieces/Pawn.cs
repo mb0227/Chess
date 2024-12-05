@@ -22,7 +22,7 @@ namespace Chess.GL
                 int file = block.GetFile();
                 if (board.GetFirstPlayerColor() == PlayerColor.White) // if first player's color is white and white pieces are on rank 6, 7 we check for ranks before it for white and after it for black
                 {
-                    // FOR WHITE PAWNS
+                    // For White Pawns
                     // if pawn on the selected block is white so we check for ranks before it
                     if (block.GetPiece().GetColor() == PieceColor.White && board.GetBlock(rank - 1, file).IsEmpty())
                     {
@@ -52,7 +52,7 @@ namespace Chess.GL
                         possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
                     }
                     
-                    // FOR BLACK PAWNS
+                    // For Black Pawns
                     // if pawn on the selected block is black so we check for ranks after it
                     if (block.GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank + 1, file).IsEmpty())
                     {
@@ -114,7 +114,7 @@ namespace Chess.GL
                         possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
                     }
 
-                    // FOR BLACK PAWNS
+                    // For Black Pawns
                     // if pawn on the selected block is black so we check for ranks before it
                     if (block.GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank - 1, file).IsEmpty())
                     {
@@ -148,9 +148,9 @@ namespace Chess.GL
             return possibleMoves;
         }
 
-        public void SetHasMoved(bool hasMoved)
+        public void SetHasMoved()
         {
-            HasMoved = hasMoved;
+            HasMoved = true;
         }
 
         public bool GetHasMoved()

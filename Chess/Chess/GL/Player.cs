@@ -22,6 +22,12 @@ namespace Chess.GL
         public Player(PlayerColor color)
         {
             Color = color;
+            DeadPieces = new LinkedList();
+        }
+
+        public void KillPiece(Piece piece)
+        {
+            DeadPieces.InsertAtHead(piece);
         }
 
         public PlayerColor GetColor()

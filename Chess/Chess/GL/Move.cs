@@ -34,15 +34,15 @@
         public override string ToString()
         {
            string details = "Start: " + StartBlock.ToString() + " End: " + EndBlock.ToString() + " Piece Moved Details: " + PieceMoved.ToString();
-           if (PieceKilled != null) details += "Piece Killed: " + PieceKilled.ToString();
-           details += "\n Notation: " + Notation; 
+           if (PieceKilled != null) details += " Piece Killed: " + PieceKilled.ToString();
+           details += "\nNotation: " + Notation; 
            return details;
         }
 
         public void MakeNotation()
         {
             Notation = GetPieceMovedString() + GetFileString(StartBlock.GetFile());
-            if (PieceKilled != null) Notation += "x";
+            if (PieceKilled != null) Notation += "x" + GetFileString(EndBlock.GetFile());
             Notation += Board.TranslateRank(EndBlock.GetRank());
             // Additional rules like castling, promotion, or checkmate
         }

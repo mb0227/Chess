@@ -15,7 +15,7 @@ namespace Chess
         bool FirstPlayerSelectedColorWhite = true;
         bool IsMoving = false;
         int SelectedRow, SelectedCol;
-        Game game;
+        Game Game;
         public MainWindow()
         {
             InitializeComponent();
@@ -31,9 +31,7 @@ namespace Chess
                 FirstPlayerColor = PlayerColor.Black;
                 SecondPlayerColor = PlayerColor.White;
             }
-            game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
-            game.GetBoard().DisplayBoard();
-            Move.SetBoard(game.GetBoard());
+            Game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
         }
 
         private void InitializeBoard()
@@ -149,14 +147,18 @@ namespace Chess
             var clickedElement = sender as Border;
             if (clickedElement != null)
             {
-
                 int row = Grid.GetRow(clickedElement);
                 int col = Grid.GetColumn(clickedElement);
+                if (Game.GetBoard().GetBlock(row, col).GetPiece() != null && !IsMoving && !Game.IsTurn(Game.GetBoard().GetBlock(row, col).GetPiece().GetColor().ToString()))
+                {
+                    Console.WriteLine(Game.GetBoard().GetBlock(row, col).GetPiece().ToString());
+                    return;
+                }
                 if (IsMoving)
                 {
-                    RemoveHighlights();
                     IsMoving = false;
                     MakeMove(SelectedRow, SelectedCol, row, col);
+                    RemoveHighlights();
                     return;
                 }
                 SelectedRow = row;
@@ -167,20 +169,14 @@ namespace Chess
                     if (Grid.GetRow(element) == SelectedRow && Grid.GetColumn(element) == SelectedCol && element is Image)
                     {
                         hasImage = true;
-                        Block block = game.GetBoard().GetBlock(SelectedRow, SelectedCol);
+                        Block block = Game.GetBoard().GetBlock(SelectedRow, SelectedCol);
                         Console.WriteLine(block.GetPiece());
                         if (block.GetPiece() != null)
                         {
-                            Console.Write("Piece: " + game.GetBoard().GetBlock(SelectedRow, SelectedCol).GetPiece().GetPieceType().ToString());
-                            Console.WriteLine(" Color: " + game.GetBoard().GetBlock(SelectedRow, SelectedCol).GetPiece().GetColor().ToString());
                             if(block.GetPiece().GetPieceType() == PieceType.Pawn)
                             {
                                 Pawn pawn = (Pawn)block.GetPiece();
-                                List <Move> moves = pawn.GetPossibleMoves(game.GetBoard());
-                                foreach (Move move in moves) 
-                                {
-                                    Console.WriteLine(move.ToString());
-                                }
+                                List <Move> moves = pawn.GetPossibleMoves(Game.GetBoard());
                                 if(moves.Count > 0)
                                 {
                                     IsMoving = true;
@@ -238,9 +234,43 @@ namespace Chess
             }
         }
 
+
+        private bool IsValidMove(int targetRow, int targetCol)
+        {
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (element is Border border && border.Background == Brushes.LightGreen)
+                {
+                    int row = Grid.GetRow(border);
+                    int col = Grid.GetColumn(border);
+
+                    if (row == targetRow && col == targetCol)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false; 
+        }
+
         private void MakeMove(int previousRow, int previousCol, int targetRow, int targetCol)
         {
             Image pieceToMove = null;
+            Image capturedPiece = null;
+
+            Block prevBlock = Game.GetBoard().GetBlock(previousRow, previousCol);
+            Block targetBlock = Game.GetBoard().GetBlock(targetRow, targetCol);
+
+            if (targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor())
+            {
+                Console.WriteLine("Invalid move. Target block has a piece of the same color.");
+                return;
+            }
+            if (!IsValidMove(targetRow, targetCol))
+            {
+                Console.WriteLine("Invalid block selected.");
+                return;
+            }
 
             foreach (UIElement element in ChessGrid.Children)
             {
@@ -251,13 +281,27 @@ namespace Chess
                 }
             }
 
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (Grid.GetRow(element) == targetRow && Grid.GetColumn(element) == targetCol && element is Image)
+                {
+                    capturedPiece = (Image)element;
+                    break;
+                }
+            }
+
             if (pieceToMove != null)
             {
-                ChessGrid.Children.Remove(pieceToMove);
+                if (capturedPiece != null)
+                {
+                    ChessGrid.Children.Remove(capturedPiece);
+                    Console.WriteLine($"Captured piece at Row: {targetRow}, Column: {targetCol}");
+                }
 
+                ChessGrid.Children.Remove(pieceToMove);
                 Grid.SetRow(pieceToMove, targetRow);
                 Grid.SetColumn(pieceToMove, targetCol);
-
+                Game.MakeMove(previousRow, previousCol, targetRow, targetCol);
                 ChessGrid.Children.Add(pieceToMove);
             }
             else
