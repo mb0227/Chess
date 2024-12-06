@@ -50,5 +50,10 @@
         {
             return Piece == null;
         }
+
+        public void SetRank(int rank)
+        {
+            Rank = rank;
+        }
     }
 }

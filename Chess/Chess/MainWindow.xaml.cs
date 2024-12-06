@@ -15,6 +15,7 @@ namespace Chess
         bool FirstPlayerSelectedColorWhite = true;
         bool IsMoving = false;
         bool PromotionPossible = false;
+        bool enPassantPossible = false;
         int SelectedRow, SelectedCol;
         Game Game;
         public MainWindow()
@@ -156,7 +157,7 @@ namespace Chess
                 }
                 if(IsMoving && CanEnPassant(row, col))
                 {
-                    Console.WriteLine("suiiiiiiiiiiiiiiiiiiii");
+                    enPassantPossible = true;
                 }
                 if (IsMoving)
                 {
@@ -174,7 +175,7 @@ namespace Chess
                     {
                         hasImage = true;
                         Block block = Game.GetBoard().GetBlock(SelectedRow, SelectedCol);
-                        Console.WriteLine(block.GetPiece());
+                        //Console.WriteLine(block.GetPiece());
                         if (block.GetPiece() != null)
                         {
                             if(block.GetPiece().GetPieceType() == PieceType.Pawn)
@@ -266,6 +267,7 @@ namespace Chess
             Block targetBlock = Game.GetBoard().GetBlock(targetRow, targetCol);
 
             string optionSelected = null;
+            int enPassantTargetRow = -1;
 
             if (targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor())
             {
@@ -281,12 +283,14 @@ namespace Chess
             {
                 PromotionPossible = false;
                 optionSelected = PromotePawn();
-                if (optionSelected == null)
-                {
-                    return;
-                }    
+                if (optionSelected == null) return;          
                 optionSelected = optionSelected.ToLower();
-                Console.WriteLine(optionSelected);
+            }
+
+            if (enPassantPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn)
+            {
+                if (FirstPlayerSelectedColorWhite && targetRow == 2) enPassantTargetRow = 3;
+                else if(!FirstPlayerSelectedColorWhite && targetRow == 5) enPassantTargetRow = 4;
             }
 
             foreach (UIElement element in ChessGrid.Children)
@@ -300,6 +304,15 @@ namespace Chess
 
             foreach (UIElement element in ChessGrid.Children)
             {
+                if (enPassantPossible)
+                {
+                    if (Grid.GetRow(element) == enPassantTargetRow && Grid.GetColumn(element) == targetCol && element is Image)
+                    {
+                        enPassantPossible = false;
+                        capturedPiece = (Image)element;
+                        break;
+                    }
+                }
                 if (Grid.GetRow(element) == targetRow && Grid.GetColumn(element) == targetCol && element is Image)
                 {
                     capturedPiece = (Image)element;
@@ -334,11 +347,9 @@ namespace Chess
                 Grid.SetColumn(pieceToMove, targetCol);
 
                 if (optionSelected != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Promotion, Game.GetPieceTypeByString(optionSelected));
+                else if(enPassantTargetRow != -1) Game.MakeMove(previousRow, previousCol, enPassantTargetRow, targetCol, MoveType.EnPassant);
                 else if (capturedPiece != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Kill);
-                else
-                {
-                    Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Normal);
-                }
+                else Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Normal);
 
                 ChessGrid.Children.Add(pieceToMove);
             }
@@ -360,28 +371,22 @@ namespace Chess
                 return null; 
             }
         }
-        bool xyz = false;
+
         private bool CanEnPassant(int targetRow, int targetCol)
         {
-            Console.WriteLine("can en passant func");
-            Console.WriteLine("fpc: " + FirstPlayerSelectedColorWhite);
-            Console.WriteLine("targetRow: " + targetRow);
-            Console.WriteLine("targetCol: " + targetCol);
-            if ( (FirstPlayerSelectedColorWhite && targetRow == 6 )|| (!FirstPlayerSelectedColorWhite && targetRow == 3))
+            if ( (FirstPlayerSelectedColorWhite && targetRow == 2 ) || (!FirstPlayerSelectedColorWhite && targetRow == 5))
             {
                 Block block = Game.GetBoard().GetBlock(targetRow, targetCol);
                 Block blockToCheckForPawn;
-                if (FirstPlayerSelectedColorWhite) blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow - 1, targetCol);
-                else blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow + 1, targetCol);
-
-                Console.WriteLine("HERE");
+                if (FirstPlayerSelectedColorWhite) blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow + 1, targetCol);
+                else blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow - 1, targetCol);
 
                 if (block.IsEmpty()
                 && (blockToCheckForPawn.GetPiece() != null
                 && blockToCheckForPawn.GetPiece().GetPieceType() == PieceType.Pawn)
                 && ((Pawn)blockToCheckForPawn.GetPiece()).GetEnPassantable())
                 {
-                    Console.WriteLine("HERE2");
+                    Console.WriteLine("En Passant possible hehe.");
                     return true;
                 }
             }

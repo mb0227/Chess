@@ -43,7 +43,7 @@ namespace Chess.DS
             if (MovesStack.Count > 0)
             {
                 return MovesStack[MovesStack.Count - 1];
-            }
+            } 
             else
             {
                 Console.WriteLine("Stack is empty, cannot peek.");
