@@ -6,24 +6,28 @@ namespace Chess.DS
 {
     public class Stack
     {
-        public List<Move> MovesStack;
+        public List<string> MovesStack; 
 
         public Stack()
         {
-            MovesStack = new List <Move>();
+            MovesStack = new List<string>();
         }
 
-        public void Push(Move move)
+        public void Push(Move whiteMove, Move blackMove = null)
         {
-           MovesStack.Add(move);
+            int moveNumber = MovesStack.Count + 1;
+            string formattedMove = blackMove == null
+                ? $"{moveNumber}. {whiteMove.GetNotation()}" // Only White's move
+                : $"{moveNumber}. {whiteMove.GetNotation()} {blackMove.GetNotation()}"; // White and Black's moves
+            MovesStack.Add(formattedMove);
         }
 
-        public Move Pop()
+        public string Pop()
         {
             if (!IsEmpty())
             {
                 int top = MovesStack.Count - 1;
-                Move move =  MovesStack[top];
+                string move = MovesStack[top];
                 MovesStack.RemoveAt(top);
                 return move;
             }
@@ -34,7 +38,7 @@ namespace Chess.DS
             }
         }
 
-        public Move Peek()
+        public string Peek()
         {
             if (MovesStack.Count > 0)
             {
@@ -54,9 +58,9 @@ namespace Chess.DS
                 Console.WriteLine("Stack is empty.");
                 return;
             }
-            for (int i = 0; i < MovesStack.Count; i++)
+            foreach (string move in MovesStack)
             {
-                Console.WriteLine(MovesStack[i].GetNotation());
+                Console.WriteLine(move);
             }
             Console.WriteLine();
         }
@@ -71,16 +75,9 @@ namespace Chess.DS
             return MovesStack.Count;
         }
 
-        public bool Contains(Move move)
+        public bool Contains(string move)
         {
-            for (int i = 0; i < MovesStack.Count; i++)
-            {
-                if (MovesStack[i].Equals(move))
-                {
-                    return true;
-                }
-            }
-            return false;
+            return MovesStack.Contains(move);
         }
     }
 }

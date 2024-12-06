@@ -1,4 +1,6 @@
-﻿namespace Chess.GL
+﻿using System;
+
+namespace Chess.GL
 {
     public class Move
     {
@@ -10,12 +12,15 @@
         private Piece PieceKilled;
         private string Notation;
 
+        private MoveType MoveType;
+        private PieceType PromotedPieceType;
         // bool members
-        private bool IsCastling;
-        private bool IsEnPassant;
-        private bool IsPromotion;
-        private bool IsCheck;
-        private bool IsCheckMate;
+
+        //private bool IsCastling;
+        //private bool IsEnPassant;
+        //private bool IsPromotion;
+        //private bool IsCheck;
+        //private bool IsCheckMate;
 
         public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled)
         {
@@ -24,11 +29,19 @@
             PieceMoved = pieceMoved;
             PieceKilled = pieceKilled;
             MakeNotation();
-            IsCastling = false;
-            IsEnPassant = false;
-            IsPromotion = false;
-            IsCheck = false;
-            IsCheckMate = false;
+            MoveType = MoveType.Normal;
+        }
+        
+        public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, MoveType moveType) : this(startBlock, endBlock, pieceMoved, pieceKilled)
+        {
+            MoveType = moveType;
+        }
+        
+        public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, MoveType moveType, PieceType promotedPieceType) : this(startBlock, endBlock, pieceMoved, pieceKilled, moveType)
+        {
+            PromotedPieceType = promotedPieceType;
+            Notation = "";
+            MakeNotation();
         }
 
         public override string ToString()
@@ -41,19 +54,23 @@
 
         public void MakeNotation()
         {
-            Notation = GetPieceMovedString() + GetFileString(StartBlock.GetFile());
+            Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(StartBlock.GetFile());
             if (PieceKilled != null) Notation += "x" + GetFileString(EndBlock.GetFile());
             Notation += Board.TranslateRank(EndBlock.GetRank());
+            if (MoveType == MoveType.Promotion)
+            {
+                Notation += "=" + GetPieceMovedString(PromotedPieceType);
+            }
             // Additional rules like castling, promotion, or checkmate
         }
 
-        private string GetPieceMovedString()
+        private string GetPieceMovedString(PieceType p)
         {
-            if (PieceMoved.GetPieceType() == PieceType.King) return "K";
-            else if (PieceMoved.GetPieceType() == PieceType.Queen) return "Q";
-            else if (PieceMoved.GetPieceType() == PieceType.Knight) return "N";
-            else if (PieceMoved.GetPieceType() == PieceType.Rook) return "R";
-            else if (PieceMoved.GetPieceType() == PieceType.Bishop) return "B";
+            if (p == PieceType.King) return "K";
+            else if (p == PieceType.Queen) return "Q";
+            else if (p == PieceType.Knight) return "N";
+            else if (p == PieceType.Rook) return "R";
+            else if (p == PieceType.Bishop) return "B";
             return "";
         }
 
@@ -87,29 +104,9 @@
             return PieceKilled;
         }
 
-        public bool GetIsCastling()
+        public MoveType GetMoveType()
         {
-            return IsCastling;
-        }
-
-        public bool GetIsEnPassant()
-        {
-            return IsEnPassant;
-        }
-
-        public bool GetIsPromotion()
-        {
-            return IsPromotion;
-        }
-
-        public bool GetIsCheck()
-        {
-            return IsCheck;
-        }
-
-        public bool GetIsCheckMate()
-        {
-            return IsCheckMate;
+            return MoveType;
         }
 
         public string GetNotation()
@@ -123,29 +120,15 @@
         }
 
         // setters for bool methods
-        public void SetIsCastling(bool isCastling)
-        {
-            IsCastling = isCastling;
-        }
 
-        public void SetIsEnPassant(bool isEnPassant)
+        public bool GetIsPromotion()
         {
-            IsEnPassant = isEnPassant;
+            return MoveType == MoveType.Promotion;
         }
 
         public void SetIsPromotion(bool isPromotion)
         {
-            IsPromotion = isPromotion;
-        }
-
-        public void SetIsCheck(bool isCheck)
-        {
-            IsCheck = isCheck;
-        }
-
-        public void SetIsCheckMate(bool isCheckMate)
-        {
-            IsCheckMate = isCheckMate;
+            if(isPromotion) MoveType = MoveType.Promotion;
         }
 
         public static void SetBoard(Board board)

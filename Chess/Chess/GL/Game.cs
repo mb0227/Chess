@@ -13,6 +13,25 @@ namespace Chess.GL
         STALEMATE,
         RESIGNATION
     }
+
+    public enum MoveType
+    {
+        Normal,
+        Kill,
+        Check,
+        Checkmate,
+        Stalemate,
+        Promotion,
+        EnPassant,
+        Castling
+    }
+
+    public enum CastlingType
+    {
+        ShortCastle,
+        LongCastle
+    }
+
     public class Game
     {
         private Player PlayerOne;
@@ -20,6 +39,8 @@ namespace Chess.GL
         private Player CurrentMove;
         private Board Board;
         private Stack Moves;
+        private Move FirstPlayerMove;
+        private Move SecondPlayerMove;
         private bool IsGameOver;
         private GameStatus Status;
 
@@ -46,7 +67,7 @@ namespace Chess.GL
             Move.SetBoard(Board);
         }
 
-        public void MakeMove(int prevRank, int prevFile, int newRank, int newFile)
+        public void MakeMove(int prevRank, int prevFile, int newRank, int newFile, MoveType moveType, PieceType pieceType = PieceType.Queen)
         {
             if (!IsGameOver && Status == GameStatus.ACTIVE && Board.WithinBounds(prevRank, prevFile) && Board.WithinBounds(newRank, newFile))
             {
@@ -69,36 +90,71 @@ namespace Chess.GL
                     return;
                 }
                 Console.WriteLine("Board Before");
-                Board.DisplayBoard();
+                //Board.DisplayBoard();
                 if (Board.GetBlock(newRank, newFile).GetPiece() == null)
                 {
-                    if(pieceAtPrev.GetPieceType() == PieceType.Pawn && (prevRank == 1 || prevRank == 6))
+                    AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
+                    if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
+                    {
+                        Pawn pawn = (Pawn)prevBlock.GetPiece();
+                        // here update piece at piece at prev to a new piece
+                        pieceAtPrev = new Piece(pieceAtPrev.GetColor(), pieceType, true);
+                    }
+                    else if(pieceAtPrev.GetPieceType() == PieceType.Pawn && (prevRank == 1 || prevRank == 6))
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
                         pawn.SetHasMoved();
+                        if (Math.Abs(prevRank - newRank) == 2)
+                        {
+                            pawn.SetEnPassantable();
+                        }
                     }
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
-                    Moves.Push(new Move(prevBlock, newBlock, pieceAtPrev, null));
-                    DisplayMoves();
                 }
                 else
                 {
                     Piece pieceAtNew = newBlock.GetPiece();
                     pieceAtNew.Kill();
+
+                    if(moveType != MoveType.Promotion)AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew);
+                    else AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
+
+                    if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
+                    {
+                        Pawn pawn = (Pawn)prevBlock.GetPiece();
+                        pieceAtPrev = new Piece(pieceAtPrev.GetColor(), pieceType, true);
+                    }
                     if(CurrentMove == PlayerOne) PlayerTwo.KillPiece(pieceAtNew);
                     else PlayerOne.KillPiece(pieceAtNew);
+
+
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
-                    Moves.Push(new Move(prevBlock, newBlock, pieceAtPrev, pieceAtNew));
-                    DisplayMoves();
                 }
                 Console.WriteLine("Board After");
-                Board.DisplayBoard();
-                if (CurrentMove == PlayerOne) CurrentMove = PlayerTwo;
-                else CurrentMove = PlayerOne;
-                // handle killing functionality
+                //Board.DisplayBoard();
+                if (CurrentMove == PlayerTwo)
+                {
+                    Moves.Push(FirstPlayerMove, SecondPlayerMove);
+                    CurrentMove = PlayerOne;
+                }
+                else
+                {
+                    CurrentMove = PlayerTwo;
+                }
+                DisplayMoves();
             }
+        }
+
+        public void AddMove(Block prevBlock, Block newBlock, MoveType moveType, Piece prevBlockPiece, Piece capturedPiece = null, PieceType promotedPieceType = PieceType.Queen)
+        {
+            Move move;
+            
+            if (moveType == MoveType.Normal) move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece);
+            else move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType, promotedPieceType);
+            if (CurrentMove == PlayerOne) FirstPlayerMove = move;
+            else SecondPlayerMove = move;
         }
 
         public void DisplayMoves()
@@ -154,6 +210,23 @@ namespace Chess.GL
         public bool IsTurn(string pieceColor)
         {
             return CurrentMove.GetColor().ToString().Trim() == pieceColor.Trim();
+        }
+
+        public static PieceType GetPieceTypeByString(string pieceName)
+        {
+            switch(pieceName)
+            {
+                case "queen":
+                    return PieceType.Queen;
+                case "bishop":
+                    return PieceType.Bishop;
+                case "rook":
+                    return PieceType.Rook;
+                case "knight":
+                    return PieceType.Knight;
+                default:
+                    return PieceType.Queen;
+            }
         }
     }
 }

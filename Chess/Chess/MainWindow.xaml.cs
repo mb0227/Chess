@@ -14,6 +14,7 @@ namespace Chess
     {
         bool FirstPlayerSelectedColorWhite = true;
         bool IsMoving = false;
+        bool PromotionPossible = false;
         int SelectedRow, SelectedCol;
         Game Game;
         public MainWindow()
@@ -151,8 +152,11 @@ namespace Chess
                 int col = Grid.GetColumn(clickedElement);
                 if (Game.GetBoard().GetBlock(row, col).GetPiece() != null && !IsMoving && !Game.IsTurn(Game.GetBoard().GetBlock(row, col).GetPiece().GetColor().ToString()))
                 {
-                    Console.WriteLine(Game.GetBoard().GetBlock(row, col).GetPiece().ToString());
                     return;
+                }
+                if(IsMoving && CanEnPassant(row, col))
+                {
+                    Console.WriteLine("suiiiiiiiiiiiiiiiiiiii");
                 }
                 if (IsMoving)
                 {
@@ -183,6 +187,7 @@ namespace Chess
                                     foreach (Move move in moves)
                                     {
                                         HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                                        if (move.GetIsPromotion()) PromotionPossible = true;
                                     }
                                 }
                             }
@@ -234,7 +239,6 @@ namespace Chess
             }
         }
 
-
         private bool IsValidMove(int targetRow, int targetCol)
         {
             foreach (UIElement element in ChessGrid.Children)
@@ -261,6 +265,8 @@ namespace Chess
             Block prevBlock = Game.GetBoard().GetBlock(previousRow, previousCol);
             Block targetBlock = Game.GetBoard().GetBlock(targetRow, targetCol);
 
+            string optionSelected = null;
+
             if (targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor())
             {
                 Console.WriteLine("Invalid move. Target block has a piece of the same color.");
@@ -270,6 +276,17 @@ namespace Chess
             {
                 Console.WriteLine("Invalid block selected.");
                 return;
+            }
+            if(PromotionPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn && ((previousRow == 1 && Game.GetPlayerOne().GetColor() == PlayerColor.White) || (previousRow == 6 && Game.GetPlayerOne().GetColor() == PlayerColor.Black)))
+            {
+                PromotionPossible = false;
+                optionSelected = PromotePawn();
+                if (optionSelected == null)
+                {
+                    return;
+                }    
+                optionSelected = optionSelected.ToLower();
+                Console.WriteLine(optionSelected);
             }
 
             foreach (UIElement element in ChessGrid.Children)
@@ -299,15 +316,76 @@ namespace Chess
                 }
 
                 ChessGrid.Children.Remove(pieceToMove);
+                if (optionSelected != null)
+                {
+                    string imagePath = System.IO.Path.Combine("..\\..\\Images", $"{Game.GetCurrentPlayer().GetColor().ToString().ToLower()}-{optionSelected}.png");
+                    imagePath = System.IO.Path.GetFullPath(imagePath);
+                    pieceToMove = new Image
+                    {
+                        Width = 53,
+                        Height = 53,
+                        Margin = new Thickness(5),
+                        Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
+                        IsHitTestVisible = false,
+                        Name = $"{optionSelected}"
+                    };
+                }
                 Grid.SetRow(pieceToMove, targetRow);
                 Grid.SetColumn(pieceToMove, targetCol);
-                Game.MakeMove(previousRow, previousCol, targetRow, targetCol);
+
+                if (optionSelected != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Promotion, Game.GetPieceTypeByString(optionSelected));
+                else if (capturedPiece != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Kill);
+                else
+                {
+                    Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Normal);
+                }
+
                 ChessGrid.Children.Add(pieceToMove);
             }
             else
             {
                 Console.WriteLine($"No piece found at Row: {previousRow}, Column: {previousCol}.");
             }
+        }
+
+        public string PromotePawn()
+        {
+            PromotionWindow promotionWindow = new PromotionWindow();
+            if (promotionWindow.ShowDialog() == true)
+            {
+                return promotionWindow.SelectedPiece;
+            }
+            else
+            {
+                return null; 
+            }
+        }
+        bool xyz = false;
+        private bool CanEnPassant(int targetRow, int targetCol)
+        {
+            Console.WriteLine("can en passant func");
+            Console.WriteLine("fpc: " + FirstPlayerSelectedColorWhite);
+            Console.WriteLine("targetRow: " + targetRow);
+            Console.WriteLine("targetCol: " + targetCol);
+            if ( (FirstPlayerSelectedColorWhite && targetRow == 6 )|| (!FirstPlayerSelectedColorWhite && targetRow == 3))
+            {
+                Block block = Game.GetBoard().GetBlock(targetRow, targetCol);
+                Block blockToCheckForPawn;
+                if (FirstPlayerSelectedColorWhite) blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow - 1, targetCol);
+                else blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow + 1, targetCol);
+
+                Console.WriteLine("HERE");
+
+                if (block.IsEmpty()
+                && (blockToCheckForPawn.GetPiece() != null
+                && blockToCheckForPawn.GetPiece().GetPieceType() == PieceType.Pawn)
+                && ((Pawn)blockToCheckForPawn.GetPiece()).GetEnPassantable())
+                {
+                    Console.WriteLine("HERE2");
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
