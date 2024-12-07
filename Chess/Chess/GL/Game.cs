@@ -197,29 +197,22 @@ namespace Chess.GL
             int tokenForPlayer = -1;
             if (tokens.Length == 3)
             {
-                tokenForPlayer = CurrentMove.GetColor() == PlayerColor.Black ? 1 : 2;
-
-                Console.WriteLine("Tokens " + tokenForPlayer);
+                if(PlayerOne.GetColor() == PlayerColor.White)
+                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.Black ? 1 : 2;
+                else
+                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.White ? 1 : 2;
 
                 prevNotation = tokens[tokenForPlayer];
-
-                Console.WriteLine("prev not " + prevNotation);
-
                 if (prevNotation.Length != 2) return;
                 int prevFile = Board.GetFileInInt(prevNotation[0].ToString());
-
-                Console.WriteLine("file " + prevFile);
-
                 int prevRank = Board.TranslateRank(int.Parse(prevNotation[1].ToString()));
-
-                Console.WriteLine("rank " + prevRank);
-
+                if(PlayerOne.GetColor() == PlayerColor.Black)
+                {
+                    prevRank = int.Parse(prevNotation[1].ToString()) - 1;
+                    prevFile = ReverseBlockValue(prevFile);
+                }
                 if (!Board.WithinBounds(prevRank, prevFile)) return;
-
                 Block block = Board.GetBlock(prevRank, prevFile);
-
-                Console.WriteLine("block" + block.ToString());
-
                 if (!block.IsEmpty() && block.GetPiece().GetPieceType() == PieceType.Pawn)
                 {
                     Pawn piece = (Pawn)block.GetPiece();
@@ -300,6 +293,31 @@ namespace Chess.GL
                     return PieceType.Knight;
                 default:
                     return PieceType.Queen;
+            }
+        }
+
+        public int ReverseBlockValue(int value)
+        {
+            switch(value)
+            {
+                case 0:
+                    return 7;
+                case 1:
+                    return 6;
+                case 2:
+                    return 5;
+                case 3:
+                    return 4;
+                case 4:
+                    return 3;
+                case 5:
+                    return 2;
+                case 6:
+                    return 1;
+                case 7:
+                    return 0;
+                default:
+                    return -1;
             }
         }
     }
