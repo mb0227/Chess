@@ -317,6 +317,10 @@ namespace Chess.GL
         public void PawnMoved(int rank)
         {
             if (rank == 2) IsEnPassantable = true; 
+        }
+
+        public void SetPawnMoved()
+        {
             HasMoved = true;
         }
 

@@ -67,7 +67,7 @@ namespace Chess.GL
             Move.SetBoard(Board);
         }
 
-        public void MakeMove(int prevRank, int prevFile, int newRank, int newFile, MoveType moveType, PieceType pieceType = PieceType.Queen)
+        public void MakeMove(int prevRank, int prevFile, int newRank, int newFile, MoveType moveType, PieceType pieceType = PieceType.Queen, int enPassantTargetRow = -1)
         {
             if (!IsGameOver && Status == GameStatus.ACTIVE && Board.WithinBounds(prevRank, prevFile) && Board.WithinBounds(newRank, newFile))
             {
@@ -89,9 +89,33 @@ namespace Chess.GL
                     Console.WriteLine("It is not your turn.");
                     return;
                 }
+
+                // update move movement
+                if (pieceAtPrev.GetPieceType() == PieceType.Pawn)
+                {
+                    Pawn pawn = (Pawn)prevBlock.GetPiece();
+                    pawn.SetPawnMoved();
+                    if (prevRank == 1 || prevRank == 6) pawn.PawnMoved(Math.Abs(prevRank - newRank));
+                }
                 //Console.WriteLine("Board Before");
                 //Board.DisplayBoard();
-                if (Board.GetBlock(newRank, newFile).GetPiece() == null && moveType != MoveType.EnPassant) // if the target block is empty
+                if (moveType == MoveType.EnPassant && Board.GetBlock(enPassantTargetRow, newFile) != null)
+                {
+                    // target row is the row where the pawn will move to, and 
+                    // enpassassant target row is where the piece to be captured
+                    Block targetBlock = Board.GetBlock(enPassantTargetRow, newFile);
+                    Piece pieceAtTarget = targetBlock.GetPiece();
+                    pieceAtTarget?.Kill();
+
+                    AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtTarget);
+
+                    if (CurrentMove == PlayerOne) PlayerTwo.KillPiece(pieceAtTarget);
+                    else PlayerOne.KillPiece(pieceAtTarget);
+                    Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
+                    Board.GetBlock(prevRank, prevFile).SetPiece(null);
+                    Board.GetBlock(enPassantTargetRow, newFile).SetPiece(null);
+                }
+                else if (Board.GetBlock(newRank, newFile).GetPiece() == null && moveType != MoveType.EnPassant) // if the target block is empty
                 {
                     AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
                     if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
@@ -100,18 +124,13 @@ namespace Chess.GL
                         // here update piece at piece at prev to a new piece
                         pieceAtPrev = new Piece(pieceAtPrev.GetColor(), pieceType, true);
                     }
-                    else if(pieceAtPrev.GetPieceType() == PieceType.Pawn && (prevRank == 1 || prevRank == 6))
-                    {
-                        Pawn pawn = (Pawn)prevBlock.GetPiece();
-                        pawn.PawnMoved(Math.Abs(prevRank- newRank));
-                    }
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }
                 else // if the target block is not empty (kill piece)
                 {
                     Piece pieceAtNew = newBlock.GetPiece();
-                    if(pieceAtNew != null) pieceAtNew.Kill();
+                    pieceAtNew?.Kill();
 
                     if(moveType != MoveType.Promotion) AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew);
                     else AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
@@ -120,15 +139,13 @@ namespace Chess.GL
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
                         pieceAtPrev = new Piece(pieceAtPrev.GetColor(), pieceType, true);
-                    }
-                    //else if (pieceAtPrev.GetPieceType() == PieceType.Pawn && moveType == MoveType.EnPassant)
-                    //    Console.WriteLine("ENENNENENENEN");
+                    };
                     if (CurrentMove == PlayerOne) PlayerTwo.KillPiece(pieceAtNew);
                     else PlayerOne.KillPiece(pieceAtNew);
-                    if (moveType == MoveType.EnPassant && PlayerOne.GetColor() == PlayerColor.White)
-                        newRank = 2;
-                    else if (moveType == MoveType.EnPassant && PlayerOne.GetColor() == PlayerColor.White)
-                        newRank = 5;
+                    //if (moveType == MoveType.EnPassant && PlayerOne.GetColor() == PlayerColor.White)
+                    //    newRank = 2;
+                    //else if (moveType == MoveType.EnPassant && PlayerOne.GetColor() == PlayerColor.White)
+                    //    newRank = 5;
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }
@@ -164,19 +181,7 @@ namespace Chess.GL
             {
                 move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece);
             }
-            else if (moveType == MoveType.EnPassant)
-            {
-                if (PlayerOne.GetColor() == PlayerColor.White)
-                {
-                    newBlock.SetRank(newBlock.GetRank() - 1);
-                    move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
-                }
-                else
-                {
-                    newBlock.SetRank(newBlock.GetRank() + 1);
-                    move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
-                }
-            }
+            else if (moveType == MoveType.EnPassant) move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
             else move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType, promotedPieceType);
 
             if (CurrentMove == PlayerOne) FirstPlayerMove = move;
@@ -194,24 +199,26 @@ namespace Chess.GL
             {
                 tokenForPlayer = CurrentMove.GetColor() == PlayerColor.Black ? 1 : 2;
 
-                //Console.WriteLine("Tokens " + tokenForPlayer);
+                Console.WriteLine("Tokens " + tokenForPlayer);
 
                 prevNotation = tokens[tokenForPlayer];
 
-                //Console.WriteLine("prev not " + prevNotation);
+                Console.WriteLine("prev not " + prevNotation);
 
                 if (prevNotation.Length != 2) return;
                 int prevFile = Board.GetFileInInt(prevNotation[0].ToString());
 
-                //Console.WriteLine("file " + prevFile);
+                Console.WriteLine("file " + prevFile);
 
                 int prevRank = Board.TranslateRank(int.Parse(prevNotation[1].ToString()));
 
-                //Console.WriteLine("rank " + prevRank);
+                Console.WriteLine("rank " + prevRank);
 
                 if (!Board.WithinBounds(prevRank, prevFile)) return;
 
                 Block block = Board.GetBlock(prevRank, prevFile);
+
+                Console.WriteLine("block" + block.ToString());
 
                 if (!block.IsEmpty() && block.GetPiece().GetPieceType() == PieceType.Pawn)
                 {

@@ -161,5 +161,35 @@ namespace Chess.GL
                     return -1;
             }
         }
+        
+        public int GetFileInIntReversed(string file)
+        {
+            switch (file)
+            {
+                case "h":
+                    return 0;
+                case "g":
+                    return 1;
+                case "f":
+                    return 2;
+                case "e":
+                    return 3;
+                case "d":
+                    return 4;
+                case "c":
+                    return 5;
+                case "b":
+                    return 6;
+                case "a":
+                    return 7;
+                default:
+                    return -1;
+            }
+        }
+
+        public int TranslateRankReversed(int rank)
+        {
+            return FirstPlayerColor == PlayerColor.Black ? 8 - rank : rank + 1;
+        }
     }
 }
