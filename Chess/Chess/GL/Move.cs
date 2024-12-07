@@ -54,7 +54,18 @@ namespace Chess.GL
 
         public void MakeNotation()
         {
-            Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(StartBlock.GetFile());
+            if (PieceMoved.GetPieceType() == PieceType.Knight)
+            {
+                if (PieceKilled == null)
+                    Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(EndBlock.GetFile());
+                else
+                    Notation = GetPieceMovedString(PieceMoved.GetPieceType());
+            }
+            else
+            {
+                Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(StartBlock.GetFile());
+            }
+
             if (PieceKilled != null) Notation += "x" + GetFileString(EndBlock.GetFile());
             Notation += Board.TranslateRank(EndBlock.GetRank());
             if (MoveType == MoveType.Promotion)

@@ -177,10 +177,10 @@ namespace Chess
                         Block block = Game.GetBoard().GetBlock(SelectedRow, SelectedCol);
                         if (block.GetPiece() != null)
                         {
-                            if(block.GetPiece().GetPieceType() == PieceType.Pawn)
+                            if (block.GetPiece().GetPieceType() == PieceType.Pawn)
                             {
                                 Pawn pawn = (Pawn)block.GetPiece();
-                                List <Move> moves = pawn.GetPossibleMoves(Game.GetBoard());
+                                List<Move> moves = pawn.GetPossibleMoves(Game.GetBoard());
                                 if (moves.Count > 0)
                                 {
                                     IsMoving = true;
@@ -192,6 +192,21 @@ namespace Chess
                                 }
                                 else return;
                             }
+                            else if (block.GetPiece().GetPieceType() == PieceType.Knight)
+                            {
+                                Knight knight = (Knight)block.GetPiece();
+                                List<Move> moves = knight.GetPossibleMoves(Game.GetBoard());
+                                if (moves.Count > 0)
+                                {
+                                    Console.WriteLine(moves.Count);
+                                    IsMoving = true;
+                                    foreach (Move move in moves)
+                                    {
+                                        HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                                    }
+                                }
+                            }
+                            else return;
                         }
                         break;
                     }
