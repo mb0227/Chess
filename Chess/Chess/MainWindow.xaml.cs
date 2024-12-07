@@ -12,10 +12,10 @@ namespace Chess
 {
     public partial class MainWindow : Window
     {
-        bool FirstPlayerSelectedColorWhite = true;
-        bool IsMoving = false;
+        bool FirstPlayerSelectedColorWhite = false;
         bool PromotionPossible = false;
         bool enPassantPossible = false;
+        bool IsMoving = false;
         int SelectedRow, SelectedCol;
         Game Game;
         public MainWindow()
@@ -155,7 +155,7 @@ namespace Chess
                 {
                     return;
                 }
-                if(IsMoving && CanEnPassant(row, col))
+                if(CanEnPassant(row, col))
                 {
                     enPassantPossible = true;
                 }
@@ -175,7 +175,6 @@ namespace Chess
                     {
                         hasImage = true;
                         Block block = Game.GetBoard().GetBlock(SelectedRow, SelectedCol);
-                        //Console.WriteLine(block.GetPiece());
                         if (block.GetPiece() != null)
                         {
                             if(block.GetPiece().GetPieceType() == PieceType.Pawn)
@@ -189,6 +188,8 @@ namespace Chess
                                     {
                                         HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
                                         if (move.GetIsPromotion()) PromotionPossible = true;
+                                        if (move.GetIsPromotion())
+                                            Console.WriteLine("sdadadad");
                                     }
                                 }
                             }
@@ -260,6 +261,7 @@ namespace Chess
 
         private void MakeMove(int previousRow, int previousCol, int targetRow, int targetCol)
         {
+            if (!IsValidMove(targetRow, targetCol)) return;
             Image pieceToMove = null;
             Image capturedPiece = null;
 
@@ -279,7 +281,12 @@ namespace Chess
                 Console.WriteLine("Invalid block selected.");
                 return;
             }
-            if(PromotionPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn && ((previousRow == 1 && Game.GetPlayerOne().GetColor() == PlayerColor.White) || (previousRow == 6 && Game.GetPlayerOne().GetColor() == PlayerColor.Black)))
+            if((PromotionPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn 
+                && ((previousRow == 1 && Game.GetPlayerOne().GetColor() == PlayerColor.White) 
+                  || (previousRow == 6 && Game.GetPlayerTwo().GetColor() == PlayerColor.Black)))
+            ||(PromotionPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn 
+                && ((previousRow == 6 && Game.GetPlayerOne().GetColor() == PlayerColor.Black) 
+                  || (previousRow == 1 && Game.GetPlayerTwo().GetColor() == PlayerColor.White))))
             {
                 PromotionPossible = false;
                 optionSelected = PromotePawn();
@@ -357,6 +364,9 @@ namespace Chess
             {
                 Console.WriteLine($"No piece found at Row: {previousRow}, Column: {previousCol}.");
             }
+            if(enPassantPossible) enPassantPossible = false;
+            if(PromotionPossible) PromotionPossible = false;
+            if(IsMoving) IsMoving = false;
         }
 
         public string PromotePawn()
@@ -386,7 +396,6 @@ namespace Chess
                 && blockToCheckForPawn.GetPiece().GetPieceType() == PieceType.Pawn)
                 && ((Pawn)blockToCheckForPawn.GetPiece()).GetEnPassantable())
                 {
-                    Console.WriteLine("En Passant possible hehe.");
                     return true;
                 }
             }

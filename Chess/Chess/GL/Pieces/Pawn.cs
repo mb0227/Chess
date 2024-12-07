@@ -81,7 +81,7 @@ namespace Chess.GL
                         possibleMoves.Add(move);
                     }
                     // check for white piece en passant on left diagonal
-                    if (rank == 3 &&block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank, file - 1) && !board.GetBlock(rank, file - 1).IsEmpty() && board.GetBlock(rank, file - 1).GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank, file - 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file - 1).GetPiece()).GetEnPassantable())
+                    if (rank == 3 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank, file - 1) && !board.GetBlock(rank, file - 1).IsEmpty() && board.GetBlock(rank, file - 1).GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank, file - 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file - 1).GetPiece()).GetEnPassantable())
                     {
                         System.Console.WriteLine("En Passant to " + rank + ", " + (file - 1));
                         Block endBlock = board.GetBlock(rank - 1, file - 1);

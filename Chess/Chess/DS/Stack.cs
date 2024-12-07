@@ -14,7 +14,7 @@ namespace Chess.DS
         }
 
         public void Push(Move whiteMove, Move blackMove = null)
-        {
+        { 
             int moveNumber = MovesStack.Count + 1;
             string formattedMove = blackMove == null
                 ? $"{moveNumber}. {whiteMove.GetNotation()}" // Only White's move
@@ -55,7 +55,7 @@ namespace Chess.DS
         {
             if (MovesStack.Count == 0)
             {
-                Console.WriteLine("Stack is empty.");
+                Console.WriteLine("No moves.");
                 return;
             }
             foreach (string move in MovesStack)

@@ -111,7 +111,7 @@ namespace Chess.GL
                 else // if the target block is not empty (kill piece)
                 {
                     Piece pieceAtNew = newBlock.GetPiece();
-                    pieceAtNew.Kill();
+                    if(pieceAtNew != null) pieceAtNew.Kill();
 
                     if(moveType != MoveType.Promotion) AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew);
                     else AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
@@ -125,15 +125,24 @@ namespace Chess.GL
                     //    Console.WriteLine("ENENNENENENEN");
                     if (CurrentMove == PlayerOne) PlayerTwo.KillPiece(pieceAtNew);
                     else PlayerOne.KillPiece(pieceAtNew);
-
+                    if (moveType == MoveType.EnPassant && PlayerOne.GetColor() == PlayerColor.White)
+                        newRank = 2;
+                    else if (moveType == MoveType.EnPassant && PlayerOne.GetColor() == PlayerColor.White)
+                        newRank = 5;
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }
                 //Console.WriteLine("Board After");
                 //Board.DisplayBoard();
+                if (CurrentMove.GetColor() == PlayerColor.Black)
+                {
+                    if (PlayerOne.GetColor() == PlayerColor.White)
+                        Moves.Push(FirstPlayerMove, SecondPlayerMove);
+                    else
+                        Moves.Push(SecondPlayerMove, FirstPlayerMove);
+                }
                 if (CurrentMove == PlayerTwo)
                 {
-                    Moves.Push(FirstPlayerMove, SecondPlayerMove);
                     CurrentMove = PlayerOne;
                 }
                 else
@@ -141,15 +150,20 @@ namespace Chess.GL
                     CurrentMove = PlayerTwo;
                 }
                 DisplayMoves();
+                //PlayerOne.DisplayDeadPieces();
+                //PlayerTwo.DisplayDeadPieces();
             }
         }
 
         public void AddMove(Block prevBlock, Block newBlock, MoveType moveType, Piece prevBlockPiece, Piece capturedPiece = null, PieceType promotedPieceType = PieceType.Queen)
         {
             // first check if the previous move was of pawn and it moved 2 blocks and player didn't kill it by en passant
-            Move move;
             SetPawnUnEnPassantable();
-            if (moveType == MoveType.Normal) move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece);
+            Move move;
+            if (moveType == MoveType.Normal)
+            {
+                move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece);
+            }
             else if (moveType == MoveType.EnPassant)
             {
                 if (PlayerOne.GetColor() == PlayerColor.White)
@@ -179,11 +193,26 @@ namespace Chess.GL
             if (tokens.Length == 3)
             {
                 tokenForPlayer = CurrentMove.GetColor() == PlayerColor.Black ? 1 : 2;
+
+                //Console.WriteLine("Tokens " + tokenForPlayer);
+
                 prevNotation = tokens[tokenForPlayer];
+
+                //Console.WriteLine("prev not " + prevNotation);
+
                 if (prevNotation.Length != 2) return;
                 int prevFile = Board.GetFileInInt(prevNotation[0].ToString());
+
+                //Console.WriteLine("file " + prevFile);
+
                 int prevRank = Board.TranslateRank(int.Parse(prevNotation[1].ToString()));
+
+                //Console.WriteLine("rank " + prevRank);
+
+                if (!Board.WithinBounds(prevRank, prevFile)) return;
+
                 Block block = Board.GetBlock(prevRank, prevFile);
+
                 if (!block.IsEmpty() && block.GetPiece().GetPieceType() == PieceType.Pawn)
                 {
                     Pawn piece = (Pawn)block.GetPiece();

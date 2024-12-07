@@ -28,8 +28,8 @@ namespace Chess.GL
             EndBlock = endBlock;
             PieceMoved = pieceMoved;
             PieceKilled = pieceKilled;
-            MakeNotation();
             MoveType = MoveType.Normal;
+            MakeNotation();
         }
         
         public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, MoveType moveType) : this(startBlock, endBlock, pieceMoved, pieceKilled)

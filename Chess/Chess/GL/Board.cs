@@ -9,6 +9,7 @@ namespace Chess.GL
 
         public Board(PlayerColor FirstPlayerColor)
         {
+            Console.WriteLine("First player color is: " + FirstPlayerColor);
             Blocks = new Block[8, 8];
             this.FirstPlayerColor = FirstPlayerColor;
             int blackPiecesRank, blackPawnsRank, whitePawnsRank, whitePiecesRank;
