@@ -1,4 +1,7 @@
-﻿namespace Chess.GL
+﻿using Chess.Interfaces;
+using System.Collections.Generic;
+
+namespace Chess.GL
 {
     public enum PieceType
     {
@@ -16,7 +19,7 @@
         Black
     }
 
-    public class Piece
+    public class Piece : IMove
     {
         private PieceColor Color;
         private PieceType PieceType;
@@ -56,6 +59,11 @@
         public virtual bool IsAttackingKing(Board board, Block kingBlock)
         {
             return false;
+        }
+
+        public virtual List<Move> GetPossibleMoves(Board board)
+        {
+            return null;
         }
     }
 }

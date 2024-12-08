@@ -35,6 +35,8 @@ namespace Chess.GL
         public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, MoveType moveType) : this(startBlock, endBlock, pieceMoved, pieceKilled)
         {
             MoveType = moveType;
+            Notation = "";
+            MakeNotation();
         }
         
         public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, MoveType moveType, PieceType promotedPieceType) : this(startBlock, endBlock, pieceMoved, pieceKilled, moveType)
@@ -72,6 +74,7 @@ namespace Chess.GL
             {
                 Notation += "=" + GetPieceMovedString(PromotedPieceType);
             }
+            if(MoveType == MoveType.Check) Notation += "+";
             // Additional rules like castling, promotion, or checkmate
         }
 

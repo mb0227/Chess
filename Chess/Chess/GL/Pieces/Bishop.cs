@@ -4,14 +4,15 @@ using System.Collections.Generic;
 
 namespace Chess.GL
 {
-    public class Bishop : Piece, IMove
+    public class Bishop : Piece
     {
         public Bishop(PieceColor color, PieceType type, bool alive) : base(color, type, alive)
         {
         }
-       List<Move> possibleMoves = new List<Move>();
+        
+        List<Move> possibleMoves = new List<Move>();
 
-        public List<Move> GetPossibleMoves(Board board)
+        public override List<Move> GetPossibleMoves(Board board)
         {
             possibleMoves.Clear();
             if (!IsAlive() || GetPieceType() != PieceType.Bishop)
@@ -108,6 +109,5 @@ namespace Chess.GL
             }
             return false;
         }
-
     }
 }

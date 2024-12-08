@@ -4,14 +4,14 @@ using System.Collections.Generic;
 
 namespace Chess.GL
 {
-    public class Knight : Piece, IMove
+    public class Knight : Piece
     {
         public Knight(PieceColor color, PieceType type, bool alive) : base(color, type, alive)
         {
         }
 
         List<Move> possibleMoves = new List<Move>();
-        public List<Move> GetPossibleMoves(Board board)
+        public override List<Move> GetPossibleMoves(Board board)
         {
             possibleMoves.Clear();
             if (!this.IsAlive() || GetPieceType() != PieceType.Knight)

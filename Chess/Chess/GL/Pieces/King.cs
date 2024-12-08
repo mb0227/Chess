@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Chess.GL
 {
-    public class King : Piece, IMove
+    public class King : Piece
     {
         private CastlingType CastlingType; // short or long
         private bool HasMoved;
@@ -14,7 +14,7 @@ namespace Chess.GL
             HasMoved = false;
         }
 
-        public List<Move> GetPossibleMoves(Board board)
+        public override List<Move> GetPossibleMoves(Board board)
         {
             List<Move> possibleMoves = new List<Move>();
 
@@ -53,9 +53,9 @@ namespace Chess.GL
             return possibleMoves;
         }
 
-        public void SetHasMoved(bool moved)
+        public void SetHasMoved()
         {
-            HasMoved = moved;
+            HasMoved = true;
         }
 
         public bool GetHasMoved()

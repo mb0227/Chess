@@ -180,7 +180,7 @@ namespace Chess.GL
             return false;
         }
 
-        private Block FindKing(PieceColor pieceColor)
+        public Block FindKing(PieceColor pieceColor)
         {
             for (int rank = 0; rank < 8; rank++)
             {
@@ -193,7 +193,7 @@ namespace Chess.GL
                     }
                 }
             }
-            return null; // Return null if king not found (shouldn't happen)
+            return null;
         }
 
         public bool IsSafeMove(Piece pieceToMove, Block endBlock)
@@ -208,6 +208,41 @@ namespace Chess.GL
             startBlock.SetPiece(pieceToMove);
             endBlock.SetPiece(capturedPiece);
             return isSafe;
+        }
+
+        public bool IsCheck(Piece pieceToMove, Block endBlock)
+        {
+            Block startBlock = GetBlock(pieceToMove);
+            Piece capturedPiece = endBlock.GetPiece();
+            endBlock.SetPiece(pieceToMove);
+            startBlock.SetPiece(null);
+            bool isCheck = IsKingInCheck(pieceToMove.GetColor() == PieceColor.White ? PieceColor.Black: PieceColor.White );
+            startBlock.SetPiece(pieceToMove);
+            endBlock.SetPiece(capturedPiece);
+            return isCheck;
+        }
+
+        public bool IsCheckMate(PieceColor pieceColor)
+        {
+            foreach (var block in Blocks)
+            {
+                Piece piece = block.GetPiece();
+                if (piece == null || piece.GetColor() != pieceColor)
+                    continue;
+                foreach (var move in piece.GetPossibleMoves(this))
+                {
+                    Console.WriteLine("HEHHE");
+                    if (IsSafeMove(piece, move.GetEndBlock()))
+                    {
+                        Console.WriteLine(pieceColor);
+                        Console.WriteLine("King is not in checkmate");
+                        Console.WriteLine(move.ToString());
+                        Console.WriteLine(piece.ToString());
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
     }
 }

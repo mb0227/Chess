@@ -3,7 +3,7 @@ using Chess.Interfaces;
 
 namespace Chess.GL
 {
-    public class Pawn : Piece, IMove
+    public class Pawn : Piece
     {
         private bool HasMoved;
         private bool IsEnPassantable;
@@ -13,7 +13,7 @@ namespace Chess.GL
             IsEnPassantable = false;
         }
 
-        public List<Move> GetPossibleMoves(Board board)
+        public override List<Move> GetPossibleMoves(Board board)
         {
             List<Move> possibleMoves = new List<Move>();
             if (!IsAlive() || GetPieceType() != PieceType.Pawn)

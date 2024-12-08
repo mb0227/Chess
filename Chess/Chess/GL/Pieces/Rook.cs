@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace Chess.GL
 {
-    public class Rook : Piece, IMove
+    public class Rook : Piece
     {
         List<Move> possibleMoves = new List<Move>();
         private bool HasMoved;
@@ -13,7 +13,7 @@ namespace Chess.GL
             HasMoved = false;
         }
 
-        public List<Move> GetPossibleMoves(Board board)
+        public override List<Move> GetPossibleMoves(Board board)
         {
             possibleMoves.Clear();
             if (!IsAlive() || GetPieceType() != PieceType.Rook)
@@ -115,9 +115,9 @@ namespace Chess.GL
             return false;
         }
 
-        public void SetHasMoved(bool hasMoved)
+        public void SetHasMoved()
         {
-            HasMoved = hasMoved;
+            HasMoved = true;
         }
 
         public bool GetHasMoved()

@@ -91,19 +91,67 @@ namespace Chess.GL
                     return;
                 }
 
-                // update move movement
+                    // update move movement
                 if (pieceAtPrev.GetPieceType() == PieceType.Pawn)
                 {
                     Pawn pawn = (Pawn)prevBlock.GetPiece();
                     pawn.SetPawnMoved();
                     if (prevRank == 1 || prevRank == 6) pawn.PawnMoved(Math.Abs(prevRank - newRank));
                 }
+                else
+                {
+                    if (pieceAtPrev.GetPieceType() == PieceType.Rook)
+                    {
+                        Rook rook = (Rook)prevBlock.GetPiece();
+                        rook.SetHasMoved();
+                    }
+                    else if (pieceAtPrev.GetPieceType() == PieceType.King)
+                    {
+                        King king = (King)prevBlock.GetPiece();
+                        king.SetHasMoved();
+                    }
+                }
+                if (Board.IsCheck(pieceAtPrev, newBlock))
+                {
+                    moveType = MoveType.Check;
+                    if (CurrentMove == PlayerOne) PlayerTwo.SetCheck(true);
+                    else PlayerOne.SetCheck(false);
+                    if (CurrentMove.GetColor() == PlayerColor.White)
+                    {
+                        if (Board.IsCheckMate(PieceColor.Black))
+                        {
+                            moveType = MoveType.Checkmate;
+                            Status = GameStatus.WHITE_WIN;
+                            IsGameOver = true;
+                            Console.WriteLine("Checkmate");
+                        }
+                    }
+                    else
+                    {
+                        if (Board.IsCheckMate(PieceColor.White))
+                        {
+                            moveType = MoveType.Checkmate;
+                            Status = GameStatus.BLACK_WIN;
+                            IsGameOver = true;
+                            Console.WriteLine("Checkmate");
+                        }
+                    }
+                }
+
+                //if (CurrentMove.IsInCheck())
+                //{
+                //    if (moveType != MoveType.Check && moveType != MoveType.Checkmate)
+                //    {
+                //        Console.WriteLine("You are in check. You must make a move to get out of check.");
+                //    }
+                //}
+
                 //Console.WriteLine("Board Before");
                 //Board.DisplayBoard();
                 if (moveType == MoveType.EnPassant && Board.GetBlock(enPassantTargetRow, newFile) != null)
                 {
                     // target row is the row where the pawn will move to, and 
-                    // enpassassant target row is where the piece to be captured
+                    // enpassant target row is where the piece to be captured
                     Block targetBlock = Board.GetBlock(enPassantTargetRow, newFile);
                     Piece pieceAtTarget = targetBlock.GetPiece();
                     pieceAtTarget?.Kill();
@@ -181,9 +229,9 @@ namespace Chess.GL
             // first check if the previous move was of pawn and it moved 2 blocks and player didn't kill it by en passant
             SetPawnUnEnPassantable();
             Move move;
-            if (moveType == MoveType.Normal)
+            if (moveType == MoveType.Normal || moveType == MoveType.Check)
             {
-                move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece);
+                move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
             }
             else if (moveType == MoveType.EnPassant) move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
             else move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType, promotedPieceType);
