@@ -163,47 +163,37 @@ namespace Chess.GL
 
         public bool IsKingInCheck(PieceColor pieceColor)
         {
-            Block kingBlock = null;
-            bool kingFound = false;
-            // find the king of the given color
-            for (int rank = 0; rank < 8 && !kingFound ; rank++)
+            Block kingBlock = FindKing(pieceColor);
+
+            foreach (var block in Blocks)
             {
-                for (int file = 0; file < 8 && !kingFound; file++)
+                Piece attackingPiece = block.GetPiece();
+                if (attackingPiece == null || attackingPiece.GetColor() == pieceColor)
+                    continue;
+
+                if (attackingPiece.IsAttackingKing(this, kingBlock))
+                {
+                    Console.WriteLine("King is in check");
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Block FindKing(PieceColor pieceColor)
+        {
+            for (int rank = 0; rank < 8; rank++)
+            {
+                for (int file = 0; file < 8; file++)
                 {
                     Piece piece = Blocks[rank, file].GetPiece();
                     if (piece != null && piece.GetPieceType() == PieceType.King && piece.GetColor() == pieceColor)
                     {
-                        kingBlock = Blocks[rank, file];
-                        kingFound = true;
+                        return Blocks[rank, file];
                     }
                 }
             }
-
-            // check if the king is in check
-            for (int i = 0; i < 8; i++)
-            {
-                for (int j = 0; j < 8; j++)
-                {
-                    Block block = Blocks[i, j];
-                    Piece attackingPiece = block.GetPiece();
-                    if (attackingPiece?.GetPieceType() == PieceType.King || attackingPiece?.GetPieceType() == PieceType.Pawn) continue;
-                    if (attackingPiece != null && attackingPiece.GetColor() != pieceColor)
-                    {
-                        if(attackingPiece.GetPieceType() == PieceType.Bishop) attackingPiece = (Bishop)attackingPiece;
-                        else if (attackingPiece.GetPieceType() == PieceType.Knight) attackingPiece = (Knight)attackingPiece;
-                        else if (attackingPiece.GetPieceType() == PieceType.Rook) attackingPiece = (Rook)attackingPiece;
-                        else  attackingPiece = (Queen)attackingPiece;
-                        
-                        Console.WriteLine("Attacking piece: " + attackingPiece.GetPieceType()); 
-                        if (attackingPiece.ValidMove(this, block, kingBlock))
-                        {
-                            Console.WriteLine("King is in check");  
-                            return true;
-                        }
-                    }
-                }
-            }
-            return false;
+            return null; // Return null if king not found (shouldn't happen)
         }
 
         public bool IsSafeMove(Piece pieceToMove, Block endBlock)

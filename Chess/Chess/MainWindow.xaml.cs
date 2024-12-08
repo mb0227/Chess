@@ -248,20 +248,20 @@ namespace Chess
                                 }
                                 else return;
                             }
-                            //else if (block.GetPiece().GetPieceType() == PieceType.King)
-                            //{
-                            //    King king = (King)block.GetPiece();
-                            //    List<Move> moves = king.GetPossibleMoves(Game.GetBoard());
-                            //    if (moves.Count > 0)
-                            //    {
-                            //        IsMoving = true;
-                            //        foreach (Move move in moves)
-                            //        {
-                            //            HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
-                            //        }
-                            //    }
-                            //    else return;
-                            //}
+                            else if (block.GetPiece().GetPieceType() == PieceType.King)
+                            {
+                                King king = (King)block.GetPiece();
+                                List<Move> moves = king.GetPossibleMoves(Game.GetBoard());
+                                if (moves.Count > 0)
+                                {
+                                    IsMoving = true;
+                                    foreach (Move move in moves)
+                                    {
+                                        HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                                    }
+                                }
+                                else return;
+                            }
                         }
                         break;
                     }

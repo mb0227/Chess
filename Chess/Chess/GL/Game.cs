@@ -29,7 +29,8 @@ namespace Chess.GL
     public enum CastlingType
     {
         ShortCastle,
-        LongCastle
+        LongCastle,
+        None
     }
 
     public class Game

@@ -35,7 +35,7 @@ namespace Chess.GL
                 if (board.WithinBounds(newRank, newFile))
                 {
                     Block endBlock = board.GetBlock(newRank, newFile);
-                    if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
+                    if ((endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor()) && board.IsSafeMove(this, endBlock))
                     {
                         Console.WriteLine($"Move to {newRank}, {newFile}");
                         possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
@@ -46,17 +46,33 @@ namespace Chess.GL
             return possibleMoves;
         }
 
-        public override bool ValidMove(Board board, Block start, Block targetBlock)
+        public override bool IsAttackingKing(Board board, Block kingBlock)
         {
-            //GetPossibleMoves(board);
-            foreach (Move move in possibleMoves)
+            Block pieceBlock = board.GetBlock(this); // Get current position of the piece
+            int pieceRank = pieceBlock.GetRank();
+            int pieceFile = pieceBlock.GetFile();
+
+            // Handle knight-specific logic
+            if (this.GetPieceType() == PieceType.Knight)
             {
-                if (move.GetStartBlock() == move.GetEndBlock() && move.GetEndBlock() == targetBlock)
+                int[,] directions = {
+                    {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
+                    {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
+                };
+
+                for (int i = 0; i < directions.GetLength(0); i++)
                 {
-                    return true;
+                    int newRank = pieceRank + directions[i, 0];
+                    int newFile = pieceFile + directions[i, 1];
+
+                    if (newRank == kingBlock.GetRank() && newFile == kingBlock.GetFile())
+                    {
+                        return true; // Knight can attack the king
+                    }
                 }
             }
             return false;
         }
+
     }
 }

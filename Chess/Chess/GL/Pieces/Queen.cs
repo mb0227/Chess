@@ -16,209 +16,112 @@ namespace Chess.GL
             possibleMoves.Clear();
             if (IsAlive() && this.GetPieceType() == PieceType.Queen)
             {
-                Block block = board.GetBlock(this); // get the block of the piece
+                Block block = board.GetBlock(this);
                 int rank = block.GetRank();
                 int file = block.GetFile();
-                System.Console.WriteLine("Queen at " + rank + ", " + file);
-                // bishops can move diagonally so we check all 4 diagonals
-                // top left
-                for (int i = 1; i < 8; i++)
+                Console.WriteLine("Queen at " + rank + ", " + file);
+
+                // Directions for Queen's movement
+                int[][] directions =
                 {
-                    if (board.WithinBounds(rank - i, file - i) && board.GetBlock(rank - i, file - i).IsEmpty())
-                    {
-                        Console.WriteLine("Move to " + (rank - i).ToString() + ", " + (file - i).ToString());
-                        Block endBlock = board.GetBlock(rank - i, file - i);
-                        if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
-                        {
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                    }
-                    else
-                    {
-                        if (board.WithinBounds(rank - i, file - i) && board.GetBlock(rank - i, file - i).GetPiece().GetColor() != this.GetColor())
-                        {
-                            Console.WriteLine("Attack to " + (rank - i).ToString() + ", " + (file - i).ToString());
-                            Block endBlock = board.GetBlock(rank - i, file - i);
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                        break;
-                    }
-                }
-                // top right
-                for (int i = 1; i < 8; i++)
+                    new int[] { -1, -1 }, // Top-left
+                    new int[] { -1, 1 },  // Top-right
+                    new int[] { 1, -1 },  // Bottom-left
+                    new int[] { 1, 1 },   // Bottom-right
+                    new int[] { 1, 0 },   // Down
+                    new int[] { -1, 0 },  // Up
+                    new int[] { 0, -1 },  // Left
+                    new int[] { 0, 1 }    // Right
+                };
+
+                foreach (var direction in directions)
                 {
-                    if (board.WithinBounds(rank - i, file + i) && board.GetBlock(rank - i, file + i).IsEmpty())
-                    {
-                        Console.WriteLine("Move to " + (rank - i).ToString() + ", " + (file + i).ToString());
-                        Block endBlock = board.GetBlock(rank - i, file + i);
-                        if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
-                        {
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                    }
-                    else
-                    {
-                        if (board.WithinBounds(rank - i, file + i) && board.GetBlock(rank - i, file + i).GetPiece().GetColor() != this.GetColor())
-                        {
-                            Console.WriteLine("Attack to " + (rank - i).ToString() + ", " + (file + i).ToString());
-                            Block endBlock = board.GetBlock(rank - i, file + i);
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                        break;
-                    }
-                }
-                // bottom left
-                for (int i = 1; i < 8; i++)
-                {
-                    if (board.WithinBounds(rank + i, file - i) && board.GetBlock(rank + i, file - i).IsEmpty())
-                    {
-                        Console.WriteLine("Move to " + (rank + i).ToString() + ", " + (file - i).ToString());
-                        Block endBlock = board.GetBlock(rank + i, file - i);
-                        if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
-                        {
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                    }
-                    else
-                    {
-                        if (board.WithinBounds(rank + i, file - i) && board.GetBlock(rank + i, file - i).GetPiece().GetColor() != this.GetColor())
-                        {
-                            Console.WriteLine("Attack to " + (rank + i).ToString() + ", " + (file - i).ToString());
-                            Block endBlock = board.GetBlock(rank + i, file - i);
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                        break;
-                    }
-                }
-                // bottom right
-                for (int i = 1; i < 8; i++)
-                {
-                    if (board.WithinBounds(rank + i, file + i) && board.GetBlock(rank + i, file + i).IsEmpty())
-                    {
-                        Console.WriteLine("Move to " + (rank + i).ToString() + ", " + (file + i).ToString());
-                        Block endBlock = board.GetBlock(rank + i, file + i);
-                        if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
-                        {
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                    }
-                    else
-                    {
-                        if (board.WithinBounds(rank + i, file + i) && board.GetBlock(rank + i, file + i).GetPiece().GetColor() != this.GetColor())
-                        {
-                            Console.WriteLine("Attack to " + (rank + i).ToString() + ", " + (file + i).ToString());
-                            Block endBlock = board.GetBlock(rank + i, file + i);
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                        break;
-                    }
-                }
-                // up
-                for (int i = 1; i < 8; i++)
-                {
-                    if (board.WithinBounds(rank + i, file) && board.GetBlock(rank + i, file).IsEmpty())
-                    {
-                        Console.WriteLine("Move to " + (rank + i).ToString() + ", " + file.ToString());
-                        Block endBlock = board.GetBlock(rank + i, file);
-                        if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
-                        {
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                    }
-                    else
-                    {
-                        if (board.WithinBounds(rank + i, file) && board.GetBlock(rank + i, file).GetPiece().GetColor() != this.GetColor())
-                        {
-                            Console.WriteLine("Attack to " + (rank + i).ToString() + ", " + file.ToString());
-                            Block endBlock = board.GetBlock(rank + i, file);
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                        break;
-                    }
-                }
-                // down
-                for (int i = 1; i < 8; i++)
-                {
-                    if (board.WithinBounds(rank - i, file) && board.GetBlock(rank - i, file).IsEmpty())
-                    {
-                        Console.WriteLine("Move to " + (rank - i).ToString() + ", " + file.ToString());
-                        Block endBlock = board.GetBlock(rank - i, file);
-                        if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
-                        {
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                    }
-                    else
-                    {
-                        if (board.WithinBounds(rank - i, file) && board.GetBlock(rank - i, file).GetPiece().GetColor() != this.GetColor())
-                        {
-                            Console.WriteLine("Attack to " + (rank - i).ToString() + ", " + file.ToString());
-                            Block endBlock = board.GetBlock(rank - i, file);
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                        break;
-                    }
-                }
-                // left
-                for (int i = 1; i < 8; i++)
-                {
-                    if (board.WithinBounds(rank, file - i) && board.GetBlock(rank, file - i).IsEmpty())
-                    {
-                        Console.WriteLine("Move to " + rank.ToString() + ", " + (file - i).ToString());
-                        Block endBlock = board.GetBlock(rank, file - i);
-                        if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
-                        {
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                    }
-                    else
-                    {
-                        if (board.WithinBounds(rank, file - i) && board.GetBlock(rank, file - i).GetPiece().GetColor() != this.GetColor())
-                        {
-                            Console.WriteLine("Attack to " + rank.ToString() + ", " + (file - i).ToString());
-                            Block endBlock = board.GetBlock(rank, file - i);
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                        break;
-                    }
-                }
-                // right
-                for (int i = 1; i < 8; i++)
-                {
-                    if (board.WithinBounds(rank, file + i) && board.GetBlock(rank, file + i).IsEmpty())
-                    {
-                        Console.WriteLine("Move to " + rank.ToString() + ", " + (file + i).ToString());
-                        Block endBlock = board.GetBlock(rank, file + i);
-                        if (endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
-                        {
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                    }
-                    else
-                    {
-                        if (board.WithinBounds(rank, file + i) && board.GetBlock(rank, file + i).GetPiece().GetColor() != this.GetColor())
-                        {
-                            Console.WriteLine("Attack to " + rank.ToString() + ", " + (file + i).ToString());
-                            Block endBlock = board.GetBlock(rank, file + i);
-                            possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
-                        }
-                        break;
-                    }
+                    int deltaRank = direction[0];
+                    int deltaFile = direction[1];
+                    AddMovesInDirection(rank, file, deltaRank, deltaFile, block, board);
                 }
             }
             return possibleMoves;
         }
 
-        public override bool ValidMove(Board board, Block start, Block targetBlock)
+        private void AddMovesInDirection(int rank, int file, int deltaRank, int deltaFile, Block startBlock, Board board)
         {
-            foreach (Move move in possibleMoves)
+            for (int i = 1; i < 8; i++)
             {
-                if (move.GetStartBlock() == move.GetEndBlock() && move.GetEndBlock() == targetBlock)
+                int newRank = rank + i * deltaRank;
+                int newFile = file + i * deltaFile;
+
+                if (!board.WithinBounds(newRank, newFile))
+                    break;
+
+                Block endBlock = board.GetBlock(newRank, newFile);
+
+                if (endBlock.IsEmpty() && board.IsSafeMove(this, endBlock))
                 {
-                    return true;
+                    Console.WriteLine($"Move to {newRank}, {newFile}");
+                    possibleMoves.Add(new Move(startBlock, endBlock, this, null));
+                }
+                else
+                {
+                    if ((endBlock.GetPiece() != null && endBlock.GetPiece().GetColor() != this.GetColor()) && board.IsSafeMove(this, endBlock))
+                    {
+                        Console.WriteLine($"Attack to {newRank}, {newFile}");
+                        possibleMoves.Add(new Move(startBlock, endBlock, this, endBlock.GetPiece()));
+                    }
+                    break; // stop further movement in this direction
+                }
+            }
+        }
+
+        public override bool IsAttackingKing(Board board, Block kingBlock)
+        {
+            Block pieceBlock = board.GetBlock(this);
+            int pieceRank = pieceBlock.GetRank();
+            int pieceFile = pieceBlock.GetFile();
+
+            if (this.GetPieceType() == PieceType.Queen)
+            {
+                int[][] directions = {
+                    new int[] {-1, 0}, // Up
+                    new int[] {1, 0},  // Down
+                    new int[] {0, -1}, // Left
+                    new int[] {0, 1},  // Right
+                    new int[] {-1, -1}, // Up-Left (Diagonal)
+                    new int[] {-1, 1},  // Up-Right (Diagonal)
+                    new int[] {1, -1},  // Down-Left (Diagonal)
+                    new int[] {1, 1}    // Down-Right (Diagonal)
+                };
+
+                foreach (var dir in directions)
+                {
+                    int rank = pieceRank;
+                    int file = pieceFile;
+
+                    while (true)
+                    {
+                        rank += dir[0];
+                        file += dir[1];
+
+                        if (!board.WithinBounds(rank, file))
+                            break;
+
+                        Block block = board.GetBlock(rank, file);
+
+                        if (block.GetPiece() != null)
+                        {
+                            if (block.GetPiece().GetColor() != this.GetColor() &&
+                                rank == kingBlock.GetRank() && file == kingBlock.GetFile()
+                                && board.IsSafeMove(this, block))
+                            {
+                                return true; // queen can attack the king
+                            }
+                            break; // stop if a piece blocks the path (no further movement in this direction)
+                        }
+                    }
                 }
             }
             return false;
         }
+
     }
 }

@@ -13,305 +13,110 @@ namespace Chess.GL
             IsEnPassantable = false;
         }
 
-        public List <Move> GetPossibleMoves(Board board)
+        public List<Move> GetPossibleMoves(Board board)
         {
-            List <Move> possibleMoves = new List <Move>();
-            if (IsAlive() && GetPieceType() == PieceType.Pawn) // if a piece is alive and is a pawn
+            List<Move> possibleMoves = new List<Move>();
+            if (!IsAlive() || GetPieceType() != PieceType.Pawn)
+                return possibleMoves;
+
+            Block currentBlock = board.GetBlock(this);
+            int rank = currentBlock.GetRank();
+            int file = currentBlock.GetFile();
+            int direction = (board.GetFirstPlayerColor() == PlayerColor.White) ?
+                            (GetColor() == PieceColor.White ? -1 : 1) :
+                            (GetColor() == PieceColor.White ? 1 : -1);
+
+            AddForwardMoves(possibleMoves, board, currentBlock, rank, file, direction);
+            AddCaptures(possibleMoves, board, currentBlock, rank, file, direction);
+            AddPromotions(possibleMoves, board, currentBlock, rank, file, direction);
+            AddEnPassantMoves(possibleMoves, board, currentBlock, rank, file, direction);
+
+            return possibleMoves;
+        }
+
+        private void AddForwardMoves(List<Move> moves, Board board, Block currentBlock, int rank, int file, int direction)
+        {
+            Block oneStep = (board.WithinBounds(rank + direction, file)) ? board.GetBlock(rank + direction, file) : null;
+            if (oneStep != null && oneStep.IsEmpty())
             {
-                Block block = board.GetBlock(this); // get the block of the piece
-                System.Console.WriteLine("Pawn at " + block.GetRank() + ", " + block.GetFile());
-                int rank = block.GetRank();
-                int file = block.GetFile();
-                if (board.GetFirstPlayerColor() == PlayerColor.White) // if first player's color is white and white pieces are on rank 6, 7 we check for ranks before it for white and after it for black
+                if(board.IsSafeMove(this, oneStep))
+                    moves.Add(new Move(currentBlock, oneStep, this, null));
+                if (!HasMoved)
                 {
-                    // For White Pawns
-                    // if pawn on the selected block is white so we check for ranks before it
-                    if (block.GetPiece().GetColor() == PieceColor.White && board.GetBlock(rank - 1, file).IsEmpty())
-                    {
-                        //System.Console.WriteLine("Move to " + (rank - 1) + ", " + file);
-                        Block endBlock = board.GetBlock(rank - 1, file);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), null));
-                    }
-                    // if pawn on the selected block is white and hasn't moved yet so we check for 2 ranks before it
-                    if (block.GetPiece().GetColor() == PieceColor.White && !HasMoved && board.GetBlock(rank - 1, file).IsEmpty() && board.GetBlock(rank - 2, file).IsEmpty())
-                    {
-                        //System.Console.WriteLine("Move to " + (rank - 2) + ", " + file);
-                        Block endBlock = board.GetBlock(rank - 2, file);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), null));
-                    }
-                    // if pawn on the selected block is white and there is a black piece on it's left diagonal
-                    if(block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank - 1, file - 1) && !board.GetBlock(rank - 1, file - 1).IsEmpty() && board.GetBlock(rank - 1, file - 1).GetPiece().GetColor() == PieceColor.Black)
-                    {
-                        //System.Console.WriteLine("Attack to " + (rank - 1) + ", " + (file - 1));
-                        Block endBlock = board.GetBlock(rank - 1, file - 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
-                    }
-                    // if pawn on the selected block is white and there is a black piece on it's right diagonal
-                    if (block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank - 1, file + 1) && !board.GetBlock(rank - 1, file + 1).IsEmpty() && board.GetBlock(rank - 1, file + 1).GetPiece().GetColor() == PieceColor.Black)
-                    {
-                        //System.Console.WriteLine("Attack to " + (rank - 1) + ", " + (file + 1));
-                        Block endBlock = board.GetBlock(rank - 1, file + 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
-                    }
-                    // if pawn is on last rank first we check for just the next rank on same file and if it's empty we add a move to it
-                    if (rank == 1 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank - 1, file) && board.GetBlock(rank - 1, file).IsEmpty())
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank - 1, file);
-                        Move move = new Move(block, endBlock, block.GetPiece(), null);
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // if pawn is on last rank now we check for next rank on left file
-                    if (rank == 1 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank - 1, file - 1) && !board.GetBlock(rank - 1, file - 1).IsEmpty() && board.GetBlock(rank - 1, file - 1).GetPiece().GetColor() == PieceColor.Black)
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank - 1, file - 1);
-                        Move move = new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece());
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // if pawn is on last rank now we check for next rank on right file
-                    if (rank == 1 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank - 1, file + 1) && !board.GetBlock(rank - 1, file + 1).IsEmpty() && board.GetBlock(rank - 1, file + 1).GetPiece().GetColor() == PieceColor.Black)
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank - 1, file + 1);
-                        Move move = new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece());
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // check for white piece en passant on left diagonal
-                    if (rank == 3 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank, file - 1) && !board.GetBlock(rank, file - 1).IsEmpty() && board.GetBlock(rank, file - 1).GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank, file - 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file - 1).GetPiece()).GetEnPassantable())
-                    {
-                        System.Console.WriteLine("En Passant to " + rank + ", " + (file - 1));
-                        Block endBlock = board.GetBlock(rank - 1, file - 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), board.GetBlock(rank, file - 1).GetPiece()));
-                    }
-                    // check for white piece en passant on right diagonal
-                    if (rank == 3 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank, file + 1) && !board.GetBlock(rank, file + 1).IsEmpty() && board.GetBlock(rank, file + 1).GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank, file + 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file + 1).GetPiece()).GetEnPassantable())
-                    {
-                        System.Console.WriteLine("En Passant to " + rank + ", " + (file + 1));
-                        Block endBlock = board.GetBlock(rank - 1, file + 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), board.GetBlock(rank, file + 1).GetPiece()));
-                    }
-
-                    // For Black Pawns
-                    // if pawn on the selected block is black so we check for ranks after it
-                    if (block.GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank + 1, file).IsEmpty())
-                    {
-                        //System.Console.WriteLine("Move to " + (rank + 1) + ", " + file);
-                        Block endBlock = board.GetBlock(rank + 1, file);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), null));
-                    }
-                    // if pawn on the selected block is black and hasn't moved yet so we check for 2 ranks after it
-                    if (block.GetPiece().GetColor() == PieceColor.Black && !HasMoved && board.GetBlock(rank + 1, file).IsEmpty() && board.GetBlock(rank + 2, file).IsEmpty())
-                    {
-                        //System.Console.WriteLine("Move to " + (rank + 2) + ", " + file);
-                        Block endBlock = board.GetBlock(rank + 2, file);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), null));
-                    }
-                    // if pawn on the selected block is black and there is a white piece on it's left diagonal
-                    if (block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank + 1, file - 1) && !board.GetBlock(rank + 1, file - 1).IsEmpty() && board.GetBlock(rank + 1, file - 1).GetPiece().GetColor() == PieceColor.White)
-                    {
-                        //System.Console.WriteLine("Attack to " + (rank + 1) + ", " + (file - 1));
-                        Block endBlock = board.GetBlock(rank + 1, file - 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
-                    }
-                    // if pawn on the selected block is black and there is a white piece on it's right diagonal
-                    if (block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank + 1, file + 1) && !board.GetBlock(rank + 1, file + 1).IsEmpty() && board.GetBlock(rank + 1, file + 1).GetPiece().GetColor() == PieceColor.White)
-                    {
-                        //System.Console.WriteLine("Attack to " + (rank + 1) + ", " + (file + 1));
-                        Block endBlock = board.GetBlock(rank + 1, file + 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
-                    }
-                    // if pawn is on last rank first we check for just the next rank on same file and if it's empty we add a move to it
-                    if (rank == 6 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank + 1, file) && board.GetBlock(rank + 1, file).IsEmpty())
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank + 1, file);
-                        Move move = new Move(block, endBlock, block.GetPiece(), null);
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // if pawn is on last rank now we check for next rank on left file
-                    if (rank == 6 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank + 1, file - 1) && !board.GetBlock(rank + 1, file - 1).IsEmpty() && board.GetBlock(rank + 1, file - 1).GetPiece().GetColor() == PieceColor.White)
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank + 1, file - 1);
-                        Move move = new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece());
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // if pawn is on last rank now we check for next rank on right file
-                    if (rank == 6 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank + 1, file + 1) && !board.GetBlock(rank + 1, file + 1).IsEmpty() && board.GetBlock(rank + 1, file + 1).GetPiece().GetColor() == PieceColor.White)
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank + 1, file + 1);
-                        Move move = new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece());
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // check for black piece en passant on left diagonal
-                    if (rank == 4 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank, file - 1) && !board.GetBlock(rank, file - 1).IsEmpty() && board.GetBlock(rank, file - 1).GetPiece().GetColor() == PieceColor.White && board.GetBlock(rank, file - 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file - 1).GetPiece()).GetEnPassantable())
-                    {
-                        System.Console.WriteLine("En Passant to " + rank + ", " + (file - 1));
-                        Block endBlock = board.GetBlock(rank + 1, file - 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), board.GetBlock(rank, file - 1).GetPiece()));
-                    }
-                    // check for black piece en passant on right diagonal
-                    if (rank == 4 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank, file + 1) && !board.GetBlock(rank, file + 1).IsEmpty() && board.GetBlock(rank, file + 1).GetPiece().GetColor() == PieceColor.White && board.GetBlock(rank, file + 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file + 1).GetPiece()).GetEnPassantable())
-                    {
-                        System.Console.WriteLine("En Passant to " + rank + ", " + (file + 1));
-                        Block endBlock = board.GetBlock(rank + 1, file + 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), board.GetBlock(rank, file + 1).GetPiece()));
-                    }   
+                    Block twoSteps = (board.WithinBounds(rank + 2 * direction, file)) ? board.GetBlock(rank + 2 * direction, file) : null;
+                    if (twoSteps != null && twoSteps.IsEmpty() && board.IsSafeMove(this, twoSteps))
+                        moves.Add(new Move(currentBlock, twoSteps, this, null));
                 }
-                else // if first player's color is black and white pieces are on rank 1, 0 we check for ranks after it for white and before for black
-                {
-                    // For White pawns
-                    // if pawn on the selected block is white so we check for ranks after it
-                    if (block.GetPiece().GetColor() == PieceColor.White && board.GetBlock(rank + 1, file).IsEmpty())
-                    {
-                        //System.Console.WriteLine("Move to " + (rank + 1) + ", " + file);
-                        Block endBlock = board.GetBlock(rank + 1, file);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), null));
-                    }
-                    // if pawn on the selected block is white and hasn't moved yet so we check for 2 ranks after it
-                    if (block.GetPiece().GetColor() == PieceColor.White && !HasMoved && board.GetBlock(rank + 1, file).IsEmpty() && board.GetBlock(rank + 2, file).IsEmpty())
-                    {
-                        //System.Console.WriteLine("Move to " + (rank + 2) + ", " + file);
-                        Block endBlock = board.GetBlock(rank + 2, file);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), null));
-                    }
-                    // if pawn on selected block is white and there is a black piece on it's left diagonal
-                    if (block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank + 1, file - 1) && !board.GetBlock(rank + 1, file - 1).IsEmpty() && board.GetBlock(rank + 1, file - 1).GetPiece().GetColor() == PieceColor.Black)
-                    {
-                        //System.Console.WriteLine("Attack to " + (rank + 1) + ", " + (file - 1));
-                        Block endBlock = board.GetBlock(rank + 1, file - 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
-                    }
-                    // if pawn on selected block is white and there is a black piece on it's right diagonal
-                    if (block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank + 1, file + 1) && !board.GetBlock(rank + 1, file + 1).IsEmpty() && board.GetBlock(rank + 1, file + 1).GetPiece().GetColor() == PieceColor.Black)
-                    {
-                        //System.Console.WriteLine("Attack to " + (rank + 1) + ", " + (file + 1));
-                        Block endBlock = board.GetBlock(rank + 1, file + 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
-                    }
-                    // if pawn is on last rank first we check for just the next rank on same file and if it's empty we add a move to it
-                    if (rank == 6 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank + 1, file) && board.GetBlock(rank + 1, file).IsEmpty())
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank + 1, file);
-                        Move move = new Move(block, endBlock, block.GetPiece(), null);
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // if pawn is on last rank now we check for next rank on left file
-                    if (rank == 6 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank + 1, file - 1) && !board.GetBlock(rank + 1, file - 1).IsEmpty() && board.GetBlock(rank + 1, file - 1).GetPiece().GetColor() == PieceColor.Black)
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank + 1, file - 1);
-                        Move move = new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece());
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // if pawn is on last rank now we check for next rank on right file
-                    if (rank == 6 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank + 1, file + 1) && !board.GetBlock(rank + 1, file + 1).IsEmpty() && board.GetBlock(rank + 1, file + 1).GetPiece().GetColor() == PieceColor.Black)
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank + 1, file + 1);
-                        Move move = new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece());
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // check for white piece en passant on left diagonal
-                    if (rank == 4 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank, file - 1) && !board.GetBlock(rank, file - 1).IsEmpty() && board.GetBlock(rank, file - 1).GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank, file - 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file - 1).GetPiece()).GetEnPassantable())
-                    {
-                        System.Console.WriteLine("En Passant to " + rank + ", " + (file - 1));
-                        Block endBlock = board.GetBlock(rank + 1, file - 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), board.GetBlock(rank, file - 1).GetPiece()));
-                    }
-                    // check for white piece en passant on right diagonal
-                    if (rank == 4 && block.GetPiece().GetColor() == PieceColor.White && board.WithinBounds(rank, file + 1) && !board.GetBlock(rank, file + 1).IsEmpty() && board.GetBlock(rank, file + 1).GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank, file + 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file + 1).GetPiece()).GetEnPassantable())
-                    {
-                        System.Console.WriteLine("En Passant to " + rank + ", " + (file + 1));
-                        Block endBlock = board.GetBlock(rank + 1, file + 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), board.GetBlock(rank, file + 1).GetPiece()));
-                    }
+            }
+        }
 
-                    // For Black Pawns
-                    // if pawn on the selected block is black so we check for ranks before it
-                    if (block.GetPiece().GetColor() == PieceColor.Black && board.GetBlock(rank - 1, file).IsEmpty())
+        private void AddCaptures(List<Move> moves, Board board, Block currentBlock, int rank, int file, int direction)
+        {
+            foreach (int offset in new[] { -1, 1 })
+            {
+                int targetRank = rank + direction;
+                int targetFile = file + offset;
+
+                if (board.WithinBounds(targetRank, targetFile))
+                {
+                    Block captureBlock = board.GetBlock(targetRank, targetFile);
+                    if (captureBlock != null && !captureBlock.IsEmpty() &&
+                        captureBlock.GetPiece().GetColor() != GetColor()
+                        && board.IsSafeMove(this, captureBlock))
                     {
-                        //System.Console.WriteLine("Move to " + (rank - 1) + ", " + file);
-                        Block endBlock = board.GetBlock(rank - 1, file);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), null));
-                    }
-                    // if pawn on the selected block is black and hasn't moved yet so we check for 2 ranks before it
-                    if (block.GetPiece().GetColor() == PieceColor.Black && !HasMoved && board.GetBlock(rank - 1, file).IsEmpty() && board.GetBlock(rank - 2, file).IsEmpty())
-                    {
-                        //System.Console.WriteLine("Move to " + (rank - 2) + ", " + file);
-                        Block endBlock = board.GetBlock(rank - 2, file);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), null));
-                    }
-                    // if pawn on the selected block is black and there is a white piece on it's left diagonal
-                    if (block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank - 1, file - 1) && !board.GetBlock(rank - 1, file - 1).IsEmpty() && board.GetBlock(rank - 1, file - 1).GetPiece().GetColor() == PieceColor.White)
-                    {
-                        //System.Console.WriteLine("Attack to " + (rank - 1) + ", " + (file - 1));
-                        Block endBlock = board.GetBlock(rank - 1, file - 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
-                    }
-                    // if pawn on the selected block is black and there is a white piece on it's right diagonal
-                    if (block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank - 1, file + 1) && !board.GetBlock(rank - 1, file + 1).IsEmpty() && board.GetBlock(rank - 1, file + 1).GetPiece().GetColor() == PieceColor.White)
-                    {
-                        //System.Console.WriteLine("Attack to " + (rank - 1) + ", " + (file + 1));
-                        Block endBlock = board.GetBlock(rank - 1, file + 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece()));
-                    }
-                    // if pawn is on last rank first we check for just the next rank on same file and if it's empty we add a move to it
-                    if (rank == 1 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank - 1, file) && board.GetBlock(rank - 1, file).IsEmpty())
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank - 1, file);
-                        Move move = new Move(block, endBlock, block.GetPiece(), null);
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // if pawn is on last rank now we check for next rank on left file
-                    if (rank == 1 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank - 1, file - 1) && !board.GetBlock(rank - 1, file - 1).IsEmpty() && board.GetBlock(rank - 1, file - 1).GetPiece().GetColor() == PieceColor.White)
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank - 1, file - 1);
-                        Move move = new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece());
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // if pawn is on last rank now we check for next rank on right file
-                    if (rank == 1 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank - 1, file + 1) && !board.GetBlock(rank - 1, file + 1).IsEmpty() && board.GetBlock(rank - 1, file + 1).GetPiece().GetColor() == PieceColor.White)
-                    {
-                        System.Console.WriteLine("Promotion");
-                        Block endBlock = board.GetBlock(rank - 1, file + 1);
-                        Move move = new Move(block, endBlock, block.GetPiece(), endBlock.GetPiece());
-                        move.SetIsPromotion(true);
-                        possibleMoves.Add(move);
-                    }
-                    // check for black piece en passant on left diagonal
-                    if (rank == 3 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank, file - 1) && !board.GetBlock(rank, file - 1).IsEmpty() && board.GetBlock(rank, file - 1).GetPiece().GetColor() == PieceColor.White && board.GetBlock(rank, file - 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file - 1).GetPiece()).GetEnPassantable())
-                    {
-                        System.Console.WriteLine("En Passant to " + rank + ", " + (file - 1));
-                        Block endBlock = board.GetBlock(rank - 1, file - 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), board.GetBlock(rank, file - 1).GetPiece()));
-                    }
-                    // check for black piece en passant on right diagonal
-                    if (rank == 3 && block.GetPiece().GetColor() == PieceColor.Black && board.WithinBounds(rank, file + 1) && !board.GetBlock(rank, file + 1).IsEmpty() && board.GetBlock(rank, file + 1).GetPiece().GetColor() == PieceColor.White && board.GetBlock(rank, file + 1).GetPiece().GetPieceType() == PieceType.Pawn && ((Pawn)board.GetBlock(rank, file + 1).GetPiece()).GetEnPassantable())
-                    {
-                        System.Console.WriteLine("En Passant to " + rank + ", " + (file + 1));
-                        Block endBlock = board.GetBlock(rank - 1, file + 1);
-                        possibleMoves.Add(new Move(block, endBlock, block.GetPiece(), board.GetBlock(rank, file + 1).GetPiece()));
+                        moves.Add(new Move(currentBlock, captureBlock, this, captureBlock.GetPiece()));
                     }
                 }
             }
-            return possibleMoves;
+        }
+
+
+        private void AddPromotions(List<Move> moves, Board board, Block currentBlock, int rank, int file, int direction)
+        {
+            int promotionRank = (GetColor() == PieceColor.White) ? 0 : 7;
+            if (rank + direction == promotionRank)
+            {
+                Block promotionBlock = (board.WithinBounds(rank + direction, file)) ? board.GetBlock(rank + direction, file) : null;
+                if (promotionBlock != null && promotionBlock.IsEmpty() && board.IsSafeMove(this, promotionBlock))
+                {
+                    Move move = new Move(currentBlock, promotionBlock, this, null);
+                    move.SetIsPromotion(true);
+                    moves.Add(move);
+                }
+                foreach (int offset in new[] { -1, 1 })
+                {
+                    Block captureBlock = (board.WithinBounds(rank + direction, file + offset)) ? board.GetBlock(rank + direction, file + offset) : null;
+                    if (captureBlock != null && !captureBlock.IsEmpty() &&
+                        captureBlock.GetPiece().GetColor() != GetColor()
+                        && board.IsSafeMove(this, captureBlock))
+                    {
+                        Move move = new Move(currentBlock, captureBlock, this, captureBlock.GetPiece());
+                        move.SetIsPromotion(true);
+                        moves.Add(move);
+                    }
+                }
+            }
+        }
+
+        private void AddEnPassantMoves(List<Move> moves, Board board, Block currentBlock, int rank, int file, int direction)
+        {
+            int enPassantRank = (GetColor() == PieceColor.White) ? 3 : 4;
+            if (rank == enPassantRank)
+            {
+                foreach (int offset in new[] { -1, 1 })
+                {
+                    Block sideBlock = board.GetBlock(rank, file + offset);
+                    if (sideBlock != null && !sideBlock.IsEmpty() &&
+                        sideBlock.GetPiece().GetPieceType() == PieceType.Pawn &&
+                        ((Pawn)sideBlock.GetPiece()).GetEnPassantable() &&
+                        sideBlock.GetPiece().GetColor() != GetColor())
+                    {
+                        Block endBlock = board.GetBlock(rank + direction, file + offset);
+                        if(board.IsSafeMove(this, endBlock))
+                            moves.Add(new Move(currentBlock, endBlock, this, sideBlock.GetPiece()));
+                    }
+                }
+            }
         }
 
         public void PawnMoved(int rank)
@@ -338,18 +143,5 @@ namespace Chess.GL
         {
             IsEnPassantable = false;
         }
-
-        //public override bool ValidMove(Board board, Block start, Block targetBlock)
-        //{
-        //    List<Move> moves = GetPossibleMoves(board);
-        //    foreach (Move move in moves)
-        //    {
-        //        if (move.GetStartBlock() == move.GetEndBlock() && move.GetEndBlock() == targetBlock)
-        //        {
-        //            return true;
-        //        }
-        //    }
-        //    return false;
-        //}
     }
 }
