@@ -338,5 +338,18 @@ namespace Chess.GL
         {
             IsEnPassantable = false;
         }
+
+        //public override bool ValidMove(Board board, Block start, Block targetBlock)
+        //{
+        //    List<Move> moves = GetPossibleMoves(board);
+        //    foreach (Move move in moves)
+        //    {
+        //        if (move.GetStartBlock() == move.GetEndBlock() && move.GetEndBlock() == targetBlock)
+        //        {
+        //            return true;
+        //        }
+        //    }
+        //    return false;
+        //}
     }
 }

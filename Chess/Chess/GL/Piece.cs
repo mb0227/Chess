@@ -52,5 +52,10 @@
         {
             return $"Color: {Color.ToString()} PieceType: {PieceType.ToString()} Alive: {Alive}";
         }
+
+        public virtual bool ValidMove(Board board, Block start, Block targetBlock)
+        {
+            return false;
+        }
     }
 }

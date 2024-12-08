@@ -138,14 +138,17 @@ namespace Chess.GL
                     if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
-                        pieceAtPrev = new Piece(pieceAtPrev.GetColor(), pieceType, true);
+                        if (pieceType == PieceType.Queen)
+                           pieceAtPrev = new Queen(pieceAtPrev.GetColor(), pieceType, true);
+                        else if (pieceType == PieceType.Bishop)
+                            pieceAtPrev = new Bishop(pieceAtPrev.GetColor(), pieceType, true);
+                        else if (pieceType == PieceType.Rook)
+                            pieceAtPrev = new Rook(pieceAtPrev.GetColor(), pieceType, true);
+                        else if (pieceType == PieceType.Knight)
+                            pieceAtPrev = new Knight(pieceAtPrev.GetColor(), pieceType, true);
                     };
                     if (CurrentMove == PlayerOne) PlayerTwo.KillPiece(pieceAtNew);
                     else PlayerOne.KillPiece(pieceAtNew);
-                    //if (moveType == MoveType.EnPassant && PlayerOne.GetColor() == PlayerColor.White)
-                    //    newRank = 2;
-                    //else if (moveType == MoveType.EnPassant && PlayerOne.GetColor() == PlayerColor.White)
-                    //    newRank = 5;
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }

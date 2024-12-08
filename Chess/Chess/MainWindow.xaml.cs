@@ -12,7 +12,7 @@ namespace Chess
 {
     public partial class MainWindow : Window
     {
-        bool FirstPlayerSelectedColorWhite = false;
+        bool FirstPlayerSelectedColorWhite = true;
         bool PromotionPossible = false;
         bool enPassantPossible = false;
         bool IsMoving = false;
@@ -198,15 +198,70 @@ namespace Chess
                                 List<Move> moves = knight.GetPossibleMoves(Game.GetBoard());
                                 if (moves.Count > 0)
                                 {
-                                    Console.WriteLine(moves.Count);
                                     IsMoving = true;
                                     foreach (Move move in moves)
                                     {
                                         HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
                                     }
                                 }
+                                else return;
                             }
-                            else return;
+                            else if (block.GetPiece().GetPieceType() == PieceType.Bishop)
+                            {
+                                Bishop bishop = (Bishop)block.GetPiece();
+                                List<Move> moves = bishop.GetPossibleMoves(Game.GetBoard());
+                                if (moves.Count > 0)
+                                {
+                                    IsMoving = true;
+                                    foreach (Move move in moves)
+                                    {
+                                        HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                                    }
+                                }
+                                else return;
+                            }
+                            else if (block.GetPiece().GetPieceType() == PieceType.Rook)
+                            {
+                                Rook rook = (Rook)block.GetPiece();
+                                List<Move> moves = rook.GetPossibleMoves(Game.GetBoard());
+                                if (moves.Count > 0)
+                                {
+                                    IsMoving = true;
+                                    foreach (Move move in moves)
+                                    {
+                                        HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                                    }
+                                }
+                                else return;
+                            }
+                            else if (block.GetPiece().GetPieceType() == PieceType.Queen)
+                            {
+                                Queen queen = (Queen)block.GetPiece();
+                                List<Move> moves = queen.GetPossibleMoves(Game.GetBoard());
+                                if (moves.Count > 0)
+                                {
+                                    IsMoving = true;
+                                    foreach (Move move in moves)
+                                    {
+                                        HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                                    }
+                                }
+                                else return;
+                            }
+                            //else if (block.GetPiece().GetPieceType() == PieceType.King)
+                            //{
+                            //    King king = (King)block.GetPiece();
+                            //    List<Move> moves = king.GetPossibleMoves(Game.GetBoard());
+                            //    if (moves.Count > 0)
+                            //    {
+                            //        IsMoving = true;
+                            //        foreach (Move move in moves)
+                            //        {
+                            //            HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                            //        }
+                            //    }
+                            //    else return;
+                            //}
                         }
                         break;
                     }

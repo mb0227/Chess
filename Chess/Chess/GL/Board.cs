@@ -9,7 +9,6 @@ namespace Chess.GL
 
         public Board(PlayerColor FirstPlayerColor)
         {
-            Console.WriteLine("First player color is: " + FirstPlayerColor);
             Blocks = new Block[8, 8];
             this.FirstPlayerColor = FirstPlayerColor;
             int blackPiecesRank, blackPawnsRank, whitePawnsRank, whitePiecesRank;
@@ -161,35 +160,64 @@ namespace Chess.GL
                     return -1;
             }
         }
-        
-        public int GetFileInIntReversed(string file)
+
+        public bool IsKingInCheck(PieceColor pieceColor)
         {
-            switch (file)
+            Block kingBlock = null;
+            bool kingFound = false;
+            // find the king of the given color
+            for (int rank = 0; rank < 8 && !kingFound ; rank++)
             {
-                case "h":
-                    return 0;
-                case "g":
-                    return 1;
-                case "f":
-                    return 2;
-                case "e":
-                    return 3;
-                case "d":
-                    return 4;
-                case "c":
-                    return 5;
-                case "b":
-                    return 6;
-                case "a":
-                    return 7;
-                default:
-                    return -1;
+                for (int file = 0; file < 8 && !kingFound; file++)
+                {
+                    Piece piece = Blocks[rank, file].GetPiece();
+                    if (piece != null && piece.GetPieceType() == PieceType.King && piece.GetColor() == pieceColor)
+                    {
+                        kingBlock = Blocks[rank, file];
+                        kingFound = true;
+                    }
+                }
             }
+
+            // check if the king is in check
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    Block block = Blocks[i, j];
+                    Piece attackingPiece = block.GetPiece();
+                    if (attackingPiece?.GetPieceType() == PieceType.King || attackingPiece?.GetPieceType() == PieceType.Pawn) continue;
+                    if (attackingPiece != null && attackingPiece.GetColor() != pieceColor)
+                    {
+                        if(attackingPiece.GetPieceType() == PieceType.Bishop) attackingPiece = (Bishop)attackingPiece;
+                        else if (attackingPiece.GetPieceType() == PieceType.Knight) attackingPiece = (Knight)attackingPiece;
+                        else if (attackingPiece.GetPieceType() == PieceType.Rook) attackingPiece = (Rook)attackingPiece;
+                        else  attackingPiece = (Queen)attackingPiece;
+                        
+                        Console.WriteLine("Attacking piece: " + attackingPiece.GetPieceType()); 
+                        if (attackingPiece.ValidMove(this, block, kingBlock))
+                        {
+                            Console.WriteLine("King is in check");  
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
         }
 
-        public int TranslateRankReversed(int rank)
+        public bool IsSafeMove(Piece pieceToMove, Block endBlock)
         {
-            return FirstPlayerColor == PlayerColor.Black ? 8 - rank : rank + 1;
+            // this function will check if the move is safe or not (safe here means if making this move will leave your king in check)
+            // we will make the move and check if the king is in check or not
+            Block startBlock = GetBlock(pieceToMove);
+            Piece capturedPiece = endBlock.GetPiece();
+            endBlock.SetPiece(pieceToMove);
+            startBlock.SetPiece(null);
+            bool isSafe = !IsKingInCheck(pieceToMove.GetColor());
+            startBlock.SetPiece(pieceToMove);
+            endBlock.SetPiece(capturedPiece);
+            return isSafe;
         }
     }
 }

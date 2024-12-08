@@ -54,7 +54,7 @@ namespace Chess.GL
 
         public void MakeNotation()
         {
-            if (PieceMoved.GetPieceType() == PieceType.Knight)
+            if (PieceMoved.GetPieceType() != PieceType.Pawn)
             {
                 if (PieceKilled == null)
                     Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(EndBlock.GetFile());
