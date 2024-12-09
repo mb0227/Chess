@@ -68,7 +68,7 @@ namespace Chess.GL
             Move.SetBoard(Board);
         }
 
-        public void MakeMove(int prevRank, int prevFile, int newRank, int newFile, MoveType moveType, PieceType pieceType = PieceType.Queen, int enPassantTargetRow = -1)
+        public void MakeMove(int prevRank, int prevFile, int newRank, int newFile, MoveType moveType, PieceType pieceType = PieceType.Queen, int enPassantTargetRow = -1, CastlingType castlingType = CastlingType.None)
         {
             if (!IsGameOver && Status == GameStatus.ACTIVE && Board.WithinBounds(prevRank, prevFile) && Board.WithinBounds(newRank, newFile))
             {
@@ -163,6 +163,21 @@ namespace Chess.GL
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                     Board.GetBlock(enPassantTargetRow, newFile).SetPiece(null);
                 }
+                else if (moveType == MoveType.Castling)
+                {
+                    AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
+
+                    int rank = (CurrentMove.GetColor() == PlayerColor.White) ? 7 : 0; 
+                    int kingStartFile = prevFile;
+                    int rookStartFile = (castlingType == CastlingType.KingSideCastle) ? 7 : 0; 
+                    int kingEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile + 2 : kingStartFile - 2;
+                    int rookEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile + 1 : kingStartFile - 1;
+
+                    Board.GetBlock(rank, rookEndFile).SetPiece(Board.GetBlock(rank, rookStartFile).GetPiece());
+                    Board.GetBlock(rank, rookStartFile).SetPiece(null);
+                    Board.GetBlock(rank, kingEndFile).SetPiece(pieceAtPrev);
+                    Board.GetBlock(prevRank, prevFile).SetPiece(null);
+                }
                 else if (Board.GetBlock(newRank, newFile).GetPiece() == null && moveType != MoveType.EnPassant) // if the target block is empty
                 {
                     AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
@@ -236,6 +251,13 @@ namespace Chess.GL
             if (moveType == MoveType.Normal || moveType == MoveType.Check)
             {
                 move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
+            }
+            else if(moveType == MoveType.Castling)
+            {
+                CastlingType castlingType = CastlingType.None;
+                if (newBlock.GetFile() == 6 || newBlock.GetFile() == 1) castlingType = CastlingType.KingSideCastle;
+                else if (newBlock.GetFile() == 2 || newBlock.GetFile() == 5) castlingType = CastlingType.QueenSideCastle;
+                move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, castlingType);
             }
             else if (moveType == MoveType.EnPassant) move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
             else move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType, promotedPieceType);

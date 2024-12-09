@@ -165,16 +165,15 @@ namespace Chess.GL
         public bool IsKingInCheck(PieceColor pieceColor)
         {
             Block kingBlock = FindKing(pieceColor);
-
+            // Console.WriteLine(kingBlock?.ToString());
             foreach (var block in Blocks)
             {
                 Piece attackingPiece = block.GetPiece();
-                if (attackingPiece == null || attackingPiece.GetColor() == pieceColor)
+                if (attackingPiece == null || attackingPiece.GetColor() == pieceColor || kingBlock == null)
                     continue;
 
                 if (attackingPiece.IsAttackingKing(this, kingBlock))
                 {
-                    Console.WriteLine("King is in check");
                     return true;
                 }
             }
@@ -231,16 +230,32 @@ namespace Chess.GL
                 if (piece == null || piece.GetColor() == pieceColor)
                     continue;
 
-                List<Move> possibleMoves = piece.GetPossibleMoves(this);
-                foreach (var move in possibleMoves)
-                {
-                    if (move.GetEndBlock().GetRank() == block.GetRank()
-                      && move.GetEndBlock().GetFile() == block.GetFile())
-                        return true;
-                }
+                if (piece.CanAttack(block, this))
+                    return true;
             }
             return false;
         }
+
+        public bool IsPathClear(int startRank, int startFile, int endRank, int endFile)
+        {
+            int rankStep = (endRank - startRank) != 0 ? (endRank - startRank) / Math.Abs(endRank - startRank) : 0;
+            int fileStep = (endFile - startFile) != 0 ? (endFile - startFile) / Math.Abs(endFile - startFile) : 0;
+
+            int currentRank = startRank + rankStep;
+            int currentFile = startFile + fileStep;
+
+            while (currentRank != endRank || currentFile != endFile)
+            {
+                if (!GetBlock(currentRank, currentFile).IsEmpty())
+                    return false;
+
+                currentRank += rankStep;
+                currentFile += fileStep;
+            }
+
+            return true;
+        }
+
 
         //public bool IsPlayerInCheck(PieceColor pieceColor)
         //{

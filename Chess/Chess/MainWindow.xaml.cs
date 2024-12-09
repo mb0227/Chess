@@ -16,6 +16,7 @@ namespace Chess
         bool FirstPlayerSelectedColorWhite = true;
         bool PromotionPossible = false;
         bool enPassantPossible = false;
+        bool castlingPossible = false;
         bool IsMoving = false;
         int SelectedRow, SelectedCol;
         Game Game;
@@ -258,6 +259,10 @@ namespace Chess
                                     IsMoving = true;
                                     foreach (Move move in moves)
                                     {
+                                        if(Math.Abs(move.GetStartBlock().GetFile() - move.GetEndBlock().GetFile()) == 2)
+                                        {
+                                            castlingPossible = true;
+                                        }
                                         HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
                                     }
                                 }
@@ -340,6 +345,7 @@ namespace Chess
 
             string optionSelected = null;
             int enPassantTargetRow = -1;
+            int castlingTargetFileRook = -1, rookCurrentFile = -1;
 
             if (targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor())
             {
@@ -372,12 +378,50 @@ namespace Chess
                 else if(!FirstPlayerSelectedColorWhite && targetRow == 5) enPassantTargetRow = 4;
             }
 
+            if (castlingPossible)
+            {
+                if (Game.GetPlayerOne().GetColor() == PlayerColor.White && targetCol == 6) // short castle 
+                {
+                    castlingTargetFileRook = targetCol - 1;
+                    rookCurrentFile = 7;
+                }
+                else if (Game.GetPlayerOne().GetColor() == PlayerColor.White && targetCol == 2) // long castle 
+                {
+                    castlingTargetFileRook = targetCol + 1;
+                    rookCurrentFile = 0;
+                }
+                else if (Game.GetPlayerOne().GetColor() == PlayerColor.Black && targetCol == 1) // short castle 
+                {
+                    castlingTargetFileRook = targetCol + 1;
+                    rookCurrentFile = 0;
+                }
+                else if (Game.GetPlayerOne().GetColor() == PlayerColor.Black && targetCol == 5) // long castle 
+                {
+                    castlingTargetFileRook = targetCol - 1;
+                    rookCurrentFile = 7;
+                }
+            }
+
+            Image rookImageForCastling = null;
+
             foreach (UIElement element in ChessGrid.Children)
             {
                 if (Grid.GetRow(element) == previousRow && Grid.GetColumn(element) == previousCol && element is Image)
                 {
                     pieceToMove = (Image)element;
                     break;
+                }
+            }
+
+            if (castlingPossible)
+            {
+                foreach (UIElement element in ChessGrid.Children)
+                {
+                    if (Grid.GetRow(element) == previousRow && Grid.GetColumn(element) == rookCurrentFile && element is Image)
+                    {
+                        rookImageForCastling = (Image)element;
+                        break;
+                    }
                 }
             }
 
@@ -405,6 +449,14 @@ namespace Chess
                 {
                     ChessGrid.Children.Remove(capturedPiece);
                 }
+
+                if(rookImageForCastling != null)
+                {
+                    ChessGrid.Children.Remove(rookImageForCastling);
+                    Grid.SetColumn(rookImageForCastling, castlingTargetFileRook);
+                    ChessGrid.Children.Add(rookImageForCastling);
+                }
+
                 ChessGrid.Children.Remove(pieceToMove);
 
                 if (optionSelected != null)
@@ -428,6 +480,8 @@ namespace Chess
                 if (optionSelected != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Promotion, Game.GetPieceTypeByString(optionSelected));
                 else if(enPassantTargetRow != -1) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.EnPassant, PieceType.Pawn, enPassantTargetRow);
                 else if (capturedPiece != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Kill);
+                else if (rookImageForCastling != null && (targetCol == 6 || targetCol == 1)) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Castling,PieceType.King, -1, CastlingType.KingSideCastle);
+                else if (rookImageForCastling != null && (targetCol == 5 || targetCol == 2)) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Castling,PieceType.King, -1, CastlingType.QueenSideCastle);
                 else Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Normal);
 
                 ChessGrid.Children.Add(pieceToMove);
@@ -439,6 +493,7 @@ namespace Chess
             if(enPassantPossible) enPassantPossible = false;
             if(PromotionPossible) PromotionPossible = false;
             if(IsMoving) IsMoving = false;
+            if (castlingPossible) castlingPossible = false;
         }
 
         public string PromotePawn()

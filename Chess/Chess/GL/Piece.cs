@@ -1,4 +1,5 @@
 ﻿using Chess.Interfaces;
+using System;
 using System.Collections.Generic;
 
 namespace Chess.GL
@@ -64,6 +65,11 @@ namespace Chess.GL
         public virtual List<Move> GetPossibleMoves(Board board)
         {
             return null;
+        }
+
+        public virtual bool CanAttack(Block targetBlock, Board board)
+        {
+            return false;
         }
     }
 }

@@ -77,5 +77,20 @@ namespace Chess.GL
             }
             return false;
         }
+
+        public override bool CanAttack(Block targetBlock, Board board)
+        {
+            Block currentBlock = board.GetBlock(this);
+            int rank = currentBlock.GetRank();
+            int file = currentBlock.GetFile();
+
+            int targetRank = targetBlock.GetRank();
+            int targetFile = targetBlock.GetFile();
+
+            int rankDiff = Math.Abs(rank - targetRank);
+            int fileDiff = Math.Abs(file - targetFile);
+
+            return (rankDiff == 2 && fileDiff == 1) || (rankDiff == 1 && fileDiff == 2);
+        }
     }
 }

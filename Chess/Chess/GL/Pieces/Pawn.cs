@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Chess.Interfaces;
 
 namespace Chess.GL
@@ -137,6 +138,25 @@ namespace Chess.GL
                 {
                     return true;
                 }
+            }
+            return false;
+        }
+
+        public bool CanAttack(Block targetBlock, Board board)
+        {
+            Block currentBlock = board.GetBlock(this);
+            int rank = currentBlock.GetRank();
+            int file = currentBlock.GetFile();
+
+            int targetRank = targetBlock.GetRank();
+            int targetFile = targetBlock.GetFile();
+
+            int direction = (GetColor() == PieceColor.White) ? 1 : -1; // Determine movement direction
+
+            if (Math.Abs(file - targetFile) == 1 && targetRank - rank == direction)
+            {
+                Piece targetPiece = board.GetBlock(targetRank, targetFile).GetPiece();
+                return targetPiece != null && targetPiece.GetColor() != GetColor();
             }
             return false;
         }

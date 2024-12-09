@@ -61,11 +61,18 @@ namespace Chess.GL
                 }
                 else
                 {
+                    if (endBlock?.GetPiece() != null) // stop further movement in this direction
+                    {
+                        if (endBlock.GetPiece().GetColor() != this.GetColor() && board.IsSafeMove(this, endBlock))
+                        {
+                            possibleMoves.Add(new Move(startBlock, endBlock, this, endBlock.GetPiece()));
+                        }
+                        break;
+                    }
                     if ((endBlock.GetPiece() != null && endBlock.GetPiece().GetColor() != this.GetColor()) && board.IsSafeMove(this, endBlock))
                     {
                         possibleMoves.Add(new Move(startBlock, endBlock, this, endBlock.GetPiece()));
                     }
-                    break; // stop further movement in this direction
                 }
             }
         }
@@ -120,5 +127,25 @@ namespace Chess.GL
             return false;
         }
 
+        public override bool CanAttack(Block targetBlock, Board board)
+        {
+            Block currentBlock = board.GetBlock(this);
+            int rank = currentBlock.GetRank();
+            int file = currentBlock.GetFile();
+
+            int targetRank = targetBlock.GetRank();
+            int targetFile = targetBlock.GetFile();
+
+            if (Math.Abs(rank - targetRank) == Math.Abs(file - targetFile)) // Diagonal movement
+            {
+                return board.IsPathClear(rank, file, targetRank, targetFile);
+            }
+            else if (rank == targetRank || file == targetFile) // Horizontal or vertical movement
+            {
+                return board.IsPathClear(rank, file, targetRank, targetFile); 
+            }
+
+            return false;
+        }
     }
 }

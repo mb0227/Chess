@@ -54,7 +54,7 @@ namespace Chess.GL
                 }
             }
 
-            // AddCastlingMoves(possibleMoves, board, currentBlock);
+            AddCastlingMoves(possibleMoves, board, currentBlock);
 
             return possibleMoves;
         }
@@ -112,6 +112,17 @@ namespace Chess.GL
             return true;
         }
 
+        public override bool CanAttack(Block targetBlock, Board board)
+        {
+            Block currentBlock = board.GetBlock(this);
+            int rank = currentBlock.GetRank();
+            int file = currentBlock.GetFile();
+
+            int targetRank = targetBlock.GetRank();
+            int targetFile = targetBlock.GetFile();
+
+            return Math.Abs(rank - targetRank) <= 1 && Math.Abs(file - targetFile) <= 1;
+        }
 
         public override bool IsAttackingKing(Board board, Block kingBlock)
         {
