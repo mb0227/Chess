@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Chess.GL
 {
@@ -222,27 +223,55 @@ namespace Chess.GL
             return isCheck;
         }
 
-        public bool IsCheckMate(PieceColor pieceColor)
+        public bool IsUnderAttack(Block block, PieceColor pieceColor)
         {
-            foreach (var block in Blocks)
+            foreach (var b in Blocks)
             {
-                Piece piece = block.GetPiece();
-                if (piece == null || piece.GetColor() != pieceColor)
+                Piece piece = b.GetPiece();
+                if (piece == null || piece.GetColor() == pieceColor)
                     continue;
-                foreach (var move in piece.GetPossibleMoves(this))
+
+                List<Move> possibleMoves = piece.GetPossibleMoves(this);
+                foreach (var move in possibleMoves)
                 {
-                    Console.WriteLine("HEHHE");
-                    if (IsSafeMove(piece, move.GetEndBlock()))
-                    {
-                        Console.WriteLine(pieceColor);
-                        Console.WriteLine("King is not in checkmate");
-                        Console.WriteLine(move.ToString());
-                        Console.WriteLine(piece.ToString());
-                        return false;
-                    }
+                    if (move.GetEndBlock().GetRank() == block.GetRank()
+                      && move.GetEndBlock().GetFile() == block.GetFile())
+                        return true;
                 }
             }
-            return true;
+            return false;
         }
+
+        //public bool IsPlayerInCheck(PieceColor pieceColor)
+        //{
+        //    if (pieceColor.ToString() == FirstPlayerColor.ToString() && PlayerOne.IsInCheck())
+        //    {
+        //        return true;
+        //    }
+        //    else if (pieceColor.ToString() == PlayerTwo.GetColor().ToString() && PlayerTwo.IsInCheck())
+        //    {
+        //        return true;
+        //    }
+        //    return false;
+        //}
+        //public bool IsCheckMate(PieceColor pieceColor)
+        //{
+        //    int count = 0;
+        //    foreach (var block in Blocks)
+        //    {
+        //        Piece piece = block.GetPiece();
+        //        if (piece == null || piece.GetColor() != pieceColor)
+        //            continue;
+        //        count += piece.GetPossibleMoves(this).Count;
+        //    }
+        //    if (count == 0)
+        //    {
+        //        Console.WriteLine("Checkmate");
+        //        return true;
+        //    }
+        //    else Console.WriteLine("Not Checkmate");
+        //    Console.WriteLine("Possible Moves " + count);
+        //    return false;
+        //}
     }
 }

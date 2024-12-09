@@ -19,7 +19,6 @@ namespace Chess.GL
                 Block block = board.GetBlock(this);
                 int rank = block.GetRank();
                 int file = block.GetFile();
-                Console.WriteLine("Queen at " + rank + ", " + file);
 
                 // Directions for Queen's movement
                 int[][] directions =
@@ -58,14 +57,12 @@ namespace Chess.GL
 
                 if (endBlock.IsEmpty() && board.IsSafeMove(this, endBlock))
                 {
-                    Console.WriteLine($"Move to {newRank}, {newFile}");
                     possibleMoves.Add(new Move(startBlock, endBlock, this, null));
                 }
                 else
                 {
                     if ((endBlock.GetPiece() != null && endBlock.GetPiece().GetColor() != this.GetColor()) && board.IsSafeMove(this, endBlock))
                     {
-                        Console.WriteLine($"Attack to {newRank}, {newFile}");
                         possibleMoves.Add(new Move(startBlock, endBlock, this, endBlock.GetPiece()));
                     }
                     break; // stop further movement in this direction
@@ -110,7 +107,7 @@ namespace Chess.GL
                         if (block.GetPiece() != null)
                         {
                             if (block.GetPiece().GetColor() != this.GetColor() &&
-                                rank == kingBlock.GetRank() && file == kingBlock.GetFile()
+                                rank == kingBlock?.GetRank() && file == kingBlock?.GetFile()
                                 && board.IsSafeMove(this, block))
                             {
                                 return true; // queen can attack the king

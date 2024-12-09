@@ -28,8 +28,8 @@ namespace Chess.GL
 
     public enum CastlingType
     {
-        ShortCastle,
-        LongCastle,
+        KingSideCastle,
+        QueenSideCastle,
         None
     }
 
@@ -91,7 +91,7 @@ namespace Chess.GL
                     return;
                 }
 
-                    // update move movement
+                // update move movement
                 if (pieceAtPrev.GetPieceType() == PieceType.Pawn)
                 {
                     Pawn pawn = (Pawn)prevBlock.GetPiece();
@@ -114,35 +114,34 @@ namespace Chess.GL
                 if (Board.IsCheck(pieceAtPrev, newBlock))
                 {
                     moveType = MoveType.Check;
-                    if (CurrentMove == PlayerOne) PlayerTwo.SetCheck(true);
-                    else PlayerOne.SetCheck(false);
-                    if (CurrentMove.GetColor() == PlayerColor.White)
-                    {
-                        if (Board.IsCheckMate(PieceColor.Black))
-                        {
-                            moveType = MoveType.Checkmate;
-                            Status = GameStatus.WHITE_WIN;
-                            IsGameOver = true;
-                            Console.WriteLine("Checkmate");
-                        }
-                    }
-                    else
-                    {
-                        if (Board.IsCheckMate(PieceColor.White))
-                        {
-                            moveType = MoveType.Checkmate;
-                            Status = GameStatus.BLACK_WIN;
-                            IsGameOver = true;
-                            Console.WriteLine("Checkmate");
-                        }
-                    }
+                    King king = (King)Board.FindKing(CurrentMove.GetColor() == PlayerColor.White ? PieceColor.Black : PieceColor.White).GetPiece();
+                    king.SetCheck(true);
+                }
+                else
+                {
+                    King king = (King)Board.FindKing(CurrentMove.GetColor() == PlayerColor.Black ? PieceColor.Black : PieceColor.White).GetPiece();
+                    king.SetCheck(false);
                 }
 
-                //if (CurrentMove.IsInCheck())
+                //if (CurrentMove.GetColor() == PlayerColor.White)
                 //{
-                //    if (moveType != MoveType.Check && moveType != MoveType.Checkmate)
+                //    if (Board.IsCheckMate(PieceColor.White))
                 //    {
-                //        Console.WriteLine("You are in check. You must make a move to get out of check.");
+                //        moveType = MoveType.Checkmate;
+                //        Status = GameStatus.WHITE_WIN;
+                //        IsGameOver = true;
+                //        Console.WriteLine("Checkmate");
+                //    }
+                //    else Console.WriteLine(CurrentMove.GetColor());
+                //}
+                //else
+                //{
+                //    if (Board.IsCheckMate(PieceColor.Black))
+                //    {
+                //        moveType = MoveType.Checkmate;
+                //        Status = GameStatus.BLACK_WIN;
+                //        IsGameOver = true;
+                //        Console.WriteLine("Checkmate");
                 //    }
                 //}
 
@@ -222,6 +221,11 @@ namespace Chess.GL
                 //PlayerOne.DisplayDeadPieces();
                 //PlayerTwo.DisplayDeadPieces();
             }
+            //King wKing = (King)GetBoard().FindKing(PieceColor.White).GetPiece();
+            //King bKing = (King)GetBoard().FindKing(PieceColor.Black).GetPiece();
+
+            //if (wKing.IsInCheck()) Console.WriteLine("white is in check");
+            //else if (bKing.IsInCheck()) Console.WriteLine("black is in check");
         }
 
         public void AddMove(Block prevBlock, Block newBlock, MoveType moveType, Piece prevBlockPiece, Piece capturedPiece = null, PieceType promotedPieceType = PieceType.Queen)

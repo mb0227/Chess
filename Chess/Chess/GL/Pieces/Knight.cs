@@ -20,7 +20,6 @@ namespace Chess.GL
             Block block = board.GetBlock(this);
             int rank = block.GetRank();
             int file = block.GetFile();
-            System.Console.WriteLine("Knight at " + rank + ", " + file);
 
             int[,] directions = {
                 {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
@@ -37,7 +36,6 @@ namespace Chess.GL
                     Block endBlock = board.GetBlock(newRank, newFile);
                     if ((endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor()) && board.IsSafeMove(this, endBlock))
                     {
-                        Console.WriteLine($"Move to {newRank}, {newFile}");
                         possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
                     }
                 }
@@ -64,8 +62,14 @@ namespace Chess.GL
                 {
                     int newRank = pieceRank + directions[i, 0];
                     int newFile = pieceFile + directions[i, 1];
+                    Block block;
 
-                    if (newRank == kingBlock.GetRank() && newFile == kingBlock.GetFile())
+                    if (board.WithinBounds(newRank, newFile))
+                        block = board.GetBlock(newRank, newFile);
+                    else
+                        continue;
+
+                    if (newRank == kingBlock?.GetRank() && newFile == kingBlock?.GetFile() && board.IsSafeMove(this, block))
                     {
                         return true; // Knight can attack the king
                     }
@@ -73,6 +77,5 @@ namespace Chess.GL
             }
             return false;
         }
-
     }
 }

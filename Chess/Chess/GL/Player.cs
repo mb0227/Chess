@@ -18,28 +18,16 @@ namespace Chess.GL
     {
         private PlayerColor Color;
         private LinkedList DeadPieces;
-        private bool InCheck;
 
         public Player(PlayerColor color)
         {
             Color = color;
             DeadPieces = new LinkedList();
-            InCheck = false;
         }
 
         public void KillPiece(Piece piece)
         {
             DeadPieces.InsertAtHead(piece);
-        }
-
-        public void SetCheck(bool check)
-        {
-            InCheck = check;
-        }
-
-        public bool IsInCheck()
-        {
-            return InCheck;
         }
 
         public PlayerColor GetColor()

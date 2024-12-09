@@ -70,7 +70,6 @@ namespace Chess.GL
             }
         }
 
-
         private void AddPromotions(List<Move> moves, Board board, Block currentBlock, int rank, int file, int direction)
         {
             int promotionRank = (GetColor() == PieceColor.White) ? 0 : 7;
@@ -117,6 +116,29 @@ namespace Chess.GL
                     }
                 }
             }
+        }
+
+        public override bool IsAttackingKing(Board board, Block kingBlock)
+        {
+            Block currentBlock = board.GetBlock(this);
+            int rank = currentBlock.GetRank();
+            int file = currentBlock.GetFile();
+            int kingRank = kingBlock.GetRank();
+            int kingFile = kingBlock.GetFile();
+
+            int direction = (board.GetFirstPlayerColor() == PlayerColor.White) ?
+                            (GetColor() == PieceColor.White ? -1 : 1) :
+                            (GetColor() == PieceColor.White ? 1 : -1);
+
+            foreach (int offset in new[] { -1, 1 })
+            {
+                if (!board.WithinBounds(rank + direction, file + offset)) continue;
+                if (rank + direction == kingRank && file + offset == kingFile)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void PawnMoved(int rank)

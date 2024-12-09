@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Collections.Generic;
+using System.Threading;
 
 namespace Chess
 {
@@ -403,7 +404,6 @@ namespace Chess
                 if (capturedPiece != null)
                 {
                     ChessGrid.Children.Remove(capturedPiece);
-                    Console.WriteLine($"Captured piece at Row: {targetRow}, Column: {targetCol}");
                 }
                 ChessGrid.Children.Remove(pieceToMove);
 
