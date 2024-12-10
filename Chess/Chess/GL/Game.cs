@@ -123,28 +123,6 @@ namespace Chess.GL
                     king.SetCheck(false);
                 }
 
-                //if (CurrentMove.GetColor() == PlayerColor.White)
-                //{
-                //    if (Board.IsCheckMate(PieceColor.White))
-                //    {
-                //        moveType = MoveType.Checkmate;
-                //        Status = GameStatus.WHITE_WIN;
-                //        IsGameOver = true;
-                //        Console.WriteLine("Checkmate");
-                //    }
-                //    else Console.WriteLine(CurrentMove.GetColor());
-                //}
-                //else
-                //{
-                //    if (Board.IsCheckMate(PieceColor.Black))
-                //    {
-                //        moveType = MoveType.Checkmate;
-                //        Status = GameStatus.BLACK_WIN;
-                //        IsGameOver = true;
-                //        Console.WriteLine("Checkmate");
-                //    }
-                //}
-
                 //Console.WriteLine("Board Before");
                 //Board.DisplayBoard();
                 if (moveType == MoveType.EnPassant && Board.GetBlock(enPassantTargetRow, newFile) != null)
@@ -172,6 +150,12 @@ namespace Chess.GL
                     int rookStartFile = (castlingType == CastlingType.KingSideCastle) ? 7 : 0; 
                     int kingEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile + 2 : kingStartFile - 2;
                     int rookEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile + 1 : kingStartFile - 1;
+
+                    if(!Board.WithinBounds(kingStartFile, kingEndFile) || !Board.WithinBounds(rookStartFile, rookEndFile))
+                    {
+                        Console.WriteLine("Invalid castling move");
+                        return;
+                    }
 
                     Board.GetBlock(rank, rookEndFile).SetPiece(Board.GetBlock(rank, rookStartFile).GetPiece());
                     Board.GetBlock(rank, rookStartFile).SetPiece(null);
@@ -217,13 +201,66 @@ namespace Chess.GL
                 }
                 //Console.WriteLine("Board After");
                 //Board.DisplayBoard();
+                if (CurrentMove.GetColor() == PlayerColor.White)
+                {
+                    if (moveType == MoveType.Check && Board.GetFinalStatus(PieceColor.Black)) // Scan for Checkmate
+                    {
+                        moveType = MoveType.Checkmate;
+                        Status = GameStatus.WHITE_WIN;
+                        IsGameOver = true;
+                    }
+                    else if(Board.GetFinalStatus(PieceColor.White)) // Scan for Stalemate
+                    {
+                        moveType = MoveType.Stalemate;
+                        Status = GameStatus.STALEMATE;
+                        IsGameOver = true;
+                    }
+                }
+                else
+                {
+                    if (moveType == MoveType.Check && Board.GetFinalStatus(PieceColor.White)) // Scan for Checkmate
+                    {
+                        moveType = MoveType.Checkmate;
+                        Status = GameStatus.BLACK_WIN;
+                        IsGameOver = true;
+                    }
+                    else if (Board.GetFinalStatus(PieceColor.Black)) // Scan for Stalemate
+                    {
+                        moveType = MoveType.Stalemate;
+                        Status = GameStatus.STALEMATE;
+                        IsGameOver = true;
+                    }
+                }
+
                 if (CurrentMove.GetColor() == PlayerColor.Black)
                 {
                     if (PlayerOne.GetColor() == PlayerColor.White)
+                    {
+                        if(moveType == MoveType.Checkmate)
+                        {
+                            SecondPlayerMove.SetMoveType(MoveType.Checkmate);
+                            SecondPlayerMove.MakeNotation();
+                        }
                         Moves.Push(FirstPlayerMove, SecondPlayerMove);
+                    }
                     else
+                    {
+                        if (moveType == MoveType.Checkmate)
+                        {
+                            FirstPlayerMove.SetMoveType(MoveType.Checkmate);
+                            FirstPlayerMove.MakeNotation();
+                        }
                         Moves.Push(SecondPlayerMove, FirstPlayerMove);
+                    }
                 }
+
+                if(CurrentMove.GetColor() == PlayerColor.White && PlayerOne.GetColor() == PlayerColor.White && moveType == MoveType.Checkmate)
+                {
+                    FirstPlayerMove.SetMoveType(MoveType.Checkmate);
+                    FirstPlayerMove.MakeNotation();
+                    Moves.Push(FirstPlayerMove);
+                }
+
                 if (CurrentMove == PlayerTwo)
                 {
                     CurrentMove = PlayerOne;

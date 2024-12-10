@@ -95,8 +95,8 @@ namespace Chess.GL
             {
                 Notation += "=" + GetPieceMovedString(PromotedPieceType);
             }
-            if(MoveType == MoveType.Check) Notation += "+";
-            // Additional rules like castling, promotion, or checkmate
+            if(MoveType == MoveType.Checkmate) Notation += "#";
+            else if (MoveType == MoveType.Check) Notation += "+";
         }
 
         private string GetPieceMovedString(PieceType p)
@@ -154,6 +154,10 @@ namespace Chess.GL
             PlayerMoved = player;
         }
 
+        public void SetMoveType(MoveType moveType)
+        {
+            MoveType = moveType;
+        }
         // setters for bool methods
 
         public bool GetIsPromotion()
