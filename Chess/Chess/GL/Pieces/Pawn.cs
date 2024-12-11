@@ -119,30 +119,7 @@ namespace Chess.GL
             }
         }
 
-        public override bool IsAttackingKing(Board board, Block kingBlock)
-        {
-            Block currentBlock = board.GetBlock(this);
-            int rank = currentBlock.GetRank();
-            int file = currentBlock.GetFile();
-            int kingRank = kingBlock.GetRank();
-            int kingFile = kingBlock.GetFile();
-
-            int direction = (board.GetFirstPlayerColor() == PlayerColor.White) ?
-                            (GetColor() == PieceColor.White ? -1 : 1) :
-                            (GetColor() == PieceColor.White ? 1 : -1);
-
-            foreach (int offset in new[] { -1, 1 })
-            {
-                if (!board.WithinBounds(rank + direction, file + offset)) continue;
-                if (rank + direction == kingRank && file + offset == kingFile)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public bool CanAttack(Block targetBlock, Board board)
+        public override bool CanAttack(Block targetBlock, Board board)
         {
             Block currentBlock = board.GetBlock(this);
             int rank = currentBlock.GetRank();

@@ -71,5 +71,10 @@ namespace Chess.GL
         {
             return false;
         }
+
+        public bool IsOppositeColor(Piece piece)
+        {
+            return this.GetColor() != piece.GetColor();
+        }
     }
 }

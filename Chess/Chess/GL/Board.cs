@@ -68,7 +68,6 @@ namespace Chess.GL
 
         public Block GetBlock(Piece piece)
         {
-            // search the board and return the block that contains the piece
             for (int rank = 0; rank < 8; rank++)
             {
                 for (int file = 0; file < 8; file++)
@@ -96,13 +95,9 @@ namespace Chess.GL
                     {
                         Piece piece = Blocks[rank, file].GetPiece();
                         if (piece.GetColor() == PieceColor.White)
-                        {
                             Console.Write("W ");
-                        }
                         else
-                        {
                             Console.Write("B ");
-                        }
                         Console.Write(piece.GetPieceType().ToString() + " ");
                     }
                 }
@@ -165,14 +160,13 @@ namespace Chess.GL
         public bool IsKingInCheck(PieceColor pieceColor)
         {
             Block kingBlock = FindKing(pieceColor);
-            //Console.WriteLine(kingBlock?.ToString() + " " + pieceColor);
             foreach (var block in Blocks)
             {
                 Piece attackingPiece = block.GetPiece();
                 if (attackingPiece == null || attackingPiece.GetColor() == pieceColor || kingBlock == null)
                     continue;
 
-                if (attackingPiece.IsAttackingKing(this, kingBlock))
+                if (attackingPiece.CanAttack(kingBlock, this))
                 {
                     return true;
                 }
@@ -193,25 +187,20 @@ namespace Chess.GL
                     }
                 }
             }
-            Console.WriteLine("King not found");
             return null;
         }
 
         public bool IsSafeMove(Piece pieceToMove, Block endBlock)
         {
-            // this function will check if the move is safe or not (safe here means if making this move will leave your king in check)
-            // we will make the move and check if the king is in check or not
             Block startBlock = GetBlock(pieceToMove);
+
             Piece capturedPiece = endBlock.GetPiece();
-            endBlock.SetPiece(pieceToMove);
             startBlock.SetPiece(null);
+            endBlock.SetPiece(pieceToMove);
+
             bool isSafe = !IsKingInCheck(pieceToMove.GetColor());
-            startBlock.SetPiece(pieceToMove);
             endBlock.SetPiece(capturedPiece);
-            if(!isSafe)
-            {
-                return false;
-            }
+            startBlock.SetPiece(pieceToMove);
             return isSafe;
         }
 
@@ -219,8 +208,9 @@ namespace Chess.GL
         {
             Block startBlock = GetBlock(pieceToMove);
             Piece capturedPiece = endBlock.GetPiece();
-            endBlock.SetPiece(pieceToMove);
             startBlock.SetPiece(null);
+            endBlock.SetPiece(null);
+            endBlock.SetPiece(pieceToMove);
             bool isCheck = IsKingInCheck(pieceToMove.GetColor() == PieceColor.White ? PieceColor.Black: PieceColor.White );
             startBlock.SetPiece(pieceToMove);
             endBlock.SetPiece(capturedPiece);
@@ -263,16 +253,15 @@ namespace Chess.GL
 
         public bool GetFinalStatus(PieceColor pieceColor)
         {
-            int count = 0;
-            Console.WriteLine(pieceColor);
             foreach (var block in Blocks)
             {
                 Piece piece = block.GetPiece();
                 if (piece == null || piece.GetColor() != pieceColor)
                     continue;
-                count += piece.GetPossibleMoves(this).Count;
+                if (piece.GetPossibleMoves(this).Count > 0)
+                    return false;
             }
-            return count == 0 ?  true : false;
+            return true;
         }
     }
 }

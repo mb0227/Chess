@@ -33,7 +33,7 @@
 
         public void SetPiece(Piece piece)
         {
-            Piece = piece;
+            this.Piece = piece;
         }
 
         public int GetRank()

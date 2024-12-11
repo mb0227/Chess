@@ -124,40 +124,6 @@ namespace Chess.GL
             return Math.Abs(rank - targetRank) <= 1 && Math.Abs(file - targetFile) <= 1;
         }
 
-        public override bool IsAttackingKing(Board board, Block kingBlock)
-        {
-            Block currentBlock = board.GetBlock(this);
-            int rank = currentBlock.GetRank();
-            int file = currentBlock.GetFile();
-            int kingRank = kingBlock.GetRank();
-            int kingFile = kingBlock.GetFile();
-
-            int[][] directions = {
-                new int[] {-1, -1}, // Top-left
-                new int[] {-1, 0},  // Top
-                new int[] {-1, 1},  // Top-right
-                new int[] {0, -1},  // Left
-                new int[] {0, 1},   // Right
-                new int[] {1, -1},  // Bottom-left
-                new int[] {1, 0},   // Bottom
-                new int[] {1, 1}    // Bottom-right
-            };
-
-            foreach (var dir in directions)
-            {
-                int newRank = rank + dir[0];
-                int newFile = file + dir[1];
-                if (!board.WithinBounds(rank, file)) continue;
-                if (newRank == kingRank && newFile == kingFile)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-
         public void SetHasMoved()
         {
             HasMoved = true;

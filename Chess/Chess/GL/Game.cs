@@ -111,6 +111,7 @@ namespace Chess.GL
                         king.SetHasMoved();
                     }
                 }
+
                 if (Board.IsCheck(pieceAtPrev, newBlock))
                 {
                     moveType = MoveType.Check;
@@ -165,22 +166,27 @@ namespace Chess.GL
                 else if (Board.GetBlock(newRank, newFile).GetPiece() == null && moveType != MoveType.EnPassant) // if the target block is empty
                 {
                     AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
+
                     if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
-                        // here update piece at piece at prev to a new piece
                         pieceAtPrev = new Piece(pieceAtPrev.GetColor(), pieceType, true);
                     }
+
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }
                 else // if the target block is not empty (kill piece)
                 {
                     Piece pieceAtNew = newBlock.GetPiece();
-                    pieceAtNew?.Kill();
 
-                    if(moveType != MoveType.Promotion) AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew);
-                    else AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
+                    if(pieceAtNew.GetPieceType() != PieceType.King)
+                        pieceAtNew?.Kill();
+
+                    if(moveType != MoveType.Promotion) 
+                        AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew);
+                    else 
+                        AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
 
                     if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
                     {
@@ -194,8 +200,12 @@ namespace Chess.GL
                         else if (pieceType == PieceType.Knight)
                             pieceAtPrev = new Knight(pieceAtPrev.GetColor(), pieceType, true);
                     };
-                    if (CurrentMove == PlayerOne) PlayerTwo.KillPiece(pieceAtNew);
-                    else PlayerOne.KillPiece(pieceAtNew);
+
+                    if (CurrentMove == PlayerOne) 
+                        PlayerTwo.KillPiece(pieceAtNew);
+                    else 
+                        PlayerOne.KillPiece(pieceAtNew);
+
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }
@@ -273,11 +283,6 @@ namespace Chess.GL
                 //PlayerOne.DisplayDeadPieces();
                 //PlayerTwo.DisplayDeadPieces();
             }
-            //King wKing = (King)GetBoard().FindKing(PieceColor.White).GetPiece();
-            //King bKing = (King)GetBoard().FindKing(PieceColor.Black).GetPiece();
-
-            //if (wKing.IsInCheck()) Console.WriteLine("white is in check");
-            //else if (bKing.IsInCheck()) Console.WriteLine("black is in check");
         }
 
         public void AddMove(Block prevBlock, Block newBlock, MoveType moveType, Piece prevBlockPiece, Piece capturedPiece = null, PieceType promotedPieceType = PieceType.Queen)

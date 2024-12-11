@@ -14,10 +14,12 @@ namespace Chess.GL
         public override List<Move> GetPossibleMoves(Board board)
         {
             possibleMoves.Clear();
+
             if (!this.IsAlive() || GetPieceType() != PieceType.Knight)
                 return possibleMoves;
 
             Block block = board.GetBlock(this);
+
             int rank = block.GetRank();
             int file = block.GetFile();
 
@@ -34,7 +36,10 @@ namespace Chess.GL
                 if (board.WithinBounds(newRank, newFile))
                 {
                     Block endBlock = board.GetBlock(newRank, newFile);
-                    if ((endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor()) && board.IsSafeMove(this, endBlock))
+
+                    // Ensure move does not leave the king in check
+                    if ((endBlock.GetPiece() == null || endBlock.GetPiece().GetColor() != this.GetColor())
+                        && board.IsSafeMove(this, endBlock))
                     {
                         possibleMoves.Add(new Move(block, endBlock, this, endBlock.GetPiece()));
                     }
@@ -42,40 +47,6 @@ namespace Chess.GL
             }
 
             return possibleMoves;
-        }
-
-        public override bool IsAttackingKing(Board board, Block kingBlock)
-        {
-            Block pieceBlock = board.GetBlock(this); // Get current position of the piece
-            int pieceRank = pieceBlock.GetRank();
-            int pieceFile = pieceBlock.GetFile();
-
-            // Handle knight-specific logic
-            if (this.GetPieceType() == PieceType.Knight)
-            {
-                int[,] directions = {
-                    {2, 1}, {2, -1}, {-2, 1}, {-2, -1},
-                    {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
-                };
-
-                for (int i = 0; i < directions.GetLength(0); i++)
-                {
-                    int newRank = pieceRank + directions[i, 0];
-                    int newFile = pieceFile + directions[i, 1];
-                    Block block;
-
-                    if (board.WithinBounds(newRank, newFile))
-                        block = board.GetBlock(newRank, newFile);
-                    else
-                        continue;
-
-                    if (newRank == kingBlock?.GetRank() && newFile == kingBlock?.GetFile() && board.IsSafeMove(this, block))
-                    {
-                        return true; // Knight can attack the king
-                    }
-                }
-            }
-            return false;
         }
 
         public override bool CanAttack(Block targetBlock, Board board)

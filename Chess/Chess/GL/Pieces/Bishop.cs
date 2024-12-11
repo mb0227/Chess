@@ -73,46 +73,6 @@ namespace Chess.GL
             }
         }
 
-        public override bool IsAttackingKing(Board board, Block kingBlock)
-        {
-            Block pieceBlock = board.GetBlock(this); // Get current position of the piece
-            int pieceRank = pieceBlock.GetRank();
-            int pieceFile = pieceBlock.GetFile();
-
-            if (this.GetPieceType() == PieceType.Bishop)
-            {
-                int[][] directions = {
-                     new int[] {-1, -1}, new int[] {-1, 1}, new int[] {1, -1}, new int[] {1, 1}
-                };
-
-                foreach (var dir in directions)
-                {
-                    int rank = pieceRank;
-                    int file = pieceFile;
-
-                    while (true)
-                    {
-                        rank += dir[0];
-                        file += dir[1];
-
-                        if (!board.WithinBounds(rank, file))
-                            break;
-
-                        Block block = board.GetBlock(rank, file);
-                        if (block.GetPiece() != null)
-                        {
-                            if (block.GetPiece().GetColor() != this.GetColor() && rank == kingBlock?.GetRank() && file == kingBlock?.GetFile() && board.IsSafeMove(this, block))
-                            {
-                                return true; // Bishop can attack the king
-                            }
-                            break; // stop at the first blocked piece
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
         public override bool CanAttack(Block targetBlock, Board board)
         {
             Block currentBlock = board.GetBlock(this);

@@ -89,14 +89,18 @@ namespace Chess.GL
                 Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(StartBlock.GetFile());
             }
 
-            if (PieceKilled != null) Notation += "x" + GetFileString(EndBlock.GetFile());
+            if (PieceKilled != null) 
+                Notation += "x" + GetFileString(EndBlock.GetFile());
+
             Notation += Board.TranslateRank(EndBlock.GetRank());
+
             if (MoveType == MoveType.Promotion)
-            {
                 Notation += "=" + GetPieceMovedString(PromotedPieceType);
-            }
-            if(MoveType == MoveType.Checkmate) Notation += "#";
-            else if (MoveType == MoveType.Check) Notation += "+";
+
+            if
+                (MoveType == MoveType.Checkmate) Notation += "#";
+            else if
+                (MoveType == MoveType.Check) Notation += "+";
         }
 
         private string GetPieceMovedString(PieceType p)

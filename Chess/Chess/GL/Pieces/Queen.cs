@@ -77,56 +77,6 @@ namespace Chess.GL
             }
         }
 
-        public override bool IsAttackingKing(Board board, Block kingBlock)
-        {
-            Block pieceBlock = board.GetBlock(this);
-            int pieceRank = pieceBlock.GetRank();
-            int pieceFile = pieceBlock.GetFile();
-
-            if (this.GetPieceType() == PieceType.Queen)
-            {
-                int[][] directions = {
-                    new int[] {-1, 0}, // Up
-                    new int[] {1, 0},  // Down
-                    new int[] {0, -1}, // Left
-                    new int[] {0, 1},  // Right
-                    new int[] {-1, -1}, // Up-Left (Diagonal)
-                    new int[] {-1, 1},  // Up-Right (Diagonal)
-                    new int[] {1, -1},  // Down-Left (Diagonal)
-                    new int[] {1, 1}    // Down-Right (Diagonal)
-                };
-
-                foreach (var dir in directions)
-                {
-                    int rank = pieceRank;
-                    int file = pieceFile;
-
-                    while (true)
-                    {
-                        rank += dir[0];
-                        file += dir[1];
-
-                        if (!board.WithinBounds(rank, file))
-                            break;
-
-                        Block block = board.GetBlock(rank, file);
-
-                        if (block.GetPiece() != null)
-                        {
-                            if (block.GetPiece().GetColor() != this.GetColor() &&
-                                rank == kingBlock?.GetRank() && file == kingBlock?.GetFile()
-                                && board.IsSafeMove(this, block))
-                            {
-                                return true; // queen can attack the king
-                            }
-                            break; // stop if a piece blocks the path (no further movement in this direction)
-                        }
-                    }
-                }
-            }
-            return false;
-        }
-
         public override bool CanAttack(Block targetBlock, Board board)
         {
             Block currentBlock = board.GetBlock(this);
