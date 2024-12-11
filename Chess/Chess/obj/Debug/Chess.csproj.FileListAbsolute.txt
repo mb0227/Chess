@@ -11,7 +11,9 @@ C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.Propert
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.csproj.GenerateResource.cache
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.csproj.CoreCompileInputs.cache
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.exe
-C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\PromotionWindow.baml
-C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\PromotionWindow.g.cs
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\Homepage.g.cs
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\Homepage.baml
+C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\GamePage.g.cs
+C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\GamePage.baml
+C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\PromotionWindow.baml
+C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\PromotionWindow.g.cs

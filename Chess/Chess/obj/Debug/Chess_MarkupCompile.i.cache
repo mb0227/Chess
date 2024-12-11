@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\App.xaml
-3-1300998930
+4-2127017331
 
-25-1279117427
-13-38814620
-MainWindow.xaml;PromotionWindow.xaml;Views\Homepage.xaml;
+26-1206590106
+14209946504
+MainWindow.xaml;Views\GamePage.xaml;Views\Homepage.xaml;Views\PromotionWindow.xaml;
 
-True
+False
 

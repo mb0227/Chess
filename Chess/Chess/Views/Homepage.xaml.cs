@@ -10,18 +10,22 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace Chess.Views
 {
-    /// <summary>
-    /// Interaction logic for Homepage.xaml
-    /// </summary>
-    public partial class Homepage : Window
+    public partial class Homepage : Page
     {
         public Homepage()
         {
             InitializeComponent();
+        }
+
+        private void MultiplayerClick(object sender, RoutedEventArgs e)
+        {
+            GamePage gamePage = new GamePage();
+            NavigationService.Navigate(gamePage);
         }
     }
 }

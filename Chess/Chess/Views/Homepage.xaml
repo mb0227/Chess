@@ -1,17 +1,46 @@
-﻿<Window x:Class="Chess.Views.Homepage"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:Chess.Interfaces"
-        mc:Ignorable="d"
-                Title="Chess Game - Homepage" Height="500" Width="800" WindowStartupLocation="CenterScreen">
-    <Window.Background>
+﻿<Page x:Class="Chess.Views.Homepage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      mc:Ignorable="d" 
+      d:DesignHeight="450" d:DesignWidth="800"
+      Title="Chess Game - Homepage" Height="500" Width="800">
+
+    <Page.Resources>
+        <!-- Button Style -->
+        <Style x:Key="MenuButtonStyle" TargetType="Button">
+            <Setter Property="Height" Value="50"/>
+            <Setter Property="FontSize" Value="18"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#3B8EDB"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Grid>
+                            <Border Background="{TemplateBinding Background}" CornerRadius="10"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#4DA6FF"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Page.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
             <GradientStop Color="#1E3C72" Offset="0"/>
             <GradientStop Color="#2A5298" Offset="1"/>
         </LinearGradientBrush>
-    </Window.Background>
+    </Page.Background>
 
     <Grid>
         <!-- Title -->
@@ -21,45 +50,20 @@
         <!-- Options Panel -->
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Width="300">
             <!-- Multiplayer Button -->
-            <Button Content="Multiplayer" FontSize="18" FontWeight="Bold" Height="50" 
-                    Foreground="White" Background="#3B8EDB" BorderThickness="0" 
-                    Padding="10">
-                <Button.Style>
-                    <Style TargetType="Button">
-                        <Setter Property="Template">
-                            <Setter.Value>
-                                <ControlTemplate TargetType="Button">
-                                    <Grid>
-                                        <Border Background="{TemplateBinding Background}" CornerRadius="10"/>
-                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Grid>
-                                    <ControlTemplate.Triggers>
-                                        <Trigger Property="IsMouseOver" Value="True">
-                                            <Setter Property="Background" Value="#4DA6FF"/>
-                                        </Trigger>
-                                    </ControlTemplate.Triggers>
-                                </ControlTemplate>
-                            </Setter.Value>
-                        </Setter>
-                    </Style>
-                </Button.Style>
-            </Button>
+            <Button Content="Multiplayer" Click="MultiplayerClick" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
 
             <!-- VS Computer Button -->
-            <Button Content="vs Computer" FontSize="18" FontWeight="Bold" Height="50" 
-                    Foreground="White" Background="#3B8EDB" BorderThickness="0" Padding="10"/>
+            <Button Content="vs Computer" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
 
             <!-- Analysis Button -->
-            <Button Content="Analysis" FontSize="18" FontWeight="Bold" Height="50" 
-                    Foreground="White" Background="#3B8EDB" BorderThickness="0" Padding="10"/>
+            <Button Content="Analysis" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
 
             <!-- About Button -->
-            <Button Content="About" FontSize="18" FontWeight="Bold" Height="50" 
-                    Foreground="White" Background="#3B8EDB" BorderThickness="0" Padding="10"/>
+            <Button Content="About" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
         </StackPanel>
 
         <!-- Footer -->
         <TextBlock Text="© 2024 Chess Game" HorizontalAlignment="Center" VerticalAlignment="Bottom" 
                    Foreground="White" FontSize="12" Margin="0,0,0,20"/>
     </Grid>
-</Window>
+</Page>

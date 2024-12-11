@@ -2,6 +2,7 @@
 using System.Windows.Documents;
 using System;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace Chess.GL
 {
@@ -46,6 +47,7 @@ namespace Chess.GL
         private Move SecondPlayerMove;
         private bool IsGameOver;
         private GameStatus Status;
+        public event Action<string> MoveMade;
 
         private static Game GameInstance;
 
@@ -298,6 +300,7 @@ namespace Chess.GL
                             SecondPlayerMove.SetNotation(SecondPlayerMove.GetNotation().Replace("+", "#"));
                         }
                         Moves.Push(FirstPlayerMove, SecondPlayerMove);
+                        OnMoveMade(Moves.Peek());
                     }
                     else
                     {
@@ -307,6 +310,7 @@ namespace Chess.GL
                             FirstPlayerMove.SetNotation(FirstPlayerMove.GetNotation().Replace("+", "#"));
                         }
                         Moves.Push(SecondPlayerMove, FirstPlayerMove);
+                        OnMoveMade(Moves.Peek()); 
                     }
                 }
 
@@ -315,6 +319,7 @@ namespace Chess.GL
                     FirstPlayerMove.SetMoveType(MoveType.Checkmate);
                     FirstPlayerMove.SetNotation(FirstPlayerMove.GetNotation().Replace("+", "#"));
                     Moves.Push(FirstPlayerMove);
+                    OnMoveMade(Moves.Peek());   
                 }
 
                 if (CurrentMove == PlayerTwo)
@@ -538,6 +543,11 @@ namespace Chess.GL
                 default:
                     return -1;
             }
+        }
+
+        private void OnMoveMade(string move)
+        {
+            MoveMade?.Invoke(move);  // Raise the event with the new move
         }
     }
 }
