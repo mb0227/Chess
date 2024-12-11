@@ -13,3 +13,5 @@ C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.csproj.
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.exe
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\PromotionWindow.baml
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\PromotionWindow.g.cs
+C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\Homepage.g.cs
+C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\Homepage.baml

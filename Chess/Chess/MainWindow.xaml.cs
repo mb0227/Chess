@@ -7,7 +7,6 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Collections.Generic;
-using System.Threading;
 
 namespace Chess
 {
@@ -367,18 +366,24 @@ namespace Chess
                 return;
             }
 
-            if((PromotionPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn 
-                && ((previousRow == 1 && Game.GetPlayerOne().GetColor() == PlayerColor.White) 
-                  || (previousRow == 6 && Game.GetPlayerTwo().GetColor() == PlayerColor.Black)))
-            ||(PromotionPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn 
-                && ((previousRow == 6 && Game.GetPlayerOne().GetColor() == PlayerColor.Black) 
-                  || (previousRow == 1 && Game.GetPlayerTwo().GetColor() == PlayerColor.White))))
+            if (PromotionPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn)
             {
-                PromotionPossible = false;
-                optionSelected = PromotePawn();
-                if (optionSelected == null) return;          
-                optionSelected = optionSelected.ToLower();
+                int promotionRow = (prevBlock.GetPiece().GetColor() == PieceColor.White) ? 1 : 6;
+
+                if(Game.GetPlayerOne().GetColor() == PlayerColor.Black)
+                    promotionRow = (prevBlock.GetPiece().GetColor() == PieceColor.White) ? 6 : 1;
+
+                Console.WriteLine("Promotion possible.");
+                Console.WriteLine(promotionRow);
+                if (previousRow == promotionRow)
+                {
+                    PromotionPossible = false;
+                    optionSelected = PromotePawn();
+                    if (optionSelected == null) return;
+                    optionSelected = optionSelected.ToLower();
+                }
             }
+
 
             if (enPassantPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn)
             {
@@ -493,7 +498,6 @@ namespace Chess
                 else if (rookImageForCastling != null && (targetCol == 6 || targetCol == 1)) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Castling,PieceType.King, -1, CastlingType.KingSideCastle);
                 else if (rookImageForCastling != null && (targetCol == 5 || targetCol == 2)) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Castling,PieceType.King, -1, CastlingType.QueenSideCastle);
                 else Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Normal);
-
                 ChessGrid.Children.Add(pieceToMove);
             }
             else

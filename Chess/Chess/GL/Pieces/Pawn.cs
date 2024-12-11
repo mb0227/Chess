@@ -74,6 +74,10 @@ namespace Chess.GL
         private void AddPromotions(List<Move> moves, Board board, Block currentBlock, int rank, int file, int direction)
         {
             int promotionRank = (GetColor() == PieceColor.White) ? 0 : 7;
+
+            if (board.GetFirstPlayerColor() == PlayerColor.Black)
+                promotionRank = (GetColor() == PieceColor.White) ? 7 : 0;
+
             if (rank + direction == promotionRank)
             {
                 Block promotionBlock = (board.WithinBounds(rank + direction, file)) ? board.GetBlock(rank + direction, file) : null;
@@ -101,6 +105,10 @@ namespace Chess.GL
         private void AddEnPassantMoves(List<Move> moves, Board board, Block currentBlock, int rank, int file, int direction)
         {
             int enPassantRank = (GetColor() == PieceColor.White) ? 3 : 4;
+
+            if (board.GetFirstPlayerColor() == PlayerColor.Black)
+                 enPassantRank = (GetColor() == PieceColor.White) ? 4 : 3;
+
             if (rank == enPassantRank)
             {
                 foreach (int offset in new[] { -1, 1 })

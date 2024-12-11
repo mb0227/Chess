@@ -13,22 +13,24 @@ namespace Chess.GL
             Blocks = new Block[8, 8];
             this.FirstPlayerColor = FirstPlayerColor;
             int blackPiecesRank, blackPawnsRank, whitePawnsRank, whitePiecesRank;
-
+            int kingIndex, queenIndex;
             if (FirstPlayerColor == PlayerColor.White)
             {
                 (blackPawnsRank, blackPiecesRank, whitePawnsRank, whitePiecesRank) = (1, 0, 6, 7);
+                (kingIndex, queenIndex) = (4, 3);
             }
             else
             {
                 (blackPawnsRank, blackPiecesRank, whitePawnsRank, whitePiecesRank) = (6, 7, 1, 0);
+                (kingIndex, queenIndex) = (3, 4);
             }
 
             // Creating White Pieces
             Blocks[whitePiecesRank, 0] = new Block(whitePiecesRank, 0, new Rook(PieceColor.White, PieceType.Rook, true));
             Blocks[whitePiecesRank, 1] = new Block(whitePiecesRank, 1, new Knight(PieceColor.White, PieceType.Knight, true));
             Blocks[whitePiecesRank, 2] = new Block(whitePiecesRank, 2, new Bishop(PieceColor.White, PieceType.Bishop, true));
-            Blocks[whitePiecesRank, 3] = new Block(whitePiecesRank, 3, new Queen(PieceColor.White, PieceType.Queen, true));
-            Blocks[whitePiecesRank, 4] = new Block(whitePiecesRank, 4, new King(PieceColor.White, PieceType.King, true));
+            Blocks[whitePiecesRank, queenIndex] = new Block(whitePiecesRank, queenIndex, new Queen(PieceColor.White, PieceType.Queen, true));
+            Blocks[whitePiecesRank, kingIndex] = new Block(whitePiecesRank, kingIndex, new King(PieceColor.White, PieceType.King, true));
             Blocks[whitePiecesRank, 5] = new Block(whitePiecesRank, 5, new Bishop(PieceColor.White, PieceType.Bishop, true));
             Blocks[whitePiecesRank, 6] = new Block(whitePiecesRank, 6, new Knight(PieceColor.White, PieceType.Knight, true));
             Blocks[whitePiecesRank, 7] = new Block(whitePiecesRank, 7, new Rook(PieceColor.White, PieceType.Rook, true));
@@ -41,8 +43,8 @@ namespace Chess.GL
             Blocks[blackPiecesRank, 0] = new Block(blackPiecesRank, 0, new Rook(PieceColor.Black, PieceType.Rook, true));
             Blocks[blackPiecesRank, 1] = new Block(blackPiecesRank, 1, new Knight(PieceColor.Black, PieceType.Knight, true));
             Blocks[blackPiecesRank, 2] = new Block(blackPiecesRank, 2, new Bishop(PieceColor.Black, PieceType.Bishop, true));
-            Blocks[blackPiecesRank, 3] = new Block(blackPiecesRank, 3, new Queen(PieceColor.Black, PieceType.Queen, true));
-            Blocks[blackPiecesRank, 4] = new Block(blackPiecesRank, 4, new King(PieceColor.Black, PieceType.King, true));
+            Blocks[blackPiecesRank, queenIndex] = new Block(blackPiecesRank, queenIndex, new Queen(PieceColor.Black, PieceType.Queen, true));
+            Blocks[blackPiecesRank, kingIndex] = new Block(blackPiecesRank, kingIndex, new King(PieceColor.Black, PieceType.King, true));
             Blocks[blackPiecesRank, 5] = new Block(blackPiecesRank, 5, new Bishop(PieceColor.Black, PieceType.Bishop, true));
             Blocks[blackPiecesRank, 6] = new Block(blackPiecesRank, 6, new Knight(PieceColor.Black, PieceType.Knight, true));
             Blocks[blackPiecesRank, 7] = new Block(blackPiecesRank, 7, new Rook(PieceColor.Black, PieceType.Rook, true));
