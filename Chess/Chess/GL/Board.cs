@@ -166,10 +166,11 @@ namespace Chess.GL
                 if (attackingPiece == null || attackingPiece.GetColor() == pieceColor || kingBlock == null)
                     continue;
 
-                if (attackingPiece.CanAttack(kingBlock, this))
-                {
+                if (attackingPiece.GetPieceType() == PieceType.Pawn && attackingPiece.IsAttackingKing(this, kingBlock))
                     return true;
-                }
+
+                if (attackingPiece.CanAttack(kingBlock, this))
+                    return true;                
             }
             return false;
         }
@@ -226,7 +227,9 @@ namespace Chess.GL
                     continue;
 
                 if (piece.CanAttack(block, this))
+                {
                     return true;
+                }
             }
             return false;
         }
@@ -258,7 +261,7 @@ namespace Chess.GL
                 Piece piece = block.GetPiece();
                 if (piece == null || piece.GetColor() != pieceColor)
                     continue;
-                if (piece.GetPossibleMoves(this).Count > 0)
+                if (piece?.GetPossibleMoves(this).Count > 0)
                     return false;
             }
             return true;

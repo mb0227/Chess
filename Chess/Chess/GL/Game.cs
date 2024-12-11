@@ -1,6 +1,7 @@
 ﻿using Chess.DS;
 using System.Windows.Documents;
 using System;
+using System.Linq;
 
 namespace Chess.GL
 {
@@ -23,7 +24,8 @@ namespace Chess.GL
         Stalemate,
         Promotion,
         EnPassant,
-        Castling
+        Castling,
+        PromotionCheck
     }
 
     public enum CastlingType
@@ -80,6 +82,7 @@ namespace Chess.GL
                 Block prevBlock = Board.GetBlock(prevRank, prevFile);
                 Piece pieceAtPrev = prevBlock.GetPiece();
                 Block newBlock = Board.GetBlock(newRank, newFile);
+
                 if(newBlock.GetPiece() != null && newBlock.GetPiece().GetColor() == pieceAtPrev.GetColor())
                 {
                     Console.WriteLine("Cannot place pieces of same color on eachother.");
@@ -91,12 +94,18 @@ namespace Chess.GL
                     return;
                 }
 
+                if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn)
+                {
+                    CheckForPromotionCheck(prevBlock, newBlock, pieceAtPrev, ref moveType,ref pieceType);
+                }
+
                 // update move movement
                 if (pieceAtPrev.GetPieceType() == PieceType.Pawn)
                 {
                     Pawn pawn = (Pawn)prevBlock.GetPiece();
                     pawn.SetPawnMoved();
-                    if (prevRank == 1 || prevRank == 6) pawn.PawnMoved(Math.Abs(prevRank - newRank));
+                    if (prevRank == 1 || prevRank == 6) 
+                        pawn.PawnMoved(Math.Abs(prevRank - newRank));
                 }
                 else
                 {
@@ -128,8 +137,6 @@ namespace Chess.GL
                 //Board.DisplayBoard();
                 if (moveType == MoveType.EnPassant && Board.GetBlock(enPassantTargetRow, newFile) != null)
                 {
-                    // target row is the row where the pawn will move to, and 
-                    // enpassant target row is where the piece to be captured
                     Block targetBlock = Board.GetBlock(enPassantTargetRow, newFile);
                     Piece pieceAtTarget = targetBlock.GetPiece();
                     pieceAtTarget?.Kill();
@@ -163,7 +170,33 @@ namespace Chess.GL
                     Board.GetBlock(rank, kingEndFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }
-                else if (Board.GetBlock(newRank, newFile).GetPiece() == null && moveType != MoveType.EnPassant) // if the target block is empty
+                else if (moveType == MoveType.PromotionCheck)
+                {
+                    Piece pieceAtNew = newBlock.GetPiece();
+
+                    if (pieceAtNew?.GetPieceType() != PieceType.King)
+                        pieceAtNew?.Kill();
+
+                    AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
+
+                    if (pieceType == PieceType.Queen)
+                        pieceAtPrev = new Queen(pieceAtPrev.GetColor(), pieceType, true);
+                    else if (pieceType == PieceType.Bishop)
+                        pieceAtPrev = new Bishop(pieceAtPrev.GetColor(), pieceType, true);
+                    else if (pieceType == PieceType.Rook)
+                        pieceAtPrev = new Rook(pieceAtPrev.GetColor(), pieceType, true);
+                    else if (pieceType == PieceType.Knight)
+                        pieceAtPrev = new Knight(pieceAtPrev.GetColor(), pieceType, true);
+
+                    if (CurrentMove == PlayerOne && pieceAtNew != null)
+                        PlayerTwo.KillPiece(pieceAtNew);
+                    else if (CurrentMove == PlayerTwo && pieceAtNew != null)
+                        PlayerOne.KillPiece(pieceAtNew);
+
+                    Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
+                    Board.GetBlock(prevRank, prevFile).SetPiece(null);
+                }
+                else if (newBlock.GetPiece() == null && moveType != MoveType.EnPassant) // if the target block is empty
                 {
                     AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
 
@@ -180,15 +213,19 @@ namespace Chess.GL
                 {
                     Piece pieceAtNew = newBlock.GetPiece();
 
-                    if(pieceAtNew.GetPieceType() != PieceType.King)
-                        pieceAtNew?.Kill();
+                    if (pieceAtNew?.GetPieceType() != PieceType.King)
+                        pieceAtNew.Kill();
 
                     if(moveType != MoveType.Promotion) 
                         AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew);
                     else 
                         AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
 
-                    if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
+                    if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn 
+                        && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) 
+                        || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.White)
+                        || prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.Black)
+                        || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
                         if (pieceType == PieceType.Queen)
@@ -213,7 +250,7 @@ namespace Chess.GL
                 //Board.DisplayBoard();
                 if (CurrentMove.GetColor() == PlayerColor.White)
                 {
-                    if (moveType == MoveType.Check && Board.GetFinalStatus(PieceColor.Black)) // Scan for Checkmate
+                    if ((moveType == MoveType.Check || moveType == MoveType.PromotionCheck) && Board.GetFinalStatus(PieceColor.Black)) // Scan for Checkmate
                     {
                         moveType = MoveType.Checkmate;
                         Status = GameStatus.WHITE_WIN;
@@ -228,7 +265,7 @@ namespace Chess.GL
                 }
                 else
                 {
-                    if (moveType == MoveType.Check && Board.GetFinalStatus(PieceColor.White)) // Scan for Checkmate
+                    if ((moveType == MoveType.Check || moveType == MoveType.PromotionCheck) && Board.GetFinalStatus(PieceColor.White)) // Scan for Checkmate
                     {
                         moveType = MoveType.Checkmate;
                         Status = GameStatus.BLACK_WIN;
@@ -249,7 +286,7 @@ namespace Chess.GL
                         if(moveType == MoveType.Checkmate)
                         {
                             SecondPlayerMove.SetMoveType(MoveType.Checkmate);
-                            SecondPlayerMove.MakeNotation();
+                            SecondPlayerMove.SetNotation(SecondPlayerMove.GetNotation().Replace("+", "#"));
                         }
                         Moves.Push(FirstPlayerMove, SecondPlayerMove);
                     }
@@ -258,7 +295,7 @@ namespace Chess.GL
                         if (moveType == MoveType.Checkmate)
                         {
                             FirstPlayerMove.SetMoveType(MoveType.Checkmate);
-                            FirstPlayerMove.MakeNotation();
+                            FirstPlayerMove.SetNotation(FirstPlayerMove.GetNotation().Replace("+", "#"));
                         }
                         Moves.Push(SecondPlayerMove, FirstPlayerMove);
                     }
@@ -267,7 +304,7 @@ namespace Chess.GL
                 if(CurrentMove.GetColor() == PlayerColor.White && PlayerOne.GetColor() == PlayerColor.White && moveType == MoveType.Checkmate)
                 {
                     FirstPlayerMove.SetMoveType(MoveType.Checkmate);
-                    FirstPlayerMove.MakeNotation();
+                    FirstPlayerMove.SetNotation(FirstPlayerMove.GetNotation().Replace("+", "#"));
                     Moves.Push(FirstPlayerMove);
                 }
 
@@ -285,6 +322,47 @@ namespace Chess.GL
             }
         }
 
+        public void CheckForPromotionCheck(Block prevBlock, Block newBlock, Piece pieceAtPrev, ref MoveType moveType,ref PieceType pieceType)
+        {
+            Piece pieceAtNew = newBlock.GetPiece(); 
+            Pawn pawn = (Pawn)prevBlock.GetPiece();
+            if  (prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White
+                || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.White
+                || prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.Black
+                || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)
+            {
+                if (pieceType == PieceType.Queen)
+                    pieceAtPrev = new Queen(pieceAtPrev.GetColor(), pieceType, true);
+                else if (pieceType == PieceType.Bishop)
+                    pieceAtPrev = new Bishop(pieceAtPrev.GetColor(), pieceType, true);
+                else if (pieceType == PieceType.Rook)
+                    pieceAtPrev = new Rook(pieceAtPrev.GetColor(), pieceType, true);
+                else if (pieceType == PieceType.Knight)
+                    pieceAtPrev = new Knight(pieceAtPrev.GetColor(), pieceType, true);
+                else
+                    return;
+            }
+
+            Board.GetBlock(newBlock.GetRank(), newBlock.GetFile()).SetPiece(pieceAtPrev);
+            Board.GetBlock(prevBlock.GetRank(), prevBlock.GetFile()).SetPiece(null);
+
+            PieceColor opponentKingColor = CurrentMove.GetColor() == PlayerColor.Black ? PieceColor.White : PieceColor.Black;
+            King king = (King)Board.FindKing(opponentKingColor).GetPiece();
+            if (Board.IsKingInCheck(opponentKingColor))
+            {
+                moveType = MoveType.PromotionCheck;
+                king.SetCheck(true);
+            }
+            else
+            {
+                king.SetCheck(false);
+            }
+
+            // reset board
+            Board.GetBlock(newBlock.GetRank(), newBlock.GetFile()).SetPiece(pieceAtNew);
+            Board.GetBlock(prevBlock.GetRank(), prevBlock.GetFile()).SetPiece(pawn);
+        }
+
         public void AddMove(Block prevBlock, Block newBlock, MoveType moveType, Piece prevBlockPiece, Piece capturedPiece = null, PieceType promotedPieceType = PieceType.Queen)
         {
             // first check if the previous move was of pawn and it moved 2 blocks and player didn't kill it by en passant
@@ -294,18 +372,30 @@ namespace Chess.GL
             {
                 move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
             }
-            else if(moveType == MoveType.Castling)
+            else if (moveType == MoveType.Castling)
             {
                 CastlingType castlingType = CastlingType.None;
-                if (newBlock.GetFile() == 6 || newBlock.GetFile() == 1) castlingType = CastlingType.KingSideCastle;
-                else if (newBlock.GetFile() == 2 || newBlock.GetFile() == 5) castlingType = CastlingType.QueenSideCastle;
+
+                if (newBlock.GetFile() == 6 || newBlock.GetFile() == 1) 
+                    castlingType = CastlingType.KingSideCastle;
+                else if (newBlock.GetFile() == 2 || newBlock.GetFile() == 5) 
+                    castlingType = CastlingType.QueenSideCastle;
+
                 move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, castlingType);
             }
-            else if (moveType == MoveType.EnPassant) move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
-            else move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType, promotedPieceType);
+            else if (moveType == MoveType.EnPassant)
+            {
+                move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType);
+            }
+            else
+            {
+                move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType, promotedPieceType);
+            }
 
-            if (CurrentMove == PlayerOne) FirstPlayerMove = move;
-            else SecondPlayerMove = move;
+            if (CurrentMove == PlayerOne) 
+                FirstPlayerMove = move;
+            else 
+                SecondPlayerMove = move;
         }
 
         private void SetPawnUnEnPassantable()

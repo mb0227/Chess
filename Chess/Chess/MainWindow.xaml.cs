@@ -19,6 +19,7 @@ namespace Chess
         bool castlingPossible = false;
         bool IsMoving = false;
         int SelectedRow, SelectedCol;
+        Piece SelectedPiece;
         Game Game;
         public MainWindow()
         {
@@ -146,6 +147,7 @@ namespace Chess
             }
         }
 
+
         private void Chessboard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var clickedElement = sender as Border;
@@ -157,10 +159,17 @@ namespace Chess
                 {
                     return;
                 }
-                if(CanEnPassant(row, col))
+
+                if(!IsMoving)
+                {
+                    SelectedPiece = Game.GetBoard().GetBlock(row, col).GetPiece();
+                }
+
+                if (CanEnPassant(row, col))
                 {
                     enPassantPossible = true;
                 }
+
                 if (IsMoving)
                 {
                     IsMoving = false;
@@ -357,6 +366,7 @@ namespace Chess
                 Console.WriteLine("Invalid block selected.");
                 return;
             }
+
             if((PromotionPossible && prevBlock.GetPiece().GetPieceType() == PieceType.Pawn 
                 && ((previousRow == 1 && Game.GetPlayerOne().GetColor() == PlayerColor.White) 
                   || (previousRow == 6 && Game.GetPlayerTwo().GetColor() == PlayerColor.Black)))
@@ -511,19 +521,28 @@ namespace Chess
 
         private bool CanEnPassant(int targetRow, int targetCol)
         {
+            //if (SelectedRow != targetRow && (targetCol != SelectedCol + 1 || targetCol != SelectedCol - 1)) return false;
+            Block block = Game.GetBoard().GetBlock(targetRow, targetCol);
             if ((FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White && targetRow == 2 ) 
                 || (FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 5)
                 || (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White && targetRow == 5)
                 || (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 2))
             {
-
-                Block block = Game.GetBoard().GetBlock(targetRow, targetCol);
                 Block blockToCheckForPawn;
 
-                if (FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White) blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow + 1, targetCol);
-                else if(FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black) blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow - 1, targetCol);
-                else if(!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White) blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow - 1, targetCol);
-                else blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow + 1, targetCol);
+                if (FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White) 
+                    blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow + 1, targetCol);
+                else if(FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black) 
+                    blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow - 1, targetCol);
+                else if(!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White) 
+                    blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow - 1, targetCol);
+                else if (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black)
+                    blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow + 1, targetCol);
+                else
+                    return false;
+
+                if (SelectedPiece == null || SelectedPiece == blockToCheckForPawn?.GetPiece()) return false;
+
                 if (block.IsEmpty()
                 && (blockToCheckForPawn.GetPiece() != null
                 && blockToCheckForPawn.GetPiece().GetPieceType() == PieceType.Pawn)

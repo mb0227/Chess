@@ -48,7 +48,6 @@ namespace Chess.GL
             MakeNotation();
         }
         
-        
         public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, MoveType moveType, PieceType promotedPieceType) : this(startBlock, endBlock, pieceMoved, pieceKilled, moveType)
         {
             PromotedPieceType = promotedPieceType;
@@ -97,10 +96,14 @@ namespace Chess.GL
             if (MoveType == MoveType.Promotion)
                 Notation += "=" + GetPieceMovedString(PromotedPieceType);
 
-            if
-                (MoveType == MoveType.Checkmate) Notation += "#";
-            else if
-                (MoveType == MoveType.Check) Notation += "+";
+            if (MoveType == MoveType.Checkmate) 
+                Notation += "#";
+            else if(MoveType == MoveType.Check) 
+                Notation += "+";
+
+            if(MoveType == MoveType.PromotionCheck)
+                Notation += "=" + GetPieceMovedString(PromotedPieceType) + "+";
+
         }
 
         private string GetPieceMovedString(PieceType p)
@@ -177,6 +180,11 @@ namespace Chess.GL
         public static void SetBoard(Board board)
         {
             Board = board;
+        }
+
+        public void SetNotation(string notation)
+        {
+            Notation = notation;
         }
     }
 }

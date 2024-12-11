@@ -105,6 +105,11 @@ namespace Chess.GL
             {
                 foreach (int offset in new[] { -1, 1 })
                 {
+                    if (!board.WithinBounds(rank, file + offset))
+                    {
+                        continue;
+                    }
+
                     Block sideBlock = board.GetBlock(rank, file + offset);
                     if (sideBlock != null && !sideBlock.IsEmpty() &&
                         sideBlock.GetPiece().GetPieceType() == PieceType.Pawn &&
@@ -119,6 +124,27 @@ namespace Chess.GL
             }
         }
 
+        public override bool IsAttackingKing(Board board, Block kingBlock)
+        {
+            Block currentBlock = board.GetBlock(this);
+            int rank = currentBlock.GetRank();
+            int file = currentBlock.GetFile();
+            int kingRank = kingBlock.GetRank();
+            int kingFile = kingBlock.GetFile();
+            int direction = (board.GetFirstPlayerColor() == PlayerColor.White) ?
+                            (GetColor() == PieceColor.White ? -1 : 1) :
+                            (GetColor() == PieceColor.White ? 1 : -1);
+            foreach (int offset in new[] { -1, 1 })
+            {
+                if (!board.WithinBounds(rank + direction, file + offset)) continue;
+                if (rank + direction == kingRank && file + offset == kingFile)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public override bool CanAttack(Block targetBlock, Board board)
         {
             Block currentBlock = board.GetBlock(this);
@@ -128,15 +154,20 @@ namespace Chess.GL
             int targetRank = targetBlock.GetRank();
             int targetFile = targetBlock.GetFile();
 
-            int direction = (GetColor() == PieceColor.White) ? 1 : -1; // Determine movement direction
+            int direction = (GetColor() == PieceColor.White) ? 1 : -1;
 
             if (Math.Abs(file - targetFile) == 1 && targetRank - rank == direction)
             {
-                Piece targetPiece = board.GetBlock(targetRank, targetFile).GetPiece();
+                Piece targetPiece = targetBlock.GetPiece();
+
+                if (targetPiece == null && targetBlock == board.FindKing(targetBlock.GetPiece().GetColor()))
+                    return true;
+
                 return targetPiece != null && targetPiece.GetColor() != GetColor();
             }
             return false;
         }
+
 
         public void PawnMoved(int rank)
         {
