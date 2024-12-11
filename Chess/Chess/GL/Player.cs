@@ -45,6 +45,11 @@ namespace Chess.GL
             DeadPieces.Display();
         }
 
+        public string GetFirstDeadPiece()
+        {
+            return DeadPieces.GetFirstPiece();
+        }
+
         public override string ToString()
         {
             return $"Player Color: {Color.ToString()}";

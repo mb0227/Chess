@@ -15,34 +15,7 @@ namespace Chess.Views
 {
     public partial class GamePage : Page, INotifyPropertyChanged
     {
-        private ObservableCollection<string> _moves;
-
-        public ObservableCollection<string> Moves
-        {
-            get => _moves;
-            set
-            {
-                if (_moves != value)
-                {
-                    _moves = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public void AddMove(string move)
-        {
-            Moves.Add(move);  // Add the move to the list
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        bool FirstPlayerSelectedColorWhite = true;
+        bool FirstPlayerSelectedColorWhite = false;
         bool PromotionPossible = false;
         bool enPassantPossible = false;
         bool castlingPossible = false;
@@ -69,9 +42,79 @@ namespace Chess.Views
             InitializeBoard();
             DataContext = this;
             Moves = new ObservableCollection<string>();
-
-            // Subscribe to the MoveMade event of the Game class
+            PlayerOneDeadPieces = new ObservableCollection<string>();
+            PlayerTwoDeadPieces = new ObservableCollection<string>();
             Game.MoveMade += AddMove;
+            Game.PlayerOneDeadPieces += AddPlayerOneDeadPiece;
+            Game.PlayerTwoDeadPieces += AddPlayerTwoDeadPiece;
+
+            PlayerOneDeadPiecesTextBox.Text = FirstPlayerColor.ToString() + "'s Dead Pieces";
+            PlayerOneDeadPiecesTextBox.HorizontalAlignment = HorizontalAlignment.Center;
+            PlayerTwoDeadPiecesTextBox.Text = SecondPlayerColor.ToString() + "'s Dead Pieces";
+            PlayerTwoDeadPiecesTextBox.HorizontalAlignment = HorizontalAlignment.Center;
+        }
+
+        private ObservableCollection<string> _moves;
+        private ObservableCollection<string> _playerOneDeadPieces;
+        private ObservableCollection<string> _playerTwoDeadPieces;
+
+        public ObservableCollection<string> Moves
+        {
+            get => _moves;
+            set
+            {
+                if (_moves != value)
+                {
+                    _moves = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public ObservableCollection<string> PlayerOneDeadPieces
+        {
+            get => _playerOneDeadPieces;
+            set
+            {
+                if (_playerOneDeadPieces != value)
+                {
+                    _playerOneDeadPieces = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public ObservableCollection<string> PlayerTwoDeadPieces
+        {
+            get => _playerTwoDeadPieces;
+            set
+            {
+                if (_playerTwoDeadPieces != value)
+                {
+                    _playerTwoDeadPieces = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public void AddMove(string move)
+        {
+            Moves.Add(move);  // Add the move to the list
+        }
+
+        public void AddPlayerOneDeadPiece(string piece)
+        {
+            PlayerOneDeadPieces.Add(piece);
+        }
+
+        public void AddPlayerTwoDeadPiece(string piece)
+        {
+            PlayerTwoDeadPieces.Add(piece);
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void InitializeBoard()
@@ -186,7 +229,7 @@ namespace Chess.Views
         private void Chessboard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var clickedElement = sender as Border;
-            if (clickedElement != null)
+            if (clickedElement != null && !Game.GetIsGameOver())
             {
                 int row = Grid.GetRow(clickedElement);
                 int col = Grid.GetColumn(clickedElement);
@@ -559,9 +602,38 @@ namespace Chess.Views
             }
         }
 
+        private void ResignClick(object sender, RoutedEventArgs e)
+        {
+            if(Game.GetIsGameOver()) return;
+            var result = MessageBox.Show("Are you sure you want to resign?", "Resign", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.No) return;
+            Game.SetIsGameOver(true);
+            Player winner = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne(); 
+            MessageBox.Show($"{Game.GetCurrentPlayer().GetColor().ToString()} has resigned. {winner.GetColor().ToString()} wins!", "Resign", MessageBoxButton.OK);
+            Game.UpdateStatus(GameStatus.RESIGNATION);
+            // go to previous page
+        }
+
+        private void DrawClick(object sender, RoutedEventArgs e)
+        {
+            if (Game.GetIsGameOver()) return;
+
+            Player nextPlayer = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne();
+            var result = MessageBox.Show($"{Game.GetCurrentPlayer().GetColor().ToString()} has offered a draw. Do you want to accept?",
+                                  "Draw Offer", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Game.MakeMove(-1,-1,-1,-1, MoveType.Draw);
+                Game.SetIsGameOver(true);
+                MessageBox.Show("Game is a draw!", "Game Draw", MessageBoxButton.OK);
+                Game.UpdateStatus(GameStatus.DRAW);
+            }
+            // go to previous page
+        }
+
         private bool CanEnPassant(int targetRow, int targetCol)
         {
-            //if (SelectedRow != targetRow && (targetCol != SelectedCol + 1 || targetCol != SelectedCol - 1)) return false;
             Block block = Game.GetBoard().GetBlock(targetRow, targetCol);
             if ((FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White && targetRow == 2)
                 || (FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 5)
@@ -592,6 +664,13 @@ namespace Chess.Views
                 }
             }
             return false;
+        }
+
+        private void ScrollViewerLoaded(object sender, RoutedEventArgs e)
+        {
+            movesViewer.ScrollToBottom();
+            playerOneDeadPiecesViewer.ScrollToBottom();
+            playerTwoDeadPiecesViewer.ScrollToBottom();
         }
     }
 }

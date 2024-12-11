@@ -23,6 +23,11 @@ namespace Chess.GL
         //private bool IsCheck;
         //private bool IsCheckMate;
 
+        public Move(MoveType moveType)
+        {
+            MoveType = moveType;
+        }
+
         public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled)
         {
             StartBlock = startBlock;
@@ -65,6 +70,9 @@ namespace Chess.GL
 
         public void MakeNotation()
         {
+            if (MoveType == MoveType.Draw) 
+                return;
+
             if(MoveType == MoveType.Castling && CastlingType == CastlingType.KingSideCastle)
             {
                 Notation = "O-O";

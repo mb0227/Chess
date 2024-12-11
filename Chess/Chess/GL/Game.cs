@@ -3,6 +3,7 @@ using System.Windows.Documents;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Chess.GL
 {
@@ -13,7 +14,8 @@ namespace Chess.GL
         WHITE_WIN,
         FORFEIT,
         STALEMATE,
-        RESIGNATION
+        RESIGNATION,
+        DRAW
     }
 
     public enum MoveType
@@ -26,7 +28,8 @@ namespace Chess.GL
         Promotion,
         EnPassant,
         Castling,
-        PromotionCheck
+        PromotionCheck,
+        Draw
     }
 
     public enum CastlingType
@@ -48,6 +51,9 @@ namespace Chess.GL
         private bool IsGameOver;
         private GameStatus Status;
         public event Action<string> MoveMade;
+        // dead pieces
+        public event Action<string> PlayerOneDeadPieces;
+        public event Action<string> PlayerTwoDeadPieces;
 
         private static Game GameInstance;
 
@@ -74,6 +80,15 @@ namespace Chess.GL
 
         public void MakeMove(int prevRank, int prevFile, int newRank, int newFile, MoveType moveType, PieceType pieceType = PieceType.Queen, int enPassantTargetRow = -1, CastlingType castlingType = CastlingType.None)
         {
+            if (moveType == MoveType.Draw)
+            {
+                Move move = new Move(moveType);
+                move.SetNotation("1/2");
+                Moves.Push(move, move);
+                MoveMade?.Invoke(Moves.Peek());
+                return;
+            }
+
             if (!IsGameOver && Status == GameStatus.ACTIVE && Board.WithinBounds(prevRank, prevFile) && Board.WithinBounds(newRank, newFile))
             {
                 if(Board.GetBlock(prevRank, prevFile).IsEmpty())
@@ -95,6 +110,7 @@ namespace Chess.GL
                     Console.WriteLine("It is not your turn.");
                     return;
                 }
+
 
                 if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn)
                 {
@@ -145,8 +161,16 @@ namespace Chess.GL
 
                     AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtTarget);
 
-                    if (CurrentMove == PlayerOne) PlayerTwo.KillPiece(pieceAtTarget);
-                    else PlayerOne.KillPiece(pieceAtTarget);
+                    if (CurrentMove == PlayerOne)
+                    {
+                        PlayerTwo.KillPiece(pieceAtTarget);
+                        PlayerTwoDeadPieces.Invoke(PlayerTwo.GetFirstDeadPiece());
+                    }
+                    else
+                    {
+                        PlayerOne.KillPiece(pieceAtTarget);
+                        PlayerOneDeadPieces.Invoke(PlayerOne.GetFirstDeadPiece());
+                    }
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                     Board.GetBlock(enPassantTargetRow, newFile).SetPiece(null);
@@ -199,11 +223,16 @@ namespace Chess.GL
                         pieceAtPrev = new Knight(pieceAtPrev.GetColor(), PieceType.Knight, true);
 
                     if (CurrentMove == PlayerOne && pieceAtNew != null)
+                    {
                         PlayerTwo.KillPiece(pieceAtNew);
+                        PlayerTwoDeadPieces.Invoke(PlayerTwo.GetFirstDeadPiece());
+                    }
                     else if (CurrentMove == PlayerTwo && pieceAtNew != null)
+                    {
                         PlayerOne.KillPiece(pieceAtNew);
+                        PlayerOneDeadPieces.Invoke(PlayerOne.GetFirstDeadPiece());
+                    }
 
-                    Console.WriteLine("Promotion Check");
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }
@@ -249,10 +278,17 @@ namespace Chess.GL
                             pieceAtPrev = new Knight(pieceAtPrev.GetColor(), PieceType.Knight, true);    
                     };
 
-                    if (CurrentMove == PlayerOne) 
+                    if (CurrentMove == PlayerOne)
+                    {
                         PlayerTwo.KillPiece(pieceAtNew);
-                    else 
+                        Console.WriteLine(PlayerTwo.GetFirstDeadPiece());
+                        PlayerTwoDeadPieces.Invoke(PlayerTwo.GetFirstDeadPiece());
+                    }
+                    else
+                    {
                         PlayerOne.KillPiece(pieceAtNew);
+                        PlayerOneDeadPieces.Invoke(PlayerOne.GetFirstDeadPiece());
+                    }
 
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
@@ -547,7 +583,7 @@ namespace Chess.GL
 
         private void OnMoveMade(string move)
         {
-            MoveMade?.Invoke(move);  // Raise the event with the new move
+            MoveMade?.Invoke(move);
         }
     }
 }
