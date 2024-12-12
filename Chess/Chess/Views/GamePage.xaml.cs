@@ -15,7 +15,8 @@ namespace Chess.Views
 {
     public partial class GamePage : Page, INotifyPropertyChanged
     {
-        bool FirstPlayerSelectedColorWhite = false;
+        bool FirstPlayerSelectedColorWhite = true;
+        bool isInCheck = false;
         bool PromotionPossible = false;
         bool enPassantPossible = false;
         bool castlingPossible = false;
@@ -374,11 +375,15 @@ namespace Chess.Views
             }
         }
 
-        private void HighlightSquares(int row, int col)
+        private void HighlightSquares(int row, int col, Brush brush = null)
         {
+            if (brush == null)
+            {
+                brush = Brushes.LightGreen;
+            }
             Border border = new Border
             {
-                Background = Brushes.LightGreen,
+                Background = brush,
                 Opacity = 0.5
             };
             Grid.SetRow(border, row);
@@ -386,12 +391,16 @@ namespace Chess.Views
             ChessGrid.Children.Add(border);
         }
 
-        private void RemoveHighlights()
+        private void RemoveHighlights(Brush brush = null)
         {
+            if (brush == null)
+            {
+                brush = Brushes.LightGreen;
+            }
             List<UIElement> elementsToRemove = new List<UIElement>();
             foreach (UIElement element in ChessGrid.Children)
             {
-                if (element is Border border && border.Background == Brushes.LightGreen)
+                if (element is Border border && border.Background == brush)
                 {
                     elementsToRemove.Add(element);
                 }
@@ -423,6 +432,15 @@ namespace Chess.Views
         private void MakeMove(int previousRow, int previousCol, int targetRow, int targetCol)
         {
             if (!IsValidMove(targetRow, targetCol)) return;
+
+            PieceColor currentPieceColor = Game.GetCurrentPlayer().GetColor() == PlayerColor.White ? PieceColor.White : PieceColor.Black;
+
+            if (isInCheck && Game.GetBoard().IsKingInCheck(currentPieceColor))
+            {
+                Block kingBlock = Game.GetBoard().FindKing(currentPieceColor);
+                isInCheck = false;
+                RemoveHighlights(Brushes.Red);
+            }
 
             Image pieceToMove = null;
             Image capturedPiece = null;
@@ -583,6 +601,15 @@ namespace Chess.Views
             {
                 Console.WriteLine($"No piece found at Row: {previousRow}, Column: {previousCol}.");
             }
+
+            PieceColor opponentPieceColor = Game.GetCurrentPlayer().GetColor() == PlayerColor.White ? PieceColor.White : PieceColor.Black;
+            if (Game.GetBoard().IsKingInCheck(opponentPieceColor))
+            {
+                Block kingBlock = Game.GetBoard().FindKing(opponentPieceColor);
+                isInCheck = true;
+                HighlightSquares(kingBlock.GetRank(), kingBlock.GetFile(), Brushes.Red);
+            }
+
             if (enPassantPossible) enPassantPossible = false;
             if (PromotionPossible) PromotionPossible = false;
             if (IsMoving) IsMoving = false;
@@ -636,9 +663,9 @@ namespace Chess.Views
         {
             Block block = Game.GetBoard().GetBlock(targetRow, targetCol);
             if ((FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White && targetRow == 2)
-                || (FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 5)
-                || (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White && targetRow == 5)
-                || (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 2))
+               || (FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 5)
+               || (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White && targetRow == 5)
+               || (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 2))
             {
                 Block blockToCheckForPawn;
 
@@ -676,22 +703,84 @@ namespace Chess.Views
                     Piece killedPiece = null;
                     if(move.GetNotation().Contains("x"))
                         killedPiece = move.GetPieceKilled();
-                    UndoMove(move.GetEndBlock(), move.GetStartBlock(), move.GetPieceMoved(), killedPiece);
+                    UndoMove(move.GetEndBlock(), move.GetStartBlock(), move.GetPieceMoved(), killedPiece, move.GetMoveType(), move.GetCastlingType());
+                    Game.UndoMove(move);
                 }
             }
         }
 
-        private void UndoMove(Block endBlock, Block startBlock, Piece piece, Piece pieceKilled)
+        private void UndoMove(Block endBlock, Block startBlock, Piece piece, Piece pieceKilled, MoveType moveType, CastlingType castlingType)
         {
             int prevRank = endBlock.GetRank();
             int prevFile = endBlock.GetFile();
             int targetRank = startBlock.GetRank();
             int targetFile = startBlock.GetFile();
+
+            int rookTargetFile = -1;
+            int rookCurrentFile = -1;
+
             Image pieceToMove = null;
             Image capturedPiece = null;
+            Image promotedPiece = null;
+            Image rookImage = null;
 
             if(pieceKilled != null)
                 capturedPiece = GetImage(pieceKilled.GetColor().ToString().ToLower(), pieceKilled.GetPieceType().ToString().ToLower());
+
+            if(moveType == MoveType.EnPassant)
+            {
+                capturedPiece = GetImage((pieceKilled.GetColor() == PieceColor.White ? PieceColor.White : PieceColor.Black).ToString().ToLower(), "pawn");
+                if (capturedPiece != null)
+                {
+                    Grid.SetRow(capturedPiece, targetRank);
+                    Grid.SetColumn(capturedPiece, prevFile);
+                    ChessGrid.Children.Add(capturedPiece);
+                }
+            }
+
+            if(moveType == MoveType.Castling)
+            {
+                if (castlingType == CastlingType.KingSideCastle && FirstPlayerSelectedColorWhite)
+                {
+                    rookCurrentFile = 5;
+                    rookTargetFile = 7;
+                }
+                else if (castlingType == CastlingType.KingSideCastle && !FirstPlayerSelectedColorWhite)
+                {
+                    rookCurrentFile = 2;
+                    rookTargetFile = 0;
+                }
+                else if (castlingType == CastlingType.QueenSideCastle && FirstPlayerSelectedColorWhite)
+                {
+                    rookCurrentFile = 3;
+                    rookTargetFile = 7;
+                }
+                else if (castlingType == CastlingType.QueenSideCastle && !FirstPlayerSelectedColorWhite)
+                {
+                    rookCurrentFile = 4;
+                    rookTargetFile = 0;
+                }
+
+                foreach (UIElement element in ChessGrid.Children)
+                {
+                    if (Grid.GetRow(element) == prevRank && Grid.GetColumn(element) == rookCurrentFile && element is Image)
+                    {
+                        pieceToMove = (Image)element;
+                        if (moveType == MoveType.Castling)
+                        {
+                            rookImage = (Image)element;
+                        }
+                        break;
+                    }
+                }
+                if (rookImage != null)
+                {
+                    ChessGrid.Children.Remove(rookImage);
+                    Grid.SetColumn(rookImage, rookTargetFile);
+                    Grid.SetRow(rookImage, prevRank);
+                    ChessGrid.Children.Add(rookImage);
+                }
+            }
 
             if (piece != null)
             {
@@ -700,25 +789,35 @@ namespace Chess.Views
                     if (Grid.GetRow(element) == prevRank && Grid.GetColumn(element) == prevFile && element is Image)
                     {
                         pieceToMove = (Image)element;
+                        if(moveType == MoveType.Promotion || moveType == MoveType.PromotionCheck)
+                        {
+                            promotedPiece = GetImage((pieceKilled.GetColor() == PieceColor.White ? PieceColor.Black : PieceColor.White).ToString().ToLower(), "pawn");
+                        }
                         break;
                     }
                 }
+
                 if (pieceToMove != null)
                 {
                     ChessGrid.Children.Remove(pieceToMove);
-                    Grid.SetRow(pieceToMove, targetRank);
-                    Grid.SetColumn(pieceToMove, targetFile);
-                    if (capturedPiece != null)
+                    if (promotedPiece != null && (moveType == MoveType.Promotion || moveType == MoveType.PromotionCheck))
+                    {
+                        Grid.SetRow(promotedPiece, targetRank);
+                        Grid.SetColumn(promotedPiece, targetFile);
+                        ChessGrid.Children.Add(promotedPiece);
+                    }
+                    else
+                    {
+                        Grid.SetRow(pieceToMove, targetRank);
+                        Grid.SetColumn(pieceToMove, targetFile);
+                        ChessGrid.Children.Add(pieceToMove);
+                    }
+                    if (capturedPiece != null && moveType != MoveType.EnPassant)
                     {
                         Grid.SetRow(capturedPiece, prevRank);
                         Grid.SetColumn(capturedPiece, prevFile);
-                        if(Game.GetCurrentPlayer() == Game.GetPlayerOne())
-                        {
-                            // remove from player two dead pieces
-                        }
                         ChessGrid.Children.Add(capturedPiece);
                     }
-                    ChessGrid.Children.Add(pieceToMove);
                 }
             }
             // change current move remove dead pieces too

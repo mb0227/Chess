@@ -153,5 +153,10 @@ namespace Chess.GL
         {
             return InCheck;
         }
+
+        public void UndoMove()
+        {
+            HasMoved = false;
+        }
     }
 }

@@ -54,5 +54,15 @@ namespace Chess.GL
         {
             return $"Player Color: {Color.ToString()}";
         }
+
+        public bool GetLatestDeadPiece()
+        {
+            if (DeadPieces.GetSize() > 0)
+            {
+                DeadPieces.RemoveFirstPiece();
+                return true;
+            }
+            return false;
+        }
     }
 }

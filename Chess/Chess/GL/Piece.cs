@@ -31,19 +31,34 @@ namespace Chess.GL
             PieceType = type;
             Alive = alive;
         }
+
         public PieceColor GetColor()
         {
             return Color;
         }
+
         public PieceType GetPieceType()
         {
             return PieceType;
         }
+
         public bool IsAlive()
         {
             return Alive;
         }
 
+        public void SetPieceType(PieceType type)
+        {
+            PieceType = type;
+        }
+
+        public void Revive()
+        {
+            if (!Alive)
+            {
+                Alive = true;
+            }
+        }
         public void Kill()
         {
             if (Alive)

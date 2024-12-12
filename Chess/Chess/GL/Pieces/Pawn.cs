@@ -201,5 +201,10 @@ namespace Chess.GL
         {
             IsEnPassantable = false;
         }
+
+        public void UndoMove()
+        {
+            IsEnPassantable = true;
+        }
     }
 }

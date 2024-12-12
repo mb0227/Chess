@@ -187,5 +187,12 @@ namespace Chess.GL
         {
             Notation = notation;
         }
+
+        public CastlingType GetCastlingType()
+        {
+            return CastlingType;
+        }
+
+
     }
 }

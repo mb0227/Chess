@@ -98,5 +98,10 @@ namespace Chess.GL
         {
             return HasMoved;
         }
+
+        public void UndoMove()
+        {
+            HasMoved = false;
+        }
     }
 }

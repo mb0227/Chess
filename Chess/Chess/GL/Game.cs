@@ -4,6 +4,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Xml.Linq;
+using System.Windows.Controls;
 
 namespace Chess.GL
 {
@@ -53,7 +54,6 @@ namespace Chess.GL
         private MovesStack MovesStack;
 
         public event Action<string> MoveMade;
-        // dead pieces
         public event Action<string> PlayerOneDeadPieces;
         public event Action<string> PlayerTwoDeadPieces;
 
@@ -100,6 +100,7 @@ namespace Chess.GL
                     Console.WriteLine("No piece at the given position.");
                     return;
                 }
+
                 Block prevBlock = Board.GetBlock(prevRank, prevFile);
                 Piece pieceAtPrev = prevBlock.GetPiece();
                 Block newBlock = Board.GetBlock(newRank, newFile);
@@ -608,6 +609,136 @@ namespace Chess.GL
             {
                 CurrentMove = PlayerOne;
             }
+        }
+
+        public void UndoMove(Move move)
+        {
+            Console.WriteLine("Board before Undo");
+            Board.DisplayBoard();
+            Block prevBlock = move.GetStartBlock();
+            Block newBlock = move.GetEndBlock();
+            Piece prevBlockPiece = move.GetPieceMoved();
+            Piece capturedPiece = move.GetPieceKilled();
+            MoveType moveType = move.GetMoveType();
+            if (moveType == MoveType.Normal)
+            {
+                if (capturedPiece == null)
+                    newBlock.SetPiece(null);
+                else
+                {
+                    newBlock.SetPiece(capturedPiece);
+                    capturedPiece.Revive();
+                }
+                prevBlock.SetPiece(prevBlockPiece);
+            }
+            else if (moveType == MoveType.Kill)
+            {
+                newBlock.SetPiece(capturedPiece);
+                prevBlock.SetPiece(prevBlockPiece);
+                capturedPiece.Revive();
+            }
+            else if (moveType == MoveType.Check || moveType == MoveType.Checkmate || moveType == MoveType.Stalemate)
+            {
+                if (capturedPiece == null)
+                    newBlock.SetPiece(null);
+                else
+                {
+                    newBlock.SetPiece(capturedPiece);
+                    capturedPiece.Revive();
+                }
+                prevBlock.SetPiece(prevBlockPiece);
+                King king = (King)Board.FindKing(CurrentMove.GetColor() == PlayerColor.Black ? PieceColor.White : PieceColor.Black).GetPiece();
+                king.SetCheck(false);
+            }
+            else if (moveType == MoveType.Promotion)
+            {
+                if (capturedPiece == null)
+                    newBlock.SetPiece(null);
+                else
+                {
+                    newBlock.SetPiece(capturedPiece);
+                    capturedPiece.Revive();
+                }
+                Piece piece = prevBlockPiece;
+                prevBlockPiece.SetPieceType(PieceType.Pawn);
+                prevBlock.SetPiece((Pawn)prevBlockPiece);
+            }
+            else if (moveType == MoveType.EnPassant)
+            {
+                newBlock.SetPiece(null);
+                prevBlock.SetPiece(prevBlockPiece);
+                capturedPiece.Revive();
+                Pawn pawn = (Pawn)capturedPiece;
+                pawn.UndoMove();
+                Board.GetBlock(prevBlock.GetRank(), newBlock.GetFile()).SetPiece(capturedPiece);
+            }
+            else if (moveType == MoveType.Castling)
+            {
+                int rookTargetFile = -1;
+                int rookCurrentFile = -1;
+                CastlingType castlingType = move.GetCastlingType();
+                bool FirstPlayerSelectedColorWhite = PlayerOne.GetColor() == PlayerColor.White;
+
+                if (castlingType == CastlingType.KingSideCastle && FirstPlayerSelectedColorWhite)
+                {
+                    rookCurrentFile = 5;
+                    rookTargetFile = 7;
+                }
+                else if (castlingType == CastlingType.KingSideCastle && !FirstPlayerSelectedColorWhite)
+                {
+                    rookCurrentFile = 2;
+                    rookTargetFile = 0;
+                }
+                else if (castlingType == CastlingType.QueenSideCastle && FirstPlayerSelectedColorWhite)
+                {
+                    rookCurrentFile = 3;
+                    rookTargetFile = 7;
+                }
+                else if (castlingType == CastlingType.QueenSideCastle && !FirstPlayerSelectedColorWhite)
+                {
+                    rookCurrentFile = 4;
+                    rookTargetFile = 0;
+                }
+
+                Block rookCurrentBlock = Board.GetBlock(newBlock.GetRank(), rookCurrentFile);
+                Block kingBlock = Board.GetBlock(newBlock.GetRank(), newBlock.GetFile());
+                Block rookTargetBlock = Board.GetBlock(newBlock.GetRank(), rookTargetFile);
+                King king = (King)kingBlock.GetPiece();
+                Rook rook = (Rook)rookCurrentBlock.GetPiece();
+
+                rook.UndoMove();
+                king.UndoMove();
+
+                rookTargetBlock.SetPiece(rookCurrentBlock.GetPiece());
+                rookCurrentBlock.SetPiece(null);
+                kingBlock.SetPiece(null);
+                prevBlock.SetPiece(prevBlockPiece);
+            }
+            
+            MovesStack.Pop();
+            if(CurrentMove == PlayerOne)
+            {
+                CurrentMove = PlayerTwo;
+                if(capturedPiece == null)
+                {
+                    PlayerTwo.GetLatestDeadPiece();
+                    //update ui
+                    //PlayerTwoDeadPieces?.Invoke(PlayerTwo.GetFirstDeadPiece());
+                }
+            }
+            else
+            {
+                CurrentMove = PlayerOne;
+                if (capturedPiece == null)
+                {
+                    PlayerOne.GetLatestDeadPiece();
+                    //update ui
+                    //PlayerOneDeadPieces?.Invoke(PlayerOne.GetFirstDeadPiece());
+                }
+            }
+            Console.WriteLine("Current Player : " + CurrentMove.ToString());
+            Console.WriteLine("Board After Undo");
+            Board.DisplayBoard();
         }
     }
 }

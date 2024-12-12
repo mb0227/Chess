@@ -106,29 +106,6 @@ namespace Chess.DS
             return size;
         }
 
-        public void RemovePiece(Piece piece)
-        {
-            Node temp = Head;
-            Node prev = null;
-            while (temp != null)
-            {
-                if (temp.Piece.Equals(piece))
-                {
-                    if (prev == null)
-                    {
-                        Head = temp.NextNode;
-                    }
-                    else
-                    {
-                        prev.NextNode = temp.NextNode;
-                    }
-                    break;
-                }
-                prev = temp;
-                temp = temp.NextNode;
-            }
-        }
-
         public void RemoveFirstPiece()
         {
             if (Head == null)
