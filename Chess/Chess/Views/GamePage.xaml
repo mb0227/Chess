@@ -166,13 +166,13 @@
         <Grid Grid.Column="1">
             <!-- Define Three Rows -->
             <Grid.RowDefinitions>
-                <RowDefinition Height="50*" />
+                <RowDefinition Height="40*" />
                 <!-- For Moves Section -->
                 <RowDefinition Height="20*" />
                 <!-- For Player One's Dead Pieces Section -->
                 <RowDefinition Height="20*" />
                 <!-- For Player Two's Dead Pieces Section -->
-                <RowDefinition Height="10*" />
+                <RowDefinition Height="20*" />
                 <!-- For Buttons Section -->
             </Grid.RowDefinitions>
 
@@ -249,13 +249,17 @@
             </ScrollViewer>
 
             <!-- Buttons Section -->
-            <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <WrapPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" ItemWidth="120" ItemHeight="35">
                 <!-- Resign Button -->
-                <Button Content="Resign" Style="{StaticResource ActionButtonStyle}" Width="90" Click="ResignClick" Margin="10"/>
+                <Button Content="Resign" Style="{StaticResource ActionButtonStyle}" Width="90" Click="ResignClick" Height="27" FontSize="12"/>
 
                 <!-- Offer Draw Button -->
-                <Button Content="Offer Draw" Style="{StaticResource ActionButtonStyle}" Width="110" Click="DrawClick" Margin="10"/>
-            </StackPanel>
+                <Button Content="Offer Draw" Style="{StaticResource ActionButtonStyle}" Width="90" Click="DrawClick" Height="24" FontSize="12"/>
+
+                <!-- Undo Button -->
+                <Button Content="Undo" Style="{StaticResource ActionButtonStyle}" Width="90" Click="UndoClick" Height="24" FontSize="12"/>
+            </WrapPanel>
+
         </Grid>
 
     </Grid>

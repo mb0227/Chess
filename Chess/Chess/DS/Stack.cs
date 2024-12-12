@@ -4,6 +4,79 @@ using System.Collections.Generic;
 
 namespace Chess.DS
 {
+    public class MovesStack
+    {
+        public List<Move> Moves;
+
+        public MovesStack()
+        {
+            Moves = new List<Move>();
+        }
+
+        public void Push(Move move)
+        {
+            Moves.Add(move);
+        }
+
+        public Move Pop()
+        {
+            if (!IsEmpty())
+            {
+                int top = Moves.Count - 1;
+                Move move = Moves[top];
+                Moves.RemoveAt(top);
+                return move;
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty, cannot pop.");
+                return null;
+            }
+        }
+
+        public Move Peek()
+        {
+            if (Moves.Count > 0)
+            {
+                return Moves[Moves.Count - 1];
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty, cannot peek.");
+                return null;
+            }
+        }
+
+        public void Display()
+        {
+            if (Moves.Count == 0)
+            {
+                Console.WriteLine("No moves.");
+                return;
+            }
+            foreach (Move move in Moves)
+            {
+                Console.WriteLine(move.GetNotation());
+            }
+            Console.WriteLine();
+        }
+
+        public bool IsEmpty()
+        {
+            return Moves.Count == 0;
+        }
+
+        public int GetSize()
+        {
+            return Moves.Count;
+        }
+
+        public bool Contains(Move move)
+        {
+            return Moves.Contains(move);
+        }
+    }
+
     public class Stack
     {
         public List<string> MovesStack; 
@@ -81,3 +154,4 @@ namespace Chess.DS
         }
     }
 }
+

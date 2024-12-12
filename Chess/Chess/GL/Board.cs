@@ -1,19 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Chess.GL
 {
     public class Board
     {
-        private Block[,] Blocks;
+        // Graph representation using an adjacency list
+        private Dictionary<string, Block> Blocks;
         private PlayerColor FirstPlayerColor;
 
         public Board(PlayerColor FirstPlayerColor)
         {
-            Blocks = new Block[8, 8];
+            Blocks = new Dictionary<string, Block>();
             this.FirstPlayerColor = FirstPlayerColor;
             int blackPiecesRank, blackPawnsRank, whitePawnsRank, whitePiecesRank;
             int kingIndex, queenIndex;
+
             if (FirstPlayerColor == PlayerColor.White)
             {
                 (blackPawnsRank, blackPiecesRank, whitePawnsRank, whitePiecesRank) = (1, 0, 6, 7);
@@ -25,62 +28,104 @@ namespace Chess.GL
                 (kingIndex, queenIndex) = (3, 4);
             }
 
-            // Creating White Pieces
-            Blocks[whitePiecesRank, 0] = new Block(whitePiecesRank, 0, new Rook(PieceColor.White, PieceType.Rook, true));
-            Blocks[whitePiecesRank, 1] = new Block(whitePiecesRank, 1, new Knight(PieceColor.White, PieceType.Knight, true));
-            Blocks[whitePiecesRank, 2] = new Block(whitePiecesRank, 2, new Bishop(PieceColor.White, PieceType.Bishop, true));
-            Blocks[whitePiecesRank, queenIndex] = new Block(whitePiecesRank, queenIndex, new Queen(PieceColor.White, PieceType.Queen, true));
-            Blocks[whitePiecesRank, kingIndex] = new Block(whitePiecesRank, kingIndex, new King(PieceColor.White, PieceType.King, true));
-            Blocks[whitePiecesRank, 5] = new Block(whitePiecesRank, 5, new Bishop(PieceColor.White, PieceType.Bishop, true));
-            Blocks[whitePiecesRank, 6] = new Block(whitePiecesRank, 6, new Knight(PieceColor.White, PieceType.Knight, true));
-            Blocks[whitePiecesRank, 7] = new Block(whitePiecesRank, 7, new Rook(PieceColor.White, PieceType.Rook, true));
-            for (int file = 0; file < 8; file++)
-            {
-                Blocks[whitePawnsRank, file] = new Block(whitePawnsRank, file, new Pawn(PieceColor.White, PieceType.Pawn, true));
-            }
-
-            // Creating Black Pieces
-            Blocks[blackPiecesRank, 0] = new Block(blackPiecesRank, 0, new Rook(PieceColor.Black, PieceType.Rook, true));
-            Blocks[blackPiecesRank, 1] = new Block(blackPiecesRank, 1, new Knight(PieceColor.Black, PieceType.Knight, true));
-            Blocks[blackPiecesRank, 2] = new Block(blackPiecesRank, 2, new Bishop(PieceColor.Black, PieceType.Bishop, true));
-            Blocks[blackPiecesRank, queenIndex] = new Block(blackPiecesRank, queenIndex, new Queen(PieceColor.Black, PieceType.Queen, true));
-            Blocks[blackPiecesRank, kingIndex] = new Block(blackPiecesRank, kingIndex, new King(PieceColor.Black, PieceType.King, true));
-            Blocks[blackPiecesRank, 5] = new Block(blackPiecesRank, 5, new Bishop(PieceColor.Black, PieceType.Bishop, true));
-            Blocks[blackPiecesRank, 6] = new Block(blackPiecesRank, 6, new Knight(PieceColor.Black, PieceType.Knight, true));
-            Blocks[blackPiecesRank, 7] = new Block(blackPiecesRank, 7, new Rook(PieceColor.Black, PieceType.Rook, true));
-            for (int file = 0; file < 8; file++)
-            {
-                Blocks[blackPawnsRank, file] = new Block(blackPawnsRank, file, new Pawn(PieceColor.Black, PieceType.Pawn, true));
-            }
-
-            // Creating Empty Blocks
-            for (int rank = 2; rank < 6; rank++)
-            {
-                for (int file = 0; file < 8; file++)
-                {
-                    Blocks[rank, file] = new Block(rank, file);
-                }
-            }
-        }
-
-        public Block GetBlock(int rank, int file)
-        {
-            return Blocks[rank, file];
-        }
-
-        public Block GetBlock(Piece piece)
-        {
+            // Create all possible board positions
             for (int rank = 0; rank < 8; rank++)
             {
                 for (int file = 0; file < 8; file++)
                 {
-                    if (Blocks[rank, file].GetPiece() == piece)
-                    {
-                        return Blocks[rank, file];
-                    }
+                    string blockKey = GetBlockKey(rank, file);
+                    Blocks[blockKey] = CreateBlockAtPosition(rank, file, blackPawnsRank, blackPiecesRank,
+                                                             whitePawnsRank, whitePiecesRank,
+                                                             kingIndex, queenIndex);
                 }
             }
-            return null;
+        }
+
+        private Block CreateBlockAtPosition(int rank, int file, int blackPawnsRank, int blackPiecesRank,
+                                            int whitePawnsRank, int whitePiecesRank,
+                                            int kingIndex, int queenIndex)
+        {
+            Block block = new Block(rank, file);
+
+            if (kingIndex == 4 && queenIndex == 3 && rank == whitePiecesRank)
+            {
+                if(file == 4)
+                    block.SetPiece(new King(PieceColor.White, PieceType.King, true));
+                if (file == 3)
+                    block.SetPiece(new Queen(PieceColor.White, PieceType.Queen, true));
+            }
+            else if (kingIndex == 3 && queenIndex == 4 && rank == whitePiecesRank)
+            {
+                if (file == 3)
+                    block.SetPiece(new King(PieceColor.White, PieceType.King, true));
+                if (file == 4)
+                    block.SetPiece(new Queen(PieceColor.White, PieceType.Queen, true));
+            }
+            if (kingIndex == 4 && queenIndex == 3 && rank == blackPiecesRank)
+            {
+                if (file == 4)
+                    block.SetPiece(new King(PieceColor.Black, PieceType.King, true));
+                if (file == 3)
+                    block.SetPiece(new Queen(PieceColor.Black, PieceType.Queen, true));
+            }
+            else if (kingIndex == 3 && queenIndex == 4 && rank == blackPiecesRank)
+            {
+                if (file == 3)
+                    block.SetPiece(new King(PieceColor.Black, PieceType.King, true));
+                if (file == 4)
+                    block.SetPiece(new Queen(PieceColor.Black, PieceType.Queen, true));
+            }
+
+                if (rank == whitePiecesRank)
+            {
+                switch (file)
+                {
+                    case 0: block.SetPiece(new Rook(PieceColor.White, PieceType.Rook, true)); break;
+                    case 1: block.SetPiece(new Knight(PieceColor.White, PieceType.Knight, true)); break;
+                    case 2: block.SetPiece(new Bishop(PieceColor.White, PieceType.Bishop, true)); break;
+                    case 5: block.SetPiece(new Bishop(PieceColor.White, PieceType.Bishop, true)); break;
+                    case 6: block.SetPiece(new Knight(PieceColor.White, PieceType.Knight, true)); break;
+                    case 7: block.SetPiece(new Rook(PieceColor.White, PieceType.Rook, true)); break;
+                }                
+            }
+            else if (rank == whitePawnsRank)
+            {
+                block.SetPiece(new Pawn(PieceColor.White, PieceType.Pawn, true));
+            }
+
+            if (rank == blackPiecesRank)
+            {
+                switch (file)
+                {
+                    case 0: block.SetPiece(new Rook(PieceColor.Black, PieceType.Rook, true)); break;
+                    case 1: block.SetPiece(new Knight(PieceColor.Black, PieceType.Knight, true)); break;
+                    case 2: block.SetPiece(new Bishop(PieceColor.Black, PieceType.Bishop, true)); break;
+                    case 5: block.SetPiece(new Bishop(PieceColor.Black, PieceType.Bishop, true)); break;
+                    case 6: block.SetPiece(new Knight(PieceColor.Black, PieceType.Knight, true)); break;
+                    case 7: block.SetPiece(new Rook(PieceColor.Black, PieceType.Rook, true)); break;
+                }
+            }
+            else if (rank == blackPawnsRank)
+            {
+                block.SetPiece(new Pawn(PieceColor.Black, PieceType.Pawn, true));
+            }
+
+            return block;
+        }
+
+        public Block GetBlock(int rank, int file)
+        {
+            return Blocks[GetBlockKey(rank, file)];
+        }
+
+        public Block GetBlock(Piece piece)
+        {
+            return Blocks.Values.FirstOrDefault(block => block.GetPiece() == piece);
+        }
+
+        private string GetBlockKey(int rank, int file)
+        {
+            return $"{rank},{file}";
         }
 
         public void DisplayBoard()
@@ -89,13 +134,14 @@ namespace Chess.GL
             {
                 for (int file = 0; file < 8; file++)
                 {
-                    if (Blocks[rank, file].IsEmpty())
+                    Block block = Blocks[GetBlockKey(rank, file)];
+                    if (block.IsEmpty())
                     {
                         Console.Write(" ");
                     }
                     else
                     {
-                        Piece piece = Blocks[rank, file].GetPiece();
+                        Piece piece = block.GetPiece();
                         if (piece.GetColor() == PieceColor.White)
                             Console.Write("W ");
                         else
@@ -107,6 +153,7 @@ namespace Chess.GL
             }
         }
 
+        // Most other methods remain largely the same, just replace array iterations with dictionary iterations
         public PlayerColor GetFirstPlayerColor()
         {
             return FirstPlayerColor;
@@ -117,112 +164,76 @@ namespace Chess.GL
             return rank >= 0 && rank < 8 && file >= 0 && file < 8;
         }
 
-        public int TranslateRank(int rank)
+        public Block FindKing(PieceColor pieceColor)
         {
-            return FirstPlayerColor == PlayerColor.White ? 8 - rank : rank + 1;
-        }
-
-        public char TranslateFile(int file)
-        {
-            if (FirstPlayerColor == PlayerColor.White)
+            return Blocks.Values.FirstOrDefault(block =>
             {
-                return ((char)('a' + file));
-            }
-            else
-            {
-                return ((char)('h' - file));
-            }
-        }
-
-        public int GetFileInInt(string file)
-        {
-            switch (file)
-            {
-                case "a":
-                    return 0;
-                case "b":
-                    return 1;
-                case "c":
-                    return 2;
-                case "d":
-                    return 3;
-                case "e":
-                    return 4;
-                case "f":
-                    return 5;
-                case "g":
-                    return 6;
-                case "h":
-                    return 7;
-                default:
-                    return -1;
-            }
+                Piece piece = block.GetPiece();
+                return piece?.GetPieceType() == PieceType.King && piece.GetColor() == pieceColor;
+            });
         }
 
         public bool IsKingInCheck(PieceColor pieceColor)
         {
             Block kingBlock = FindKing(pieceColor);
-            foreach (var block in Blocks)
+            if (kingBlock == null)
+                return false;
+
+            foreach (var block in Blocks.Values)
             {
                 Piece attackingPiece = block.GetPiece();
-                if (attackingPiece == null || attackingPiece.GetColor() == pieceColor || kingBlock == null)
+                if (attackingPiece == null || attackingPiece.GetColor() == pieceColor)
                     continue;
 
                 if (attackingPiece.GetPieceType() == PieceType.Pawn && attackingPiece.IsAttackingKing(this, kingBlock))
                     return true;
 
                 if (attackingPiece.CanAttack(kingBlock, this))
-                    return true;                
+                    return true;
             }
             return false;
-        }
-
-        public Block FindKing(PieceColor pieceColor)
-        {
-            for (int rank = 0; rank < 8; rank++)
-            {
-                for (int file = 0; file < 8; file++)
-                {
-                    Piece piece = Blocks[rank, file].GetPiece();
-                    if (piece?.GetPieceType() == PieceType.King && piece.GetColor() == pieceColor)
-                    {
-                        return Blocks[rank, file];
-                    }
-                }
-            }
-            return null;
         }
 
         public bool IsSafeMove(Piece pieceToMove, Block endBlock)
         {
             Block startBlock = GetBlock(pieceToMove);
+            if (startBlock == null || endBlock == null)
+                return false;
 
             Piece capturedPiece = endBlock.GetPiece();
             startBlock.SetPiece(null);
             endBlock.SetPiece(pieceToMove);
 
             bool isSafe = !IsKingInCheck(pieceToMove.GetColor());
+
+            // Restore the original board state
             endBlock.SetPiece(capturedPiece);
             startBlock.SetPiece(pieceToMove);
+
             return isSafe;
         }
 
         public bool IsCheck(Piece pieceToMove, Block endBlock)
         {
             Block startBlock = GetBlock(pieceToMove);
+            if (startBlock == null || endBlock == null)
+                return false;
+
             Piece capturedPiece = endBlock.GetPiece();
             startBlock.SetPiece(null);
-            endBlock.SetPiece(null);
             endBlock.SetPiece(pieceToMove);
-            bool isCheck = IsKingInCheck(pieceToMove.GetColor() == PieceColor.White ? PieceColor.Black: PieceColor.White );
+
+            bool isCheck = IsKingInCheck(pieceToMove.GetColor() == PieceColor.White ? PieceColor.Black : PieceColor.White);
+
             startBlock.SetPiece(pieceToMove);
             endBlock.SetPiece(capturedPiece);
+
             return isCheck;
         }
 
         public bool IsUnderAttack(Block block, PieceColor pieceColor)
         {
-            foreach (var b in Blocks)
+            foreach (var b in Blocks.Values)
             {
                 Piece piece = b.GetPiece();
                 if (piece == null || piece.GetColor() == pieceColor)
@@ -258,15 +269,50 @@ namespace Chess.GL
 
         public bool GetFinalStatus(PieceColor pieceColor)
         {
-            foreach (var block in Blocks)
+            foreach (var block in Blocks.Values)
             {
                 Piece piece = block.GetPiece();
                 if (piece == null || piece.GetColor() != pieceColor)
                     continue;
+
                 if (piece?.GetPossibleMoves(this).Count > 0)
                     return false;
             }
             return true;
+        }
+
+        // Additional helper methods to maintain previous functionality
+        public int TranslateRank(int rank)
+        {
+            return FirstPlayerColor == PlayerColor.White ? 8 - rank : rank + 1;
+        }
+
+        public char TranslateFile(int file)
+        {
+            if (FirstPlayerColor == PlayerColor.White)
+            {
+                return ((char)('a' + file));
+            }
+            else
+            {
+                return ((char)('h' - file));
+            }
+        }
+
+        public int GetFileInInt(string file)
+        {
+            switch (file)
+            {
+                case "a": return 0;
+                case "b": return 1;
+                case "c": return 2;
+                case "d": return 3;
+                case "e": return 4;
+                case "f": return 5;
+                case "g": return 6;
+                case "h": return 7;
+                default: return -1;
+            }
         }
     }
 }

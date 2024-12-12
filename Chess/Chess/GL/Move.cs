@@ -15,13 +15,6 @@ namespace Chess.GL
         private MoveType MoveType;
         private PieceType PromotedPieceType;
         private CastlingType CastlingType;
-        // bool members
-
-        //private bool IsCastling;
-        //private bool IsEnPassant;
-        //private bool IsPromotion;
-        //private bool IsCheck;
-        //private bool IsCheckMate;
 
         public Move(MoveType moveType)
         {

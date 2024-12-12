@@ -50,6 +50,8 @@ namespace Chess.GL
         private Move SecondPlayerMove;
         private bool IsGameOver;
         private GameStatus Status;
+        private MovesStack MovesStack;
+
         public event Action<string> MoveMade;
         // dead pieces
         public event Action<string> PlayerOneDeadPieces;
@@ -72,6 +74,7 @@ namespace Chess.GL
             PlayerTwo = playerTwo;
             Board = new Board(playerOne.GetColor());
             Moves = new Stack();
+            MovesStack = new MovesStack();
             IsGameOver = false;
             Status = GameStatus.ACTIVE;
             CurrentMove = PlayerOne.GetColor().ToString().Trim() == "White" ? PlayerOne : PlayerTwo;
@@ -86,6 +89,7 @@ namespace Chess.GL
                 move.SetNotation("1/2");
                 Moves.Push(move, move);
                 MoveMade?.Invoke(Moves.Peek());
+                MovesStack.Push(move);
                 return;
             }
 
@@ -361,12 +365,15 @@ namespace Chess.GL
                 if (CurrentMove == PlayerTwo)
                 {
                     CurrentMove = PlayerOne;
+                    MovesStack.Push(SecondPlayerMove);
                 }
                 else
                 {
                     CurrentMove = PlayerTwo;
+                    MovesStack.Push(FirstPlayerMove);
                 }
                 DisplayMoves();
+                MovesStack.Display();
                 //PlayerOne.DisplayDeadPieces();
                 //PlayerTwo.DisplayDeadPieces();
             }
@@ -584,6 +591,23 @@ namespace Chess.GL
         private void OnMoveMade(string move)
         {
             MoveMade?.Invoke(move);
+        }
+
+        public MovesStack GetMovesStack()
+        {
+            return MovesStack;
+        }
+
+        public void SetNextPlayer()
+        {
+            if (CurrentMove == PlayerOne)
+            {
+                CurrentMove = PlayerTwo;
+            }
+            else
+            {
+                CurrentMove = PlayerOne;
+            }
         }
     }
 }

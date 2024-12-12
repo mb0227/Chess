@@ -225,7 +225,6 @@ namespace Chess.Views
             }
         }
 
-
         private void Chessboard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var clickedElement = sender as Border;
@@ -424,6 +423,7 @@ namespace Chess.Views
         private void MakeMove(int previousRow, int previousCol, int targetRow, int targetCol)
         {
             if (!IsValidMove(targetRow, targetCol)) return;
+
             Image pieceToMove = null;
             Image capturedPiece = null;
 
@@ -664,6 +664,82 @@ namespace Chess.Views
                 }
             }
             return false;
+        }
+
+        private void UndoClick(object sender, RoutedEventArgs e)
+        {
+            if (Game.GetMovesStack().GetSize() > 0)
+            {
+                Move move = Game.GetMovesStack().Pop();
+                if (move != null)
+                {
+                    Piece killedPiece = null;
+                    if(move.GetNotation().Contains("x"))
+                        killedPiece = move.GetPieceKilled();
+                    UndoMove(move.GetEndBlock(), move.GetStartBlock(), move.GetPieceMoved(), killedPiece);
+                }
+            }
+        }
+
+        private void UndoMove(Block endBlock, Block startBlock, Piece piece, Piece pieceKilled)
+        {
+            int prevRank = endBlock.GetRank();
+            int prevFile = endBlock.GetFile();
+            int targetRank = startBlock.GetRank();
+            int targetFile = startBlock.GetFile();
+            Image pieceToMove = null;
+            Image capturedPiece = null;
+
+            if(pieceKilled != null)
+                capturedPiece = GetImage(pieceKilled.GetColor().ToString().ToLower(), pieceKilled.GetPieceType().ToString().ToLower());
+
+            if (piece != null)
+            {
+                foreach (UIElement element in ChessGrid.Children)
+                {
+                    if (Grid.GetRow(element) == prevRank && Grid.GetColumn(element) == prevFile && element is Image)
+                    {
+                        pieceToMove = (Image)element;
+                        break;
+                    }
+                }
+                if (pieceToMove != null)
+                {
+                    ChessGrid.Children.Remove(pieceToMove);
+                    Grid.SetRow(pieceToMove, targetRank);
+                    Grid.SetColumn(pieceToMove, targetFile);
+                    if (capturedPiece != null)
+                    {
+                        Grid.SetRow(capturedPiece, prevRank);
+                        Grid.SetColumn(capturedPiece, prevFile);
+                        if(Game.GetCurrentPlayer() == Game.GetPlayerOne())
+                        {
+                            // remove from player two dead pieces
+                        }
+                        ChessGrid.Children.Add(capturedPiece);
+                    }
+                    ChessGrid.Children.Add(pieceToMove);
+                }
+            }
+            // change current move remove dead pieces too
+            //Game.SetNextPlayer();
+        }
+
+        private Image GetImage(string color, string piece)
+        {
+            Image image = null;
+            string imagePath = System.IO.Path.Combine("..\\..\\Images", $"{color}-{piece}.png");
+            imagePath = System.IO.Path.GetFullPath(imagePath);
+            image = new Image
+            {
+                Width = 53,
+                Height = 53,
+                Margin = new Thickness(5),
+                Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
+                IsHitTestVisible = false,
+                Name = $"{piece}"
+            };
+            return image;
         }
 
         private void ScrollViewerLoaded(object sender, RoutedEventArgs e)

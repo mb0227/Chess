@@ -36,7 +36,7 @@ namespace Chess.DS
         {
             if (Head == null)
                 return null;
-            return Head.Piece.GetPieceType().ToString();
+            return GetSize() + ". " + Head.Piece.GetPieceType().ToString();
         }
 
         public void InsertAtTail(Piece piece)
@@ -94,7 +94,7 @@ namespace Chess.DS
             return false;
         }
 
-        public int Size()
+        public int GetSize()
         {
             Node temp = Head;
             int size = 0;
