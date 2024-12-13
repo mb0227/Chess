@@ -53,7 +53,7 @@
             <Button Content="Multiplayer" Click="MultiplayerClick" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
 
             <!-- VS Computer Button -->
-            <Button Content="vs Computer" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
+            <Button Content="vs Computer" Click="VsComputerClick" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
 
             <!-- Analysis Button -->
             <Button Content="Analysis" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>

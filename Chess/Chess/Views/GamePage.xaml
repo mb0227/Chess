@@ -1,11 +1,12 @@
-﻿<Page x:Class="Chess.Views.GamePage"
+﻿
+<Page x:Class="Chess.Views.GamePage"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:Chess.Views"
       mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
+      d:DesignHeight="350" d:DesignWidth="700"
       Title="GamePage">
 
     <Page.Resources>
@@ -33,6 +34,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+        <local:DeadPieceImageConverter x:Key="DeadPieceImageConverter" />
     </Page.Resources>
 
     <Grid>
@@ -164,22 +166,76 @@
         </Grid>
 
         <Grid Grid.Column="1">
-            <!-- Define Three Rows -->
+            <!-- Define Five Rows -->
             <Grid.RowDefinitions>
-                <RowDefinition Height="40*" />
-                <!-- For Moves Section -->
                 <RowDefinition Height="20*" />
-                <!-- For Player One's Dead Pieces Section -->
+                <!-- Time Controls Section -->
+                <RowDefinition Height="10*" />
+                <!-- Moves Header Section -->
+                <RowDefinition Height="30*" />
+                <!-- Moves Section -->
+                <RowDefinition Height="10*" />
+                <!-- Player One Dead Pieces Header -->
                 <RowDefinition Height="20*" />
-                <!-- For Player Two's Dead Pieces Section -->
+                <!-- Player One Dead Pieces Section -->
+                <RowDefinition Height="10*" />
+                <!-- Player Two Dead Pieces Header -->
                 <RowDefinition Height="20*" />
-                <!-- For Buttons Section -->
+                <!-- Player Two Dead Pieces Section -->
+                <RowDefinition Height="25*" />
+                <!-- Buttons Section -->
             </Grid.RowDefinitions>
 
+            <!-- Time Controls Section -->
+            <Grid Grid.Row="0" Background="#D3D3D3">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <!-- Player Labels -->
+                    <RowDefinition Height="Auto" />
+                    <!-- Player Times -->
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50*" />
+                    <ColumnDefinition Width="50*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Player Labels -->
+                <TextBlock x:Name="PlayerOneTimeTextBox"
+                Text="Player One" FontSize="16" FontWeight="Bold" 
+                VerticalAlignment="Center" HorizontalAlignment="Center" 
+                Foreground="#444" />
+                <TextBlock x:Name="PlayerTwoTimeTextBox"
+                Text="Player Two" Grid.Column="1" FontSize="16" FontWeight="Bold" 
+                VerticalAlignment="Center" HorizontalAlignment="Center" 
+                Foreground="#444" />
+                
+                 <Border Grid.Row="1" Background="#E0E0E0" CornerRadius="5" Margin="10"
+                         HorizontalAlignment="Center" VerticalAlignment="Center">
+                         <TextBlock x:Name="PlayerOneTimeControl"
+                         Text="03:00" FontSize="20" FontWeight="SemiBold" 
+                         VerticalAlignment="Center" HorizontalAlignment="Center" 
+                         Foreground="#000" Padding="10" />
+                </Border>
+                <Border Grid.Row="1" Grid.Column="1" Background="#E0E0E0" CornerRadius="5" Margin="10"
+                        HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <TextBlock x:Name="PlayerTwoTimeControl"
+                        Text="03:00" FontSize="20" FontWeight="SemiBold" 
+                        VerticalAlignment="Center" HorizontalAlignment="Center" 
+                        Foreground="#000" Padding="10" />
+                </Border>
+            </Grid>
+
+
+            <!-- Moves Header Section -->
+            <Grid Grid.Row="1" Background="#D3D3D3">
+                <TextBlock Text="Moves" FontSize="18" FontWeight="Bold" 
+                   VerticalAlignment="Center" HorizontalAlignment="Center" 
+                   Foreground="#444" />
+            </Grid>
+
             <!-- Moves Section -->
-            <ScrollViewer x:Name="movesViewer" Grid.Row="0" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Loaded="ScrollViewerLoaded">
+            <ScrollViewer x:Name="movesViewer" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Loaded="ScrollViewerLoaded">
                 <StackPanel Background="#D3D3D3" >
-                    <TextBlock Text="Moves:" FontSize="20" VerticalAlignment="Center" Foreground="#444" Margin="0,0,0,10" HorizontalAlignment="Center" FontFamily="Tahoma" FontWeight="Bold"/>
                     <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                         <ListBox ItemsSource="{Binding Moves}"
                          Background="#F1F1F1"
@@ -200,66 +256,62 @@
                 </StackPanel>
             </ScrollViewer>
 
+            <!-- Player One Dead Pieces Header -->
+            <Grid Grid.Row="3" Background="#D3D3D3">
+                <TextBlock  x:Name="PlayerOneDeadPiecesTextBox" FontSize="18" FontWeight="Bold" 
+                   VerticalAlignment="Center" HorizontalAlignment="Center" 
+                   Foreground="#444" />
+            </Grid>
+
             <!-- Player One Dead Pieces Section -->
-            <ScrollViewer x:Name="playerOneDeadPiecesViewer" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <StackPanel Background="#D3D3D3">
-                    <TextBlock Name ="PlayerOneDeadPiecesTextBox" Text="Player One Dead Pieces:" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Foreground="#444" Margin="0,0,0,10" FontFamily="Tahoma"/>
-                    <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Top">
-                        <ListBox ItemsSource="{Binding PlayerOneDeadPieces}"
-                         Background="#F1F1F1"
-                         BorderBrush="#B0B0B0"
-                         BorderThickness="1"
-                         Width="Auto"
-                         Margin="5"
-                         FontSize="16"
-                         Foreground="#444"
-                         HorizontalContentAlignment="Center">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" FontSize="16" Padding="5" Foreground="#444"/>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </WrapPanel>
-                </StackPanel>
+            <ScrollViewer x:Name="playerOneDeadPiecesViewer" Grid.Row="4" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding PlayerOneDeadPieces}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" Background="#F1F1F1" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding ., Converter={StaticResource DeadPieceImageConverter}}" 
+                       Width="40" Height="40" Margin="5" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
+
+
+            <!-- Player Two Dead Pieces Header -->
+            <Grid Grid.Row="5" Background="#D3D3D3">
+                <TextBlock x:Name="PlayerTwoDeadPiecesTextBox" FontSize="18" FontWeight="Bold" 
+                   VerticalAlignment="Center" HorizontalAlignment="Center" 
+                   Foreground="#444" />
+            </Grid>
 
             <!-- Player Two Dead Pieces Section -->
-            <ScrollViewer x:Name="playerTwoDeadPiecesViewer" Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-                <StackPanel Background="#D3D3D3" >
-                    <TextBlock Name ="PlayerTwoDeadPiecesTextBox" Text="Player Two Dead Pieces:" FontSize="16" FontWeight="Bold" VerticalAlignment="Center" Foreground="#444" Margin="0,0,0,10" FontFamily="Tahoma"/>
-                    <WrapPanel HorizontalAlignment="Center" VerticalAlignment="Top">
-                        <ListBox ItemsSource="{Binding PlayerTwoDeadPieces}"
-                         Background="#F1F1F1"
-                         BorderBrush="#B0B0B0"
-                         BorderThickness="1"
-                         Width="Auto"
-                         Margin="5"
-                         FontSize="16"
-                         Foreground="#444"
-                         HorizontalContentAlignment="Center">
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding}" FontSize="16" Padding="5" Foreground="#444"/>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
-                        </ListBox>
-                    </WrapPanel>
-                </StackPanel>
+            <ScrollViewer x:Name="playerTwoDeadPiecesViewer" Grid.Row="6" VerticalScrollBarVisibility="Disabled" HorizontalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding PlayerTwoDeadPieces}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" Background="#F1F1F1" HorizontalAlignment="Center" VerticalAlignment="Top"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Image Source="{Binding ., Converter={StaticResource DeadPieceImageConverter}}" 
+                       Width="40" Height="40" Margin="5" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </ScrollViewer>
 
+
             <!-- Buttons Section -->
-            <WrapPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" ItemWidth="120" ItemHeight="35">
-                <!-- Resign Button -->
+            <WrapPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" ItemWidth="120" ItemHeight="35">
                 <Button Content="Resign" Style="{StaticResource ActionButtonStyle}" Width="90" Click="ResignClick" Height="27" FontSize="12"/>
-
-                <!-- Offer Draw Button -->
                 <Button Content="Offer Draw" Style="{StaticResource ActionButtonStyle}" Width="90" Click="DrawClick" Height="24" FontSize="12"/>
-
-                <!-- Undo Button -->
                 <Button Content="Undo" Style="{StaticResource ActionButtonStyle}" Width="90" Click="UndoClick" Height="24" FontSize="12"/>
             </WrapPanel>
-
         </Grid>
 
     </Grid>

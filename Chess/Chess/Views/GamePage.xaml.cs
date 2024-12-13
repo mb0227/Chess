@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Windows.Threading;
 
 namespace Chess.Views
 {
@@ -23,9 +24,10 @@ namespace Chess.Views
         bool IsMoving = false;
 
         int SelectedRow, SelectedCol;
+        private int TimeControl = 0;
 
         Piece SelectedPiece;
-        
+
         Game Game;
 
         public GamePage()
@@ -54,38 +56,41 @@ namespace Chess.Views
             PlayerOneDeadPieces = new ObservableCollection<string>();
             PlayerTwoDeadPieces = new ObservableCollection<string>();
 
-            Game.MoveMade += AddMove;
-            Game.PlayerOneDeadPieces += AddPlayerOneDeadPiece;
-            Game.PlayerTwoDeadPieces += AddPlayerTwoDeadPiece;
+            Game.MoveMade += HandlesMovesChanged;
+            Game.PlayerOneDeadPiecesChanged += HandlePlayerOneDeadPiecesChanged;
+            Game.PlayerTwoDeadPiecesChanged += HandlePlayerTwoDeadPiecesChanged;
 
+            PlayerOneTimeTextBox.Text = FirstPlayerColor.ToString() + "'s Time";            
             PlayerOneDeadPiecesTextBox.Text = FirstPlayerColor.ToString() + "'s Dead Pieces";
             PlayerOneDeadPiecesTextBox.HorizontalAlignment = HorizontalAlignment.Center;
+            
+            PlayerTwoTimeTextBox.Text = SecondPlayerColor.ToString() + "'s Time";
             PlayerTwoDeadPiecesTextBox.Text = SecondPlayerColor.ToString() + "'s Dead Pieces";
             PlayerTwoDeadPiecesTextBox.HorizontalAlignment = HorizontalAlignment.Center;
 
+            if (TimeControl < 10)
+            {
+                PlayerOneTimeControl.Text = $"0{TimeControl}:00";
+                PlayerTwoTimeControl.Text = $"0{TimeControl}:00";
+            }
+            else
+            {
+                PlayerOneTimeControl.Text = $"{TimeControl}:00";
+                PlayerTwoTimeControl.Text = $"{TimeControl}:00";
+            }
+
+            _playerOneTime = TimeSpan.FromMinutes(TimeControl);
+            _playerTwoTime = TimeSpan.FromMinutes(TimeControl);
+
+             _countdownTimer = new DispatcherTimer
+            {
+                Interval = TimeSpan.FromSeconds(1) // Tick every second
+            };
+            _countdownTimer.Tick += CountdownTimer_Tick;
+
+            UpdateTimeDisplays();
+
             DisplayComputerMove(); // if computer is first
-        }
-
-        public void AddMove(string move)
-        {
-            Moves.Add(move);  // Add the move to the list
-        }
-
-        public void AddPlayerOneDeadPiece(string piece)
-        {
-            PlayerOneDeadPieces.Add(piece);
-        }
-
-        public void AddPlayerTwoDeadPiece(string piece)
-        {
-            PlayerTwoDeadPieces.Add(piece);
-        }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         private void InitializeBoard()
@@ -583,10 +588,33 @@ namespace Chess.Views
 
             DisplayComputerMove();
 
+            if(Game.GetCurrentPlayer() == Game.GetPlayerOne())
+            {       
+                StartPlayerOneTurn();
+            }
+            else
+            {               
+                StartPlayerTwoTurn();
+            }
+
             if (Game.CheckDraw())
             {
                 Draw();
             }
+        }
+
+        public void DisplayLoseMessage(PlayerColor playerColor, string reason = " by Checkmate!")
+        {
+            Game.SetIsGameOver(true);
+            MessageBox.Show($"{playerColor} lost{reason}", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
+
+            if (Game.GetPlayerOne().GetColor() == PlayerColor.White && Game.GetPlayerOne().GetColor() == playerColor)
+                Game.UpdateStatus(GameStatus.BLACK_WIN);
+            else if (Game.GetPlayerTwo().GetColor() == PlayerColor.White && Game.GetPlayerTwo().GetColor() == playerColor)
+                Game.UpdateStatus(GameStatus.BLACK_WIN);
+            else
+                Game.UpdateStatus(GameStatus.WHITE_WIN);
+            RemoveHighlights();
         }
 
         public void DisplayComputerMove()
@@ -616,11 +644,11 @@ namespace Chess.Views
 
         private void ResignClick(object sender, RoutedEventArgs e)
         {
-            if(Game.GetIsGameOver()) return;
+            if (Game.GetIsGameOver()) return;
             var result = MessageBox.Show("Are you sure you want to resign?", "Resign", MessageBoxButton.YesNo, MessageBoxImage.Question);
             if (result == MessageBoxResult.No) return;
             Game.SetIsGameOver(true);
-            Player winner = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne(); 
+            Player winner = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne();
             MessageBox.Show($"{Game.GetCurrentPlayer().GetColor().ToString()} has resigned. {winner.GetColor().ToString()} wins!", "Resign", MessageBoxButton.OK);
             Game.UpdateStatus(GameStatus.RESIGNATION);
             // go to previous page
@@ -647,6 +675,7 @@ namespace Chess.Views
             Game.SetIsGameOver(true);
             MessageBox.Show("Game is a draw!", "Game Draw", MessageBoxButton.OK);
             Game.UpdateStatus(GameStatus.DRAW);
+            RemoveHighlights();
         }
 
         private bool CanEnPassant(int targetRow, int targetCol)
@@ -691,10 +720,11 @@ namespace Chess.Views
                 if (move != null)
                 {
                     Piece killedPiece = null;
-                    if(move.GetNotation().Contains("x"))
+                    if (move.GetNotation().Contains("x"))
                         killedPiece = move.GetPieceKilled();
                     UndoMove(move.GetEndBlock(), move.GetStartBlock(), move.GetPieceMoved(), killedPiece, move.GetMoveType(), move.GetCastlingType());
                     Game.UndoMove(move);
+                    RemoveHighlights();
                 }
             }
         }
@@ -714,10 +744,10 @@ namespace Chess.Views
             Image promotedPiece = null;
             Image rookImage = null;
 
-            if(pieceKilled != null)
+            if (pieceKilled != null)
                 capturedPiece = GetImage(pieceKilled.GetColor().ToString().ToLower(), pieceKilled.GetPieceType().ToString().ToLower());
 
-            if(moveType == MoveType.EnPassant)
+            if (moveType == MoveType.EnPassant)
             {
                 capturedPiece = GetImage((pieceKilled.GetColor() == PieceColor.White ? PieceColor.White : PieceColor.Black).ToString().ToLower(), "pawn");
                 if (capturedPiece != null)
@@ -728,7 +758,7 @@ namespace Chess.Views
                 }
             }
 
-            if(moveType == MoveType.Castling)
+            if (moveType == MoveType.Castling)
             {
                 if (castlingType == CastlingType.KingSideCastle && FirstPlayerSelectedColorWhite)
                 {
@@ -779,7 +809,7 @@ namespace Chess.Views
                     if (Grid.GetRow(element) == prevRank && Grid.GetColumn(element) == prevFile && element is Image)
                     {
                         pieceToMove = (Image)element;
-                        if(moveType == MoveType.Promotion || moveType == MoveType.PromotionCheck)
+                        if (moveType == MoveType.Promotion || moveType == MoveType.PromotionCheck)
                         {
                             if (moveType == MoveType.PromotionCheck)
                                 RemoveHighlights(Brushes.Red);
@@ -836,14 +866,62 @@ namespace Chess.Views
         private void ScrollViewerLoaded(object sender, RoutedEventArgs e)
         {
             movesViewer.ScrollToBottom();
-            playerOneDeadPiecesViewer.ScrollToBottom();
-            playerTwoDeadPiecesViewer.ScrollToBottom();
         }
-
 
         private ObservableCollection<string> _moves;
         private ObservableCollection<string> _playerOneDeadPieces;
         private ObservableCollection<string> _playerTwoDeadPieces;
+
+        private void HandlesMovesChanged(string move, bool isAdd)
+        {
+            if (isAdd)
+            {
+                Moves.Add(move);
+            }
+            else // remove the move which contains this exact text
+            {
+                if(Moves.Count > 0)
+                {
+                    string lastMove = Moves[Moves.Count - 1];
+                    string[] tokens = lastMove.Split(' ');
+                    if (tokens[1] == move || tokens[2] == move)
+                    {
+                        Moves.RemoveAt(Moves.Count - 1);
+                    }
+                }
+            }
+        }
+
+        private void HandlePlayerOneDeadPiecesChanged(string piece, bool isAdd)
+        {
+            if (isAdd)
+            {
+                PlayerOneDeadPieces.Add(piece);
+            }
+            else
+            {
+                PlayerOneDeadPieces.Remove(piece); 
+            }
+        }
+
+        private void HandlePlayerTwoDeadPiecesChanged(string piece, bool isAdd)
+        {
+            if (isAdd)
+            {
+                PlayerTwoDeadPieces.Add(piece);
+            }
+            else
+            {
+                PlayerTwoDeadPieces.Remove(piece);
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public ObservableCollection<string> Moves
         {
@@ -882,5 +960,61 @@ namespace Chess.Views
             }
         }
 
+        // Timer functionality
+        private DispatcherTimer _countdownTimer;
+        private TimeSpan _playerOneTime;
+        private TimeSpan _playerTwoTime;
+        private bool _isPlayerOneTurn = true;
+
+        private void CountdownTimer_Tick(object sender, EventArgs e)
+        {
+            if (_isPlayerOneTurn)
+            {
+                _playerOneTime = _playerOneTime.Subtract(TimeSpan.FromSeconds(1));
+                if (_playerOneTime.TotalSeconds <= 0)
+                {
+                    _countdownTimer.Stop();
+                    PlayerOneTimeTextBox.Text = "Time's Up!";
+                    DisplayLoseMessage(FirstPlayerSelectedColorWhite ? PlayerColor.White : PlayerColor.Black, " on Time!!");
+                    return;
+                }
+            }
+            else
+            {
+                _playerTwoTime = _playerTwoTime.Subtract(TimeSpan.FromSeconds(1));
+                if (_playerTwoTime.TotalSeconds <= 0)
+                {
+                    _countdownTimer.Stop();
+                    PlayerTwoTimeTextBox.Text = "Time's Up!";
+                    DisplayLoseMessage(FirstPlayerSelectedColorWhite ? PlayerColor.Black : PlayerColor.White, " on Time!!");
+                    return;
+                }
+            }
+
+            UpdateTimeDisplays();
+        }
+
+        private void UpdateTimeDisplays()
+        {
+            PlayerOneTimeControl.Text = _playerOneTime.ToString(@"mm\:ss");
+            PlayerTwoTimeControl.Text = _playerTwoTime.ToString(@"mm\:ss");
+        }
+
+        public void StartPlayerOneTurn()
+        {
+            _isPlayerOneTurn = true;
+            _countdownTimer.Start();
+        }
+
+        public void StartPlayerTwoTurn()
+        {
+            _isPlayerOneTurn = false;
+            _countdownTimer.Start();
+        }
+
+        public void PauseTimer()
+        {
+            _countdownTimer.Stop();
+        }
     }
 }

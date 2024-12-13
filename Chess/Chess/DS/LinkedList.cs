@@ -36,7 +36,7 @@ namespace Chess.DS
         {
             if (Head == null)
                 return null;
-            return GetSize() + ". " + Head.Piece.GetPieceType().ToString();
+            return  Head.Piece.GetColor().ToString().ToLower() + "-" + Head.Piece.GetPieceType().ToString().ToLower();
         }
 
         public void InsertAtTail(Piece piece)
@@ -62,10 +62,10 @@ namespace Chess.DS
             Node temp = Head;
             while (temp != null)
             {
-                Console.Write($"{temp.Piece.ToString()} -> ");
+                Console.Write($"{temp.Piece.GetColor().ToString()}'s Dead Pieces: {temp.Piece.GetPieceType()}, ");
                 temp = temp.NextNode;
             }
-            Console.WriteLine("NULL");
+            Console.WriteLine();
         }
 
         public Piece GetLastPiece()
@@ -106,11 +106,13 @@ namespace Chess.DS
             return size;
         }
 
-        public void RemoveFirstPiece()
+        public Piece RemoveFirstPiece()
         {
             if (Head == null)
-                return;
+                return null;
+            Node temp = Head;
             Head = Head.NextNode;
+            return temp.Piece;
         }
 
         public Piece RemoveLastPiece()

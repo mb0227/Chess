@@ -66,14 +66,15 @@ namespace Chess.GL
             return $"Player Color: {Color.ToString()} Player Type: {PlayerType.ToString()}";
         }
 
-        public bool GetLatestDeadPiece()
+        public Piece GetLatestDeadPiece()
         {
+            Piece piece = null;
             if (DeadPieces.GetSize() > 0)
             {
-                DeadPieces.RemoveFirstPiece();
-                return true;
+                piece = DeadPieces.RemoveFirstPiece();
+                return piece;
             }
-            return false;
+            return piece;
         }
     }
 }

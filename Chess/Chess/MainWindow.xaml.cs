@@ -1,12 +1,5 @@
-﻿using Chess.GL;
-using System;
-using System.Linq;
+﻿using System;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Collections.Generic;
 using Chess.Views;
 
 namespace Chess
@@ -16,7 +9,16 @@ namespace Chess
         public MainWindow()
         {
             InitializeComponent();
-            Main.Content = new GamePage();
+
+            SelectOptions options = new SelectOptions();
+            if (options.ShowDialog() == true)
+            {
+                string selectedColor = options.SelectedColor;
+                string selectedTimeControl = options.SelectedTimeControl;
+                string selectedDifficulty = options.SelectedDifficulty;
+
+                MessageBox.Show($"Color: {selectedColor}, Time: {selectedTimeControl}, Difficulty: {selectedDifficulty}", "Selection Summary");
+            }
         }
     }
 }

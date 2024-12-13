@@ -27,5 +27,11 @@ namespace Chess.Views
             GamePage gamePage = new GamePage();
             NavigationService.Navigate(gamePage);
         }
+        
+        private void VsComputerClick(object sender, RoutedEventArgs e)
+        {
+            GamePage gamePage = new GamePage();
+            NavigationService.Navigate(gamePage);
+        }
     }
 }
