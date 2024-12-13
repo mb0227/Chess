@@ -53,10 +53,8 @@ namespace Chess.Views
         {
             if (sender is Button button)
             {
-                // Extract the piece name by removing "Button" from the button's name
                 SelectedPiece = button.Name.Replace("Button", "");
 
-                // Set dialog result and close the window
                 this.DialogResult = true;
                 this.Close();
             }

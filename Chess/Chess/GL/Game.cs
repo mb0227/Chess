@@ -8,40 +8,9 @@ using System.Windows.Controls;
 
 namespace Chess.GL
 {
-    public enum GameStatus
-    {
-        ACTIVE,
-        BLACK_WIN,
-        WHITE_WIN,
-        FORFEIT,
-        STALEMATE,
-        RESIGNATION,
-        DRAW
-    }
-
-    public enum MoveType
-    {
-        Normal,
-        Kill,
-        Check,
-        Checkmate,
-        Stalemate,
-        Promotion,
-        EnPassant,
-        Castling,
-        PromotionCheck,
-        Draw
-    }
-
-    public enum CastlingType
-    {
-        KingSideCastle,
-        QueenSideCastle,
-        None
-    }
-
     public class Game
     {
+        // Class Members
         private Player PlayerOne;
         private Player PlayerTwo;
         private Player CurrentMove;
@@ -53,6 +22,8 @@ namespace Chess.GL
         private GameStatus Status;
         private MovesStack MovesStack;
 
+        private int Difficulty;
+
         // bool: true for add, false for remove
         public event Action<string, bool> MoveMade;
         public event Action<string, bool> PlayerOneDeadPiecesChanged; 
@@ -60,15 +31,7 @@ namespace Chess.GL
 
         private static Game GameInstance;
 
-        public static Game MakeGame(Player playerOne, Player playerTwo) //Singleton Pattern
-        {
-            if (GameInstance == null)
-            {
-                GameInstance = new Game(playerOne, playerTwo);
-            }
-            return GameInstance;
-        }
-
+        // Constructors
         private Game(Player playerOne, Player playerTwo)
         {
             PlayerOne = playerOne;
@@ -80,14 +43,56 @@ namespace Chess.GL
             Status = GameStatus.ACTIVE;
             CurrentMove = PlayerOne.GetColor().ToString().Trim() == "White" ? PlayerOne : PlayerTwo;
             Move.SetBoard(Board);
+            Computer.SetBoard(Board);
         }
 
+        private Game(Player playerOne, Player playerTwo, int difficulty) : this(playerOne, playerTwo)
+        {
+            Difficulty = difficulty;
+        }
+
+        // Game Initiazlize Methods
+        public static Game MakeGame(Player playerOne, Player playerTwo) //Singleton Pattern
+        {
+            if (GameInstance == null)
+            {
+                GameInstance = new Game(playerOne, playerTwo);
+            }
+            else
+            {
+                RestartGame();
+                GameInstance = new Game(playerOne, playerTwo);
+            }
+            return GameInstance;
+        }
+        
+        public static Game MakeGame(Player playerOne, Player playerTwo, int difficulty)
+        {
+            if (GameInstance == null)
+            {
+                GameInstance = new Game(playerOne, playerTwo, difficulty);
+            }
+            else
+            {
+                RestartGame();
+                GameInstance = new Game(playerOne, playerTwo, difficulty);
+            }
+            return GameInstance;
+        }
+
+        private static void RestartGame()
+        {
+            GameInstance = null;
+        }
+
+        // Move Functionality
         public Move MakeComputerMove()
         {
             Move computerMove = null;
-            if (CurrentMove.GetPlayerType() == PlayerType.Computer)
+            if (CurrentMove.GetPlayerType() == PlayerType.Computer && !IsGameOver)
             {
-                computerMove = Board.MakeAIMove(CurrentMove.GetColor(), 3); // first argument is player's color and second argument is the depth of the minimax algorithm
+                Computer computer = (Computer)CurrentMove;
+                computerMove = computer.MakeAIMove(CurrentMove.GetColor(), Difficulty); // first argument is player's color and second argument is the depth of the minimax algorithm
             }
             return computerMove;
         }
@@ -465,161 +470,6 @@ namespace Chess.GL
                 SecondPlayerMove = move;
         }
 
-        private void SetPawnUnEnPassantable()
-        {
-            if (Moves.GetSize() == 0) return;
-            string lastMove = Moves.Peek();
-            string[] tokens = lastMove.Split(' ');
-            string prevNotation;
-            int tokenForPlayer = -1;
-            if (tokens.Length == 3)
-            {
-                if (PlayerOne.GetColor() == PlayerColor.White)
-                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.Black ? 1 : 2;
-                else
-                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.White ? 2 : 1;
-
-                prevNotation = tokens[tokenForPlayer];
-                if (prevNotation.Length != 2) return;
-                int prevFile = Board.GetFileInInt(prevNotation[0].ToString());
-                int prevRank = Board.TranslateRank(int.Parse(prevNotation[1].ToString()));
-                if (PlayerOne.GetColor() == PlayerColor.Black)
-                {
-                    prevRank = int.Parse(prevNotation[1].ToString()) - 1;
-                    prevFile = ReverseBlockValue(prevFile);
-                }
-                if (!Board.WithinBounds(prevRank, prevFile)) return;
-                Block block = Board.GetBlock(prevRank, prevFile);
-                if (!block.IsEmpty() && block.GetPiece().GetPieceType() == PieceType.Pawn)
-                {
-                    Pawn piece = (Pawn)block.GetPiece();
-                    if (piece.GetEnPassantable())
-                    {
-                        piece.SetUnEnPassantable();
-                    }
-                }
-            }
-        }
-
-        public void DisplayMoves()
-        {
-            Moves.Display();
-        }
-
-        public Player GetPlayerOne()
-        {
-            return PlayerOne;
-        }
-
-        public Player GetPlayerTwo()
-        {
-            return PlayerTwo;
-        }
-
-        public Board GetBoard()
-        {
-            return Board;
-        }
-
-        public Stack GetMoves()
-        {
-            return Moves;
-        }
-
-        public bool GetIsGameOver()
-        {
-            return IsGameOver;
-        }
-
-        public GameStatus GetStatus()
-        {
-            return Status;
-        }
-
-        public Player GetCurrentPlayer()
-        {
-            return CurrentMove;
-        }
-
-        public void UpdateStatus(GameStatus status)
-        {
-            Status = status;
-        }
-
-        public void SetIsGameOver(bool isGameOver)
-        {
-            IsGameOver = isGameOver;
-        }
-
-        public bool IsTurn(string pieceColor)
-        {
-            return CurrentMove.GetColor().ToString().Trim() == pieceColor.Trim();
-        }
-
-        public static PieceType GetPieceTypeByString(string pieceName)
-        {
-            switch (pieceName)
-            {
-                case "queen":
-                    return PieceType.Queen;
-                case "bishop":
-                    return PieceType.Bishop;
-                case "rook":
-                    return PieceType.Rook;
-                case "knight":
-                    return PieceType.Knight;
-                default:
-                    return PieceType.Queen;
-            }
-        }
-
-        public int ReverseBlockValue(int value)
-        {
-            switch (value)
-            {
-                case 0:
-                    return 7;
-                case 1:
-                    return 6;
-                case 2:
-                    return 5;
-                case 3:
-                    return 4;
-                case 4:
-                    return 3;
-                case 5:
-                    return 2;
-                case 6:
-                    return 1;
-                case 7:
-                    return 0;
-                default:
-                    return -1;
-            }
-        }
-
-        private void OnMoveMade(string move)
-        {
-            MoveMade?.Invoke(move, true);
-        }
-
-        public MovesStack GetMovesStack()
-        {
-            return MovesStack;
-        }
-
-        public void SetNextPlayer()
-        {
-            if (CurrentMove == PlayerOne)
-            {
-                CurrentMove = PlayerTwo;
-            }
-            else
-            {
-                CurrentMove = PlayerOne;
-            }
-        }
-
         public void UndoMove(Move move)
         {
             MoveMade?.Invoke(move.GetNotation(), false);
@@ -761,9 +611,140 @@ namespace Chess.GL
                     }
                 }
             }
-            //Console.WriteLine("Current Player : " + CurrentMove.ToString());
         }
 
+        // Control Functions
+        private void SetPawnUnEnPassantable()
+        {
+            if (Moves.GetSize() == 0) return;
+            string lastMove = Moves.Peek();
+            string[] tokens = lastMove.Split(' ');
+            string prevNotation;
+            int tokenForPlayer = -1;
+            if (tokens.Length == 3)
+            {
+                if (PlayerOne.GetColor() == PlayerColor.White)
+                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.Black ? 1 : 2;
+                else
+                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.White ? 2 : 1;
+
+                prevNotation = tokens[tokenForPlayer];
+                if (prevNotation.Length != 2) return;
+                int prevFile = Board.GetFileInInt(prevNotation[0].ToString());
+                int prevRank = Board.TranslateRank(int.Parse(prevNotation[1].ToString()));
+                if (PlayerOne.GetColor() == PlayerColor.Black)
+                {
+                    prevRank = int.Parse(prevNotation[1].ToString()) - 1;
+                    prevFile = ReverseBlockValue(prevFile);
+                }
+                if (!Board.WithinBounds(prevRank, prevFile)) return;
+                Block block = Board.GetBlock(prevRank, prevFile);
+                if (!block.IsEmpty() && block.GetPiece().GetPieceType() == PieceType.Pawn)
+                {
+                    Pawn piece = (Pawn)block.GetPiece();
+                    if (piece.GetEnPassantable())
+                    {
+                        piece.SetUnEnPassantable();
+                    }
+                }
+            }
+        }
+
+        // Display Functions
+        public void DisplayMoves()
+        {
+            Moves.Display();
+        }
+
+        // Getters 
+        public Player GetPlayerOne()
+        {
+            return PlayerOne;
+        }
+
+        public Player GetPlayerTwo()
+        {
+            return PlayerTwo;
+        }
+
+        public Board GetBoard()
+        {
+            return Board;
+        }
+
+        public Stack GetMoves()
+        {
+            return Moves;
+        }
+
+        public MovesStack GetMovesStack()
+        {
+            return MovesStack;
+        }
+
+        public bool GetIsGameOver()
+        {
+            return IsGameOver;
+        }
+
+        public GameStatus GetStatus()
+        {
+            return Status;
+        }
+
+        public bool IsTurn(string pieceColor)
+        {
+            return CurrentMove.GetColor().ToString().Trim() == pieceColor.Trim();
+        }
+
+        public Player GetCurrentPlayer()
+        {
+            return CurrentMove;
+        }
+
+        // Setters
+        public void SetIsGameOver(bool isGameOver)
+        {
+            IsGameOver = isGameOver;
+        }
+
+        public void UpdateStatus(GameStatus status)
+        {
+            Status = status;
+        }
+
+        // Utility Functions
+        public int ReverseBlockValue(int value)
+        {
+            switch (value)
+            {
+                case 0:
+                    return 7;
+                case 1:
+                    return 6;
+                case 2:
+                    return 5;
+                case 3:
+                    return 4;
+                case 4:
+                    return 3;
+                case 5:
+                    return 2;
+                case 6:
+                    return 1;
+                case 7:
+                    return 0;
+                default:
+                    return -1;
+            }
+        }
+
+        private void OnMoveMade(string move)
+        {
+            MoveMade?.Invoke(move, true);
+        }
+
+        // Check Status Functions
         public bool CheckThreeFoldRepeitetion()
         {
             if (Moves.GetSize() < 3) return false;

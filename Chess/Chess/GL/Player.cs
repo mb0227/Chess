@@ -2,18 +2,6 @@
 
 namespace Chess.GL
 {
-    public enum PlayerColor
-    {
-        White,
-        Black
-    }
-
-    public enum PlayerType
-    {
-        Human,
-        Computer
-    }
-
     public class Player
     {
         protected PlayerColor Color;
@@ -26,46 +14,15 @@ namespace Chess.GL
             DeadPieces = new LinkedList();
         }
 
-        public void KillPiece(Piece piece)
-        {
-            DeadPieces.InsertAtHead(piece);
-        }
-
         public PlayerColor GetColor()
         {
             return Color;
-        }
-
-        public void SetPlayerType(PlayerType type)
-        {
-            PlayerType = type;
         }
 
         public PlayerType GetPlayerType()
         {
             return PlayerType;
         }
-
-        public void AddDeadPiece(Piece piece)
-        {
-            DeadPieces.InsertAtHead(piece);
-        }
-
-        public void DisplayDeadPieces()
-        {
-            DeadPieces.Display();
-        }
-
-        public string GetFirstDeadPiece()
-        {
-            return DeadPieces.GetFirstPiece();
-        }
-
-        public override string ToString()
-        {
-            return $"Player Color: {Color.ToString()} Player Type: {PlayerType.ToString()}";
-        }
-
         public Piece GetLatestDeadPiece()
         {
             Piece piece = null;
@@ -75,6 +32,26 @@ namespace Chess.GL
                 return piece;
             }
             return piece;
+        }
+
+        public void KillPiece(Piece piece)
+        {
+            DeadPieces.InsertAtHead(piece);
+        }
+
+        public string GetFirstDeadPiece()
+        {
+            return DeadPieces.GetFirstPiece();
+        }
+
+        public void DisplayDeadPieces()
+        {
+            DeadPieces.Display();
+        }
+
+        public override string ToString()
+        {
+            return $"Player Color: {Color.ToString()} Player Type: {PlayerType.ToString()}";
         }
     }
 }

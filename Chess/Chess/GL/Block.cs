@@ -31,11 +31,6 @@
             return Piece;
         }
 
-        public void SetPiece(Piece piece)
-        {
-            this.Piece = piece;
-        }
-
         public int GetRank()
         {
             return Rank;
@@ -45,15 +40,14 @@
         {
             return File;
         }
+        public void SetPiece(Piece piece)
+        {
+            this.Piece = piece;
+        }
 
         public bool IsEmpty()
         {
             return Piece == null;
-        }
-
-        public void SetRank(int rank)
-        {
-            Rank = rank;
         }
     }
 }

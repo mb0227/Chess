@@ -16,7 +16,7 @@ namespace Chess.Views
 {
     public partial class GamePage : Page, INotifyPropertyChanged
     {
-        bool FirstPlayerSelectedColorWhite = true;
+        bool FirstPlayerSelectedColorWhite;
         bool PromotionPossible = false;
         bool enPassantPossible = false;
         bool castlingPossible = false;
@@ -24,30 +24,50 @@ namespace Chess.Views
         bool IsMoving = false;
 
         int SelectedRow, SelectedCol;
-        private int TimeControl = 0;
+        private int TimeControl = 1;
 
         Piece SelectedPiece;
 
         Game Game;
 
-        public GamePage()
+        public GamePage(PlayerColor firstPlayerColor, int timeControl, int difficulty = -1)
         {
             InitializeComponent();
 
             PlayerColor FirstPlayerColor, SecondPlayerColor;
 
-            if (FirstPlayerSelectedColorWhite)
+            TimeControl = timeControl;
+
+            if (firstPlayerColor == PlayerColor.White)
             {
                 FirstPlayerColor = PlayerColor.White;
                 SecondPlayerColor = PlayerColor.Black;
+                FirstPlayerSelectedColorWhite = true;
             }
             else
             {
                 FirstPlayerColor = PlayerColor.Black;
                 SecondPlayerColor = PlayerColor.White;
+                FirstPlayerSelectedColorWhite = false;
             }
 
-            Game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
+            if (difficulty != -1)
+                Game = Game.MakeGame(new Human(FirstPlayerColor), new Computer(SecondPlayerColor), difficulty);
+            else
+                Game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
+
+            //if (FirstPlayerSelectedColorWhite)
+            //{
+            //    FirstPlayerColor = PlayerColor.White;
+            //    SecondPlayerColor = PlayerColor.Black;
+            //}
+            //else
+            //{
+            //    FirstPlayerColor = PlayerColor.Black;
+            //    SecondPlayerColor = PlayerColor.White;
+            //}
+
+            //Game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
 
             InitializeBoard();
 
@@ -60,10 +80,10 @@ namespace Chess.Views
             Game.PlayerOneDeadPiecesChanged += HandlePlayerOneDeadPiecesChanged;
             Game.PlayerTwoDeadPiecesChanged += HandlePlayerTwoDeadPiecesChanged;
 
-            PlayerOneTimeTextBox.Text = FirstPlayerColor.ToString() + "'s Time";            
+            PlayerOneTimeTextBox.Text = FirstPlayerColor.ToString() + "'s Time";
             PlayerOneDeadPiecesTextBox.Text = FirstPlayerColor.ToString() + "'s Dead Pieces";
             PlayerOneDeadPiecesTextBox.HorizontalAlignment = HorizontalAlignment.Center;
-            
+
             PlayerTwoTimeTextBox.Text = SecondPlayerColor.ToString() + "'s Time";
             PlayerTwoDeadPiecesTextBox.Text = SecondPlayerColor.ToString() + "'s Dead Pieces";
             PlayerTwoDeadPiecesTextBox.HorizontalAlignment = HorizontalAlignment.Center;
@@ -82,7 +102,7 @@ namespace Chess.Views
             _playerOneTime = TimeSpan.FromMinutes(TimeControl);
             _playerTwoTime = TimeSpan.FromMinutes(TimeControl);
 
-             _countdownTimer = new DispatcherTimer
+            _countdownTimer = new DispatcherTimer
             {
                 Interval = TimeSpan.FromSeconds(1) // Tick every second
             };
@@ -93,6 +113,7 @@ namespace Chess.Views
             DisplayComputerMove(); // if computer is first
         }
 
+        // UI Functions
         private void InitializeBoard()
         {
             string[] pieces = { "rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook" };
@@ -201,6 +222,86 @@ namespace Chess.Views
             }
         }
 
+        private void HighlightSquares(int row, int col, Brush brush = null)
+        {
+            if (brush == null)
+            {
+                brush = Brushes.LightGreen;
+            }
+            Border border = new Border
+            {
+                Background = brush,
+                Opacity = 0.5
+            };
+            Grid.SetRow(border, row);
+            Grid.SetColumn(border, col);
+            ChessGrid.Children.Add(border);
+        }
+
+        private void RemoveHighlights(Brush brush = null)
+        {
+            if (brush == null)
+            {
+                brush = Brushes.LightGreen;
+            }
+            List<UIElement> elementsToRemove = new List<UIElement>();
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (element is Border border && border.Background == brush)
+                {
+                    elementsToRemove.Add(element);
+                }
+            }
+            foreach (UIElement element in elementsToRemove)
+            {
+                ChessGrid.Children.Remove(element);
+            }
+        }
+
+        private bool IsValidMove(int targetRow, int targetCol)
+        {
+            if (Game.GetCurrentPlayer().GetPlayerType() == PlayerType.Computer)
+                return true;
+
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (element is Border border && border.Background == Brushes.LightGreen)
+                {
+                    int row = Grid.GetRow(border);
+                    int col = Grid.GetColumn(border);
+
+                    if (row == targetRow && col == targetCol)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private Image GetImage(string color, string piece)
+        {
+            Image image = null;
+            string imagePath = System.IO.Path.Combine("..\\..\\Images", $"{color}-{piece}.png");
+            imagePath = System.IO.Path.GetFullPath(imagePath);
+            image = new Image
+            {
+                Width = 53,
+                Height = 53,
+                Margin = new Thickness(5),
+                Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
+                IsHitTestVisible = false,
+                Name = $"{piece}"
+            };
+            return image;
+        }
+
+        private void ScrollViewerLoaded(object sender, RoutedEventArgs e)
+        {
+            movesViewer.ScrollToBottom();
+        }
+
+        // Move Handling Functions
         private void Chessboard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var clickedElement = sender as Border;
@@ -232,12 +333,10 @@ namespace Chess.Views
                 }
                 SelectedRow = row;
                 SelectedCol = col;
-                bool hasImage = false;
                 foreach (UIElement element in ChessGrid.Children)
                 {
                     if (Grid.GetRow(element) == SelectedRow && Grid.GetColumn(element) == SelectedCol && element is Image)
                     {
-                        hasImage = true;
                         Block block = Game.GetBoard().GetBlock(SelectedRow, SelectedCol);
                         if (block.GetPiece() != null)
                         {
@@ -334,77 +433,7 @@ namespace Chess.Views
                         break;
                     }
                 }
-                HandleSquareClick(SelectedRow, SelectedCol, hasImage);
             }
-        }
-
-        private void HandleSquareClick(int row, int col, bool hasImage)
-        {
-            if (hasImage)
-            {
-                //ClickedBoxTextBlock.Text = $"Row: {row} Column: {col} Piece.";
-            }
-            else
-            {
-                //ClickedBoxTextBlock.Text = $"Row: {row} Column: {col} Empty.";
-            }
-        }
-
-        private void HighlightSquares(int row, int col, Brush brush = null)
-        {
-            if (brush == null)
-            {
-                brush = Brushes.LightGreen;
-            }
-            Border border = new Border
-            {
-                Background = brush,
-                Opacity = 0.5
-            };
-            Grid.SetRow(border, row);
-            Grid.SetColumn(border, col);
-            ChessGrid.Children.Add(border);
-        }
-
-        private void RemoveHighlights(Brush brush = null)
-        {
-            if (brush == null)
-            {
-                brush = Brushes.LightGreen;
-            }
-            List<UIElement> elementsToRemove = new List<UIElement>();
-            foreach (UIElement element in ChessGrid.Children)
-            {
-                if (element is Border border && border.Background == brush)
-                {
-                    elementsToRemove.Add(element);
-                }
-            }
-            foreach (UIElement element in elementsToRemove)
-            {
-                ChessGrid.Children.Remove(element);
-            }
-        }
-
-        private bool IsValidMove(int targetRow, int targetCol)
-        {
-            if (Game.GetCurrentPlayer().GetPlayerType() == PlayerType.Computer)
-                return true;
-
-            foreach (UIElement element in ChessGrid.Children)
-            {
-                if (element is Border border && border.Background == Brushes.LightGreen)
-                {
-                    int row = Grid.GetRow(border);
-                    int col = Grid.GetColumn(border);
-
-                    if (row == targetRow && col == targetCol)
-                    {
-                        return true;
-                    }
-                }
-            }
-            return false;
         }
 
         private void MakeMove(int previousRow, int previousCol, int targetRow, int targetCol)
@@ -560,7 +589,7 @@ namespace Chess.Views
                 Grid.SetRow(pieceToMove, targetRow);
                 Grid.SetColumn(pieceToMove, targetCol);
 
-                if (optionSelected != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Promotion, Game.GetPieceTypeByString(optionSelected));
+                if (optionSelected != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Promotion, UtilityFunctions.GetPieceTypeByString(optionSelected));
                 else if (enPassantTargetRow != -1) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.EnPassant, PieceType.Pawn, enPassantTargetRow);
                 else if (capturedPiece != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Kill);
                 else if (rookImageForCastling != null && (targetCol == 6 || targetCol == 1)) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Castling, PieceType.King, -1, CastlingType.KingSideCastle);
@@ -586,35 +615,25 @@ namespace Chess.Views
             if (IsMoving) IsMoving = false;
             if (castlingPossible) castlingPossible = false;
 
-            DisplayComputerMove();
 
-            if(Game.GetCurrentPlayer() == Game.GetPlayerOne())
-            {       
+            if (Game.GetCurrentPlayer() == Game.GetPlayerOne())
+            {
                 StartPlayerOneTurn();
             }
             else
-            {               
+            {
                 StartPlayerTwoTurn();
             }
+
+            DisplayComputerMove();
+
+            GetGameStatus();
 
             if (Game.CheckDraw())
             {
                 Draw();
+                NavigateToHomePage();
             }
-        }
-
-        public void DisplayLoseMessage(PlayerColor playerColor, string reason = " by Checkmate!")
-        {
-            Game.SetIsGameOver(true);
-            MessageBox.Show($"{playerColor} lost{reason}", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
-
-            if (Game.GetPlayerOne().GetColor() == PlayerColor.White && Game.GetPlayerOne().GetColor() == playerColor)
-                Game.UpdateStatus(GameStatus.BLACK_WIN);
-            else if (Game.GetPlayerTwo().GetColor() == PlayerColor.White && Game.GetPlayerTwo().GetColor() == playerColor)
-                Game.UpdateStatus(GameStatus.BLACK_WIN);
-            else
-                Game.UpdateStatus(GameStatus.WHITE_WIN);
-            RemoveHighlights();
         }
 
         public void DisplayComputerMove()
@@ -640,42 +659,6 @@ namespace Chess.Views
             {
                 return null;
             }
-        }
-
-        private void ResignClick(object sender, RoutedEventArgs e)
-        {
-            if (Game.GetIsGameOver()) return;
-            var result = MessageBox.Show("Are you sure you want to resign?", "Resign", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (result == MessageBoxResult.No) return;
-            Game.SetIsGameOver(true);
-            Player winner = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne();
-            MessageBox.Show($"{Game.GetCurrentPlayer().GetColor().ToString()} has resigned. {winner.GetColor().ToString()} wins!", "Resign", MessageBoxButton.OK);
-            Game.UpdateStatus(GameStatus.RESIGNATION);
-            // go to previous page
-        }
-
-        private void DrawClick(object sender, RoutedEventArgs e)
-        {
-            if (Game.GetIsGameOver()) return;
-
-            Player nextPlayer = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne();
-            var result = MessageBox.Show($"{Game.GetCurrentPlayer().GetColor().ToString()} has offered a draw. Do you want to accept?",
-                                  "Draw Offer", MessageBoxButton.YesNo, MessageBoxImage.Question);
-
-            if (result == MessageBoxResult.Yes)
-            {
-                Draw();
-            }
-            // go to previous page
-        }
-
-        public void Draw()
-        {
-            Game.MakeMove(-1, -1, -1, -1, MoveType.Draw);
-            Game.SetIsGameOver(true);
-            MessageBox.Show("Game is a draw!", "Game Draw", MessageBoxButton.OK);
-            Game.UpdateStatus(GameStatus.DRAW);
-            RemoveHighlights();
         }
 
         private bool CanEnPassant(int targetRow, int targetCol)
@@ -710,6 +693,53 @@ namespace Chess.Views
                 }
             }
             return false;
+        }
+
+        private void ResignClick(object sender, RoutedEventArgs e)
+        {
+            if (Game.GetIsGameOver()) return;
+            var result = MessageBox.Show("Are you sure you want to resign?", "Resign", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            if (result == MessageBoxResult.No) return;
+            Game.SetIsGameOver(true);
+            Player winner = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne();
+            MessageBox.Show($"{Game.GetCurrentPlayer().GetColor().ToString()} has resigned. {winner.GetColor().ToString()} wins!", "Resign", MessageBoxButton.OK, MessageBoxImage.Information);
+            Game.UpdateStatus(GameStatus.RESIGNATION);
+            NavigateToHomePage();
+        }
+
+        private void DrawClick(object sender, RoutedEventArgs e)
+        {
+            if (Game.GetIsGameOver()) return;
+
+            Player nextPlayer = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne();
+            var result = MessageBox.Show($"{Game.GetCurrentPlayer().GetColor().ToString()} has offered a draw. Do you want to accept?",
+                                  "Draw Offer", MessageBoxButton.YesNo, MessageBoxImage.Question);
+
+            if (result == MessageBoxResult.Yes)
+            {
+                Draw();
+                NavigateToHomePage();
+            }
+        }
+
+        private void GetGameStatus()
+        {
+            if (Game.GetIsGameOver())
+            {
+                if (Game.GetStatus() == GameStatus.BLACK_WIN || Game.GetStatus() == GameStatus.WHITE_WIN)
+                {
+                    Player winner = Game.GetCurrentPlayer() == Game.GetPlayerOne() ? Game.GetPlayerTwo() : Game.GetPlayerOne();
+                    RemoveHighlights();
+                    DisplayLoseMessage(Game.GetCurrentPlayer().GetColor());
+                    NavigateToHomePage();
+                }
+                else if (Game.GetStatus() == GameStatus.STALEMATE)
+                {
+                    MessageBox.Show("Game is a draw by stalemate!", "Game Draw", MessageBoxButton.OK, MessageBoxImage.Information);
+                    RemoveHighlights();
+                    NavigateToHomePage();
+                }
+            }
         }
 
         private void UndoClick(object sender, RoutedEventArgs e)
@@ -842,80 +872,28 @@ namespace Chess.Views
                     }
                 }
             }
-            // change current move remove dead pieces too
-            //Game.SetNextPlayer();
         }
 
-        private Image GetImage(string color, string piece)
+        // Game status related functions
+        public void Draw()
         {
-            Image image = null;
-            string imagePath = System.IO.Path.Combine("..\\..\\Images", $"{color}-{piece}.png");
-            imagePath = System.IO.Path.GetFullPath(imagePath);
-            image = new Image
-            {
-                Width = 53,
-                Height = 53,
-                Margin = new Thickness(5),
-                Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
-                IsHitTestVisible = false,
-                Name = $"{piece}"
-            };
-            return image;
+            Game.MakeMove(-1, -1, -1, -1, MoveType.Draw);
+            Game.SetIsGameOver(true);
+            MessageBox.Show("Game is a draw!", "Game Draw", MessageBoxButton.OK, MessageBoxImage.Information);
+            Game.UpdateStatus(GameStatus.DRAW);
+            RemoveHighlights();
         }
 
-        private void ScrollViewerLoaded(object sender, RoutedEventArgs e)
+        public void DisplayLoseMessage(PlayerColor playerColor, string reason = " by Checkmate!")
         {
-            movesViewer.ScrollToBottom();
+            Game.SetIsGameOver(true);
+            MessageBox.Show($"{playerColor} lost{reason}", "Game Over", MessageBoxButton.OK, MessageBoxImage.Information);
+            RemoveHighlights();
         }
 
         private ObservableCollection<string> _moves;
         private ObservableCollection<string> _playerOneDeadPieces;
         private ObservableCollection<string> _playerTwoDeadPieces;
-
-        private void HandlesMovesChanged(string move, bool isAdd)
-        {
-            if (isAdd)
-            {
-                Moves.Add(move);
-            }
-            else // remove the move which contains this exact text
-            {
-                if(Moves.Count > 0)
-                {
-                    string lastMove = Moves[Moves.Count - 1];
-                    string[] tokens = lastMove.Split(' ');
-                    if (tokens[1] == move || tokens[2] == move)
-                    {
-                        Moves.RemoveAt(Moves.Count - 1);
-                    }
-                }
-            }
-        }
-
-        private void HandlePlayerOneDeadPiecesChanged(string piece, bool isAdd)
-        {
-            if (isAdd)
-            {
-                PlayerOneDeadPieces.Add(piece);
-            }
-            else
-            {
-                PlayerOneDeadPieces.Remove(piece); 
-            }
-        }
-
-        private void HandlePlayerTwoDeadPiecesChanged(string piece, bool isAdd)
-        {
-            if (isAdd)
-            {
-                PlayerTwoDeadPieces.Add(piece);
-            }
-            else
-            {
-                PlayerTwoDeadPieces.Remove(piece);
-            }
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -935,6 +913,7 @@ namespace Chess.Views
                 }
             }
         }
+
         public ObservableCollection<string> PlayerOneDeadPieces
         {
             get => _playerOneDeadPieces;
@@ -947,6 +926,7 @@ namespace Chess.Views
                 }
             }
         }
+
         public ObservableCollection<string> PlayerTwoDeadPieces
         {
             get => _playerTwoDeadPieces;
@@ -957,6 +937,50 @@ namespace Chess.Views
                     _playerTwoDeadPieces = value;
                     OnPropertyChanged();
                 }
+            }
+        }
+
+        private void HandlesMovesChanged(string move, bool isAdd)
+        {
+            if (isAdd)
+            {
+                Moves.Add(move);
+            }
+            else // remove the move which contains this exact text
+            {
+                if (Moves.Count > 0)
+                {
+                    string lastMove = Moves[Moves.Count - 1];
+                    string[] tokens = lastMove.Split(' ');
+                    if (tokens[1] == move || tokens[2] == move)
+                    {
+                        Moves.RemoveAt(Moves.Count - 1);
+                    }
+                }
+            }
+        }
+
+        private void HandlePlayerOneDeadPiecesChanged(string piece, bool isAdd)
+        {
+            if (isAdd)
+            {
+                PlayerOneDeadPieces.Add(piece);
+            }
+            else
+            {
+                PlayerOneDeadPieces.Remove(piece);
+            }
+        }
+
+        private void HandlePlayerTwoDeadPiecesChanged(string piece, bool isAdd)
+        {
+            if (isAdd)
+            {
+                PlayerTwoDeadPieces.Add(piece);
+            }
+            else
+            {
+                PlayerTwoDeadPieces.Remove(piece);
             }
         }
 
@@ -1015,6 +1039,17 @@ namespace Chess.Views
         public void PauseTimer()
         {
             _countdownTimer.Stop();
+        }
+
+        public void ResumeTimer()
+        {
+            _countdownTimer.Start();
+        }
+
+        public void NavigateToHomePage()
+        {
+            _countdownTimer.Stop();
+            NavigationService.Navigate(new Homepage());
         }
     }
 }

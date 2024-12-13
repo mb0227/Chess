@@ -57,6 +57,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GL\Enums.cs" />
+    <Compile Include="GL\UtilityFunctions.cs" />
     <Compile Include="Views\DeadPieceImageConverter.cs" />
     <Compile Include="Views\GamePage.xaml.cs">
       <DependentUpon>GamePage.xaml</DependentUpon>

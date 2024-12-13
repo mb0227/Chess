@@ -13,11 +13,13 @@ namespace Chess.Views
         public string SelectedTimeControl { get; private set; }
         public string SelectedDifficulty { get; private set; }
 
-        public SelectOptions()
+        public SelectOptions(bool hideDifficultySection)
         {
             InitializeComponent();
             LoadImages();
             SelectedDifficulty = "Medium"; // Default
+            if(hideDifficultySection)
+                HideDifficultySection();
         }
 
         private void LoadImages()
@@ -40,7 +42,7 @@ namespace Chess.Views
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
-            SelectedColor = (FindName("White") as RadioButton)?.IsChecked == true ? "White" : "Black";
+            SelectedColor = GetCheckedRadioButton("Color");
             SelectedTimeControl = GetCheckedRadioButton("TimeControl");
             SelectedDifficulty = (DifficultyComboBox.SelectedItem as ComboBoxItem)?.Content.ToString();
 

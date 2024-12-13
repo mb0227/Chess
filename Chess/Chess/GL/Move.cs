@@ -53,60 +53,6 @@ namespace Chess.GL
             MakeNotation();
         }
 
-        public override string ToString()
-        {
-           string details = "Start: " + StartBlock.ToString() + " End: " + EndBlock.ToString() + " Piece Moved Details: " + PieceMoved.ToString();
-           if (PieceKilled != null) details += " Piece Killed: " + PieceKilled.ToString();
-           details += " Notation: " + Notation; 
-           return details;
-        }
-
-        public void MakeNotation()
-        {
-            if (MoveType == MoveType.Draw) 
-                return;
-
-            if(MoveType == MoveType.Castling && CastlingType == CastlingType.KingSideCastle)
-            {
-                Notation = "O-O";
-                return;
-            }
-            if (MoveType == MoveType.Castling && CastlingType == CastlingType.QueenSideCastle)
-            {
-                Notation = "O-O-O";
-                return;
-            }
-
-            if (PieceMoved.GetPieceType() != PieceType.Pawn)
-            {
-                if (PieceKilled == null)
-                    Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(EndBlock.GetFile());
-                else
-                    Notation = GetPieceMovedString(PieceMoved.GetPieceType());
-            }
-            else
-            {
-                Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(StartBlock.GetFile());
-            }
-
-            if (PieceKilled != null) 
-                Notation += "x" + GetFileString(EndBlock.GetFile());
-
-            Notation += Board.TranslateRank(EndBlock.GetRank());
-
-            if (MoveType == MoveType.Promotion)
-                Notation += "=" + GetPieceMovedString(PromotedPieceType);
-
-            if (MoveType == MoveType.Checkmate) 
-                Notation += "#";
-            else if(MoveType == MoveType.Check) 
-                Notation += "+";
-
-            if(MoveType == MoveType.PromotionCheck)
-                Notation += "=" + GetPieceMovedString(PromotedPieceType) + "+";
-
-        }
-
         private string GetPieceMovedString(PieceType p)
         {
             if (p == PieceType.King) return "K";
@@ -157,20 +103,14 @@ namespace Chess.GL
             return Notation;
         }
 
-        public void SetPlayerMoved(Player player)
+        public bool GetIsPromotion()
         {
-            PlayerMoved = player;
+            return MoveType == MoveType.Promotion;
         }
 
         public void SetMoveType(MoveType moveType)
         {
             MoveType = moveType;
-        }
-        // setters for bool methods
-
-        public bool GetIsPromotion()
-        {
-            return MoveType == MoveType.Promotion;
         }
 
         public void SetIsPromotion(bool isPromotion)
@@ -193,6 +133,58 @@ namespace Chess.GL
             return CastlingType;
         }
 
+        public void MakeNotation()
+        {
+            if (MoveType == MoveType.Draw)
+                return;
 
+            if (MoveType == MoveType.Castling && CastlingType == CastlingType.KingSideCastle)
+            {
+                Notation = "O-O";
+                return;
+            }
+            if (MoveType == MoveType.Castling && CastlingType == CastlingType.QueenSideCastle)
+            {
+                Notation = "O-O-O";
+                return;
+            }
+
+            if (PieceMoved.GetPieceType() != PieceType.Pawn)
+            {
+                if (PieceKilled == null)
+                    Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(EndBlock.GetFile());
+                else
+                    Notation = GetPieceMovedString(PieceMoved.GetPieceType());
+            }
+            else
+            {
+                Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(StartBlock.GetFile());
+            }
+
+            if (PieceKilled != null)
+                Notation += "x" + GetFileString(EndBlock.GetFile());
+
+            Notation += Board.TranslateRank(EndBlock.GetRank());
+
+            if (MoveType == MoveType.Promotion)
+                Notation += "=" + GetPieceMovedString(PromotedPieceType);
+
+            if (MoveType == MoveType.Checkmate)
+                Notation += "#";
+            else if (MoveType == MoveType.Check)
+                Notation += "+";
+
+            if (MoveType == MoveType.PromotionCheck)
+                Notation += "=" + GetPieceMovedString(PromotedPieceType) + "+";
+
+        }
+
+        public override string ToString()
+        {
+            string details = "Start: " + StartBlock.ToString() + " End: " + EndBlock.ToString() + " Piece Moved Details: " + PieceMoved.ToString();
+            if (PieceKilled != null) details += " Piece Killed: " + PieceKilled.ToString();
+            details += " Notation: " + Notation;
+            return details;
+        }
     }
 }

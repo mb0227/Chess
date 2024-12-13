@@ -47,18 +47,14 @@ namespace Chess.DS
             }
         }
 
-        public void Display()
+        public Move PeekLast(int count)
         {
-            if (Moves.Count == 0)
+            if (count > Moves.Count)
             {
-                Console.WriteLine("No moves.");
-                return;
+                Console.WriteLine("Count is greater than the number of moves in the stack.");
+                return null;
             }
-            foreach (Move move in Moves)
-            {
-                Console.WriteLine(move.GetNotation());
-            }
-            Console.WriteLine();
+            return Moves[Moves.Count - count];
         }
 
         public bool IsEmpty()
@@ -75,20 +71,18 @@ namespace Chess.DS
         {
             return Moves;
         }
-
-        public Move PeekLast(int count)
+        public void Display()
         {
-            if (count > Moves.Count)
+            if (Moves.Count == 0)
             {
-                Console.WriteLine("Count is greater than the number of moves in the stack.");
-                return null;
+                Console.WriteLine("No moves.");
+                return;
             }
-            return Moves[Moves.Count - count];
-        }
-
-        public bool Contains(Move move)
-        {
-            return Moves.Contains(move);
+            foreach (Move move in Moves)
+            {
+                Console.WriteLine(move.GetNotation());
+            }
+            Console.WriteLine();
         }
     }
 
@@ -139,6 +133,16 @@ namespace Chess.DS
             }
         }
 
+        public bool IsEmpty()
+        {
+            return MovesStack.Count == 0;
+        }
+
+        public int GetSize()
+        {
+            return MovesStack.Count;
+        }
+
         public void Display()
         {
             if (MovesStack.Count == 0)
@@ -153,20 +157,6 @@ namespace Chess.DS
             Console.WriteLine();
         }
 
-        public bool IsEmpty()
-        {
-            return MovesStack.Count == 0;
-        }
-
-        public int GetSize()
-        {
-            return MovesStack.Count;
-        }
-
-        public bool Contains(string move)
-        {
-            return MovesStack.Contains(move);
-        }
     }
 }
 

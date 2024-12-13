@@ -4,21 +4,6 @@ using System.Collections.Generic;
 
 namespace Chess.GL
 {
-    public enum PieceType
-    {
-        Pawn,
-        Rook,
-        Knight,
-        Bishop,
-        Queen,
-        King
-    }
-
-    public enum PieceColor
-    {
-        White,
-        Black
-    }
 
     public class Piece : IMove
     {
@@ -60,6 +45,7 @@ namespace Chess.GL
                 Alive = true;
             }
         }
+
         public void Kill()
         {
             if (Alive)
@@ -86,11 +72,6 @@ namespace Chess.GL
         public virtual bool CanAttack(Block targetBlock, Board board)
         {
             return false;
-        }
-
-        public bool IsOppositeColor(Piece piece)
-        {
-            return this.GetColor() != piece.GetColor();
         }
     }
 }

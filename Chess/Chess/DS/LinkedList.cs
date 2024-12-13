@@ -32,13 +32,6 @@ namespace Chess.DS
             Head = newNode;
         }
 
-        public string GetFirstPiece()
-        {
-            if (Head == null)
-                return null;
-            return  Head.Piece.GetColor().ToString().ToLower() + "-" + Head.Piece.GetPieceType().ToString().ToLower();
-        }
-
         public void InsertAtTail(Piece piece)
         {
             if (Head == null)
@@ -57,41 +50,20 @@ namespace Chess.DS
             temp.NextNode = newNode;
         }
 
-        public void Display()
+        public Piece RemoveFirstPiece()
         {
-            Node temp = Head;
-            while (temp != null)
-            {
-                Console.Write($"{temp.Piece.GetColor().ToString()}'s Dead Pieces: {temp.Piece.GetPieceType()}, ");
-                temp = temp.NextNode;
-            }
-            Console.WriteLine();
-        }
-
-        public Piece GetLastPiece()
-        {
-            Node temp = Head;
-            if (temp == null)
+            if (Head == null)
                 return null;
-            while (temp.NextNode != null)
-            {
-                temp = temp.NextNode;
-            }
+            Node temp = Head;
+            Head = Head.NextNode;
             return temp.Piece;
         }
 
-        public bool Contains(Piece piece)
+        public string GetFirstPiece()
         {
-            Node temp = Head;
-            while (temp != null)
-            {
-                if (temp.Piece.Equals(piece))
-                {
-                    return true;
-                }
-                temp = temp.NextNode;
-            }
-            return false;
+            if (Head == null)
+                return null;
+            return Head.Piece.GetColor().ToString().ToLower() + "-" + Head.Piece.GetPieceType().ToString().ToLower();
         }
 
         public int GetSize()
@@ -106,38 +78,15 @@ namespace Chess.DS
             return size;
         }
 
-        public Piece RemoveFirstPiece()
+        public void Display()
         {
-            if (Head == null)
-                return null;
             Node temp = Head;
-            Head = Head.NextNode;
-            return temp.Piece;
-        }
-
-        public Piece RemoveLastPiece()
-        {
-            Piece lastPiece = null;
-
-            if (Head == null)
-                return null;
-
-            if (Head.NextNode == null)
+            while (temp != null)
             {
-                lastPiece = Head.Piece;
-                Head = null;
-                return lastPiece;
-            }
-
-            Node temp = Head;
-            while (temp.NextNode.NextNode != null)
-            {
+                Console.Write($"{temp.Piece.GetColor().ToString()}'s Dead Pieces: {temp.Piece.GetPieceType()}, ");
                 temp = temp.NextNode;
             }
-
-            lastPiece = temp.NextNode.Piece;
-            temp.NextNode = null;
-            return lastPiece;
+            Console.WriteLine();
         }
     }
 }
