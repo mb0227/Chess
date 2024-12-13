@@ -71,6 +71,21 @@ namespace Chess.DS
             return Moves.Count;
         }
 
+        public List<Move> GetMoves()
+        {
+            return Moves;
+        }
+
+        public Move PeekLast(int count)
+        {
+            if (count > Moves.Count)
+            {
+                Console.WriteLine("Count is greater than the number of moves in the stack.");
+                return null;
+            }
+            return Moves[Moves.Count - count];
+        }
+
         public bool Contains(Move move)
         {
             return Moves.Contains(move);

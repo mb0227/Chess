@@ -57,7 +57,7 @@ namespace Chess.GL
         {
            string details = "Start: " + StartBlock.ToString() + " End: " + EndBlock.ToString() + " Piece Moved Details: " + PieceMoved.ToString();
            if (PieceKilled != null) details += " Piece Killed: " + PieceKilled.ToString();
-           details += "\nNotation: " + Notation; 
+           details += " Notation: " + Notation; 
            return details;
         }
 

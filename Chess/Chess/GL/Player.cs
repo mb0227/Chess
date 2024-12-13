@@ -16,8 +16,9 @@ namespace Chess.GL
 
     public class Player
     {
-        private PlayerColor Color;
-        private LinkedList DeadPieces;
+        protected PlayerColor Color;
+        protected LinkedList DeadPieces;
+        protected PlayerType PlayerType;
 
         public Player(PlayerColor color)
         {
@@ -33,6 +34,16 @@ namespace Chess.GL
         public PlayerColor GetColor()
         {
             return Color;
+        }
+
+        public void SetPlayerType(PlayerType type)
+        {
+            PlayerType = type;
+        }
+
+        public PlayerType GetPlayerType()
+        {
+            return PlayerType;
         }
 
         public void AddDeadPiece(Piece piece)
@@ -52,7 +63,7 @@ namespace Chess.GL
 
         public override string ToString()
         {
-            return $"Player Color: {Color.ToString()}";
+            return $"Player Color: {Color.ToString()} Player Type: {PlayerType.ToString()}";
         }
 
         public bool GetLatestDeadPiece()

@@ -81,6 +81,16 @@ namespace Chess.GL
             Move.SetBoard(Board);
         }
 
+        public Move MakeComputerMove()
+        {
+            Move computerMove = null;
+            if(CurrentMove.GetPlayerType() == PlayerType.Computer)
+            {
+                computerMove = Board.MakeAIMove(CurrentMove.GetColor(), 3); // first argument is player's color and second argument is the depth of the minimax algorithm
+            }
+            return computerMove;
+        }
+
         public void MakeMove(int prevRank, int prevFile, int newRank, int newFile, MoveType moveType, PieceType pieceType = PieceType.Queen, int enPassantTargetRow = -1, CastlingType castlingType = CastlingType.None)
         {
             if (moveType == MoveType.Draw)
@@ -650,7 +660,7 @@ namespace Chess.GL
                 King king = (King)Board.FindKing(CurrentMove.GetColor() == PlayerColor.Black ? PieceColor.White : PieceColor.Black).GetPiece();
                 king.SetCheck(false);
             }
-            else if (moveType == MoveType.Promotion)
+            else if (moveType == MoveType.Promotion || moveType == MoveType.PromotionCheck)
             {
                 if (capturedPiece == null)
                     newBlock.SetPiece(null);
@@ -659,6 +669,13 @@ namespace Chess.GL
                     newBlock.SetPiece(capturedPiece);
                     capturedPiece.Revive();
                 }
+
+                if(moveType == MoveType.PromotionCheck)
+                {
+                    King opponentKing = (King)Board.FindKing(CurrentMove.GetColor() == PlayerColor.Black ? PieceColor.Black : PieceColor.White).GetPiece();
+                    opponentKing.SetCheck(false);
+                }
+
                 Piece piece = prevBlockPiece;
                 prevBlockPiece.SetPieceType(PieceType.Pawn);
                 prevBlock.SetPiece((Pawn)prevBlockPiece);
@@ -736,9 +753,61 @@ namespace Chess.GL
                     //PlayerOneDeadPieces?.Invoke(PlayerOne.GetFirstDeadPiece());
                 }
             }
-            Console.WriteLine("Current Player : " + CurrentMove.ToString());
-            Console.WriteLine("Board After Undo");
-            Board.DisplayBoard();
+            //Console.WriteLine("Current Player : " + CurrentMove.ToString());
+            //Console.WriteLine("Board After Undo");
+            //Board.DisplayBoard();
+        }
+
+        public bool CheckThreeFoldRepeitetion()
+        {
+            if (Moves.GetSize() < 3) return false;
+            // Checking for three fold repeitetion
+            Move lastMove = MovesStack.Pop();
+            Move secondLastMove = MovesStack.Pop();
+            Move thirdLastMove = MovesStack.Pop();
+            Move fourthLastMove = MovesStack.Pop();
+            Move fifthLastMove = MovesStack.Pop();
+            Move sixthLastMove = MovesStack.Pop();
+
+            MovesStack.Push(sixthLastMove);
+            MovesStack.Push(fifthLastMove);
+            MovesStack.Push(fourthLastMove);
+            MovesStack.Push(thirdLastMove);
+            MovesStack.Push(secondLastMove);
+            MovesStack.Push(lastMove);
+
+            if (lastMove.GetNotation() == fifthLastMove.GetNotation()
+            && thirdLastMove.GetEndBlock().GetRank() == fifthLastMove.GetStartBlock().GetRank()
+            && thirdLastMove.GetEndBlock().GetFile() == fifthLastMove.GetStartBlock().GetFile()
+            && lastMove.GetPieceMoved() == thirdLastMove.GetPieceMoved()
+            && thirdLastMove.GetPieceMoved() == fifthLastMove.GetPieceMoved()
+            && secondLastMove.GetNotation() == sixthLastMove.GetNotation()
+            && fourthLastMove.GetEndBlock().GetRank() == sixthLastMove.GetStartBlock().GetRank()
+            && fourthLastMove.GetEndBlock().GetFile() == sixthLastMove.GetStartBlock().GetFile()
+            && secondLastMove.GetPieceMoved() == fourthLastMove.GetPieceMoved()
+            && fourthLastMove.GetPieceMoved() == sixthLastMove.GetPieceMoved())
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool CheckFiftyMoveRule()
+        {
+            // Checking for 50 move rule
+            if (Moves.GetSize() < 50) return false;
+            List<Move> moves = MovesStack.GetMoves();
+            for (int i = 0; i < 100; i++)
+            {
+                if (moves[i].GetPieceMoved().GetPieceType() == PieceType.Pawn)
+                    return false;
+            }
+            return true;
+        }
+
+        public bool CheckDraw()
+        {
+            return CheckThreeFoldRepeitetion() || CheckFiftyMoveRule(); 
         }
     }
 }

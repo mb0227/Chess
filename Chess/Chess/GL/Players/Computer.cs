@@ -4,6 +4,7 @@
     {
         public Computer(PlayerColor color) : base(color)
         {
+            PlayerType = PlayerType.Computer;
         }
     }
 }

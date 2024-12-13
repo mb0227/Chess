@@ -22,9 +22,10 @@ namespace Chess.GL
 
     public class Piece : IMove
     {
-        private PieceColor Color;
-        private PieceType PieceType;
-        private bool Alive;
+        protected PieceColor Color;
+        protected PieceType PieceType;
+        protected bool Alive;
+        
         public Piece(PieceColor color, PieceType type, bool alive)
         {
             Color = color;

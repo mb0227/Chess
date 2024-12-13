@@ -4,6 +4,7 @@
     {
         public Human(PlayerColor color) : base(color)
         {
+            PlayerType = PlayerType.Human;
         }
     }
 }

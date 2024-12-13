@@ -16,19 +16,24 @@ namespace Chess.Views
     public partial class GamePage : Page, INotifyPropertyChanged
     {
         bool FirstPlayerSelectedColorWhite = true;
-        bool isInCheck = false;
         bool PromotionPossible = false;
         bool enPassantPossible = false;
         bool castlingPossible = false;
+        bool isInCheck = false;
         bool IsMoving = false;
+
         int SelectedRow, SelectedCol;
+
         Piece SelectedPiece;
+        
         Game Game;
 
         public GamePage()
         {
             InitializeComponent();
+
             PlayerColor FirstPlayerColor, SecondPlayerColor;
+
             if (FirstPlayerSelectedColorWhite)
             {
                 FirstPlayerColor = PlayerColor.White;
@@ -39,12 +44,16 @@ namespace Chess.Views
                 FirstPlayerColor = PlayerColor.Black;
                 SecondPlayerColor = PlayerColor.White;
             }
+
             Game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
+
             InitializeBoard();
+
             DataContext = this;
             Moves = new ObservableCollection<string>();
             PlayerOneDeadPieces = new ObservableCollection<string>();
             PlayerTwoDeadPieces = new ObservableCollection<string>();
+
             Game.MoveMade += AddMove;
             Game.PlayerOneDeadPieces += AddPlayerOneDeadPiece;
             Game.PlayerTwoDeadPieces += AddPlayerTwoDeadPiece;
@@ -53,47 +62,8 @@ namespace Chess.Views
             PlayerOneDeadPiecesTextBox.HorizontalAlignment = HorizontalAlignment.Center;
             PlayerTwoDeadPiecesTextBox.Text = SecondPlayerColor.ToString() + "'s Dead Pieces";
             PlayerTwoDeadPiecesTextBox.HorizontalAlignment = HorizontalAlignment.Center;
-        }
 
-        private ObservableCollection<string> _moves;
-        private ObservableCollection<string> _playerOneDeadPieces;
-        private ObservableCollection<string> _playerTwoDeadPieces;
-
-        public ObservableCollection<string> Moves
-        {
-            get => _moves;
-            set
-            {
-                if (_moves != value)
-                {
-                    _moves = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public ObservableCollection<string> PlayerOneDeadPieces
-        {
-            get => _playerOneDeadPieces;
-            set
-            {
-                if (_playerOneDeadPieces != value)
-                {
-                    _playerOneDeadPieces = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-        public ObservableCollection<string> PlayerTwoDeadPieces
-        {
-            get => _playerTwoDeadPieces;
-            set
-            {
-                if (_playerTwoDeadPieces != value)
-                {
-                    _playerTwoDeadPieces = value;
-                    OnPropertyChanged();
-                }
-            }
+            DisplayComputerMove(); // if computer is first
         }
 
         public void AddMove(string move)
@@ -413,6 +383,9 @@ namespace Chess.Views
 
         private bool IsValidMove(int targetRow, int targetCol)
         {
+            if (Game.GetCurrentPlayer().GetPlayerType() == PlayerType.Computer)
+                return true;
+
             foreach (UIElement element in ChessGrid.Children)
             {
                 if (element is Border border && border.Background == Brushes.LightGreen)
@@ -452,14 +425,9 @@ namespace Chess.Views
             int enPassantTargetRow = -1;
             int castlingTargetFileRook = -1, rookCurrentFile = -1;
 
-            if (targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor())
+            if (targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor() && Game.GetCurrentPlayer().GetPlayerType() != PlayerType.Computer)
             {
                 Console.WriteLine("Invalid move. Target block has a piece of the same color.");
-                return;
-            }
-            if (!IsValidMove(targetRow, targetCol))
-            {
-                Console.WriteLine("Invalid block selected.");
                 return;
             }
 
@@ -470,8 +438,6 @@ namespace Chess.Views
                 if (Game.GetPlayerOne().GetColor() == PlayerColor.Black)
                     promotionRow = (prevBlock.GetPiece().GetColor() == PieceColor.White) ? 6 : 1;
 
-                Console.WriteLine("Promotion possible.");
-                Console.WriteLine(promotionRow);
                 if (previousRow == promotionRow)
                 {
                     PromotionPossible = false;
@@ -614,6 +580,25 @@ namespace Chess.Views
             if (PromotionPossible) PromotionPossible = false;
             if (IsMoving) IsMoving = false;
             if (castlingPossible) castlingPossible = false;
+
+            DisplayComputerMove();
+
+            if (Game.CheckDraw())
+            {
+                Draw();
+            }
+        }
+
+        public void DisplayComputerMove()
+        {
+            if (Game.GetCurrentPlayer().GetPlayerType() == PlayerType.Computer)
+            {
+                Move move = Game.MakeComputerMove();
+                if (move != null)
+                {
+                    MakeMove(move.GetStartBlock().GetRank(), move.GetStartBlock().GetFile(), move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
+                }
+            }
         }
 
         public string PromotePawn()
@@ -651,12 +636,17 @@ namespace Chess.Views
 
             if (result == MessageBoxResult.Yes)
             {
-                Game.MakeMove(-1,-1,-1,-1, MoveType.Draw);
-                Game.SetIsGameOver(true);
-                MessageBox.Show("Game is a draw!", "Game Draw", MessageBoxButton.OK);
-                Game.UpdateStatus(GameStatus.DRAW);
+                Draw();
             }
             // go to previous page
+        }
+
+        public void Draw()
+        {
+            Game.MakeMove(-1, -1, -1, -1, MoveType.Draw);
+            Game.SetIsGameOver(true);
+            MessageBox.Show("Game is a draw!", "Game Draw", MessageBoxButton.OK);
+            Game.UpdateStatus(GameStatus.DRAW);
         }
 
         private bool CanEnPassant(int targetRow, int targetCol)
@@ -791,6 +781,8 @@ namespace Chess.Views
                         pieceToMove = (Image)element;
                         if(moveType == MoveType.Promotion || moveType == MoveType.PromotionCheck)
                         {
+                            if (moveType == MoveType.PromotionCheck)
+                                RemoveHighlights(Brushes.Red);
                             promotedPiece = GetImage((pieceKilled.GetColor() == PieceColor.White ? PieceColor.Black : PieceColor.White).ToString().ToLower(), "pawn");
                         }
                         break;
@@ -847,5 +839,48 @@ namespace Chess.Views
             playerOneDeadPiecesViewer.ScrollToBottom();
             playerTwoDeadPiecesViewer.ScrollToBottom();
         }
+
+
+        private ObservableCollection<string> _moves;
+        private ObservableCollection<string> _playerOneDeadPieces;
+        private ObservableCollection<string> _playerTwoDeadPieces;
+
+        public ObservableCollection<string> Moves
+        {
+            get => _moves;
+            set
+            {
+                if (_moves != value)
+                {
+                    _moves = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public ObservableCollection<string> PlayerOneDeadPieces
+        {
+            get => _playerOneDeadPieces;
+            set
+            {
+                if (_playerOneDeadPieces != value)
+                {
+                    _playerOneDeadPieces = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+        public ObservableCollection<string> PlayerTwoDeadPieces
+        {
+            get => _playerTwoDeadPieces;
+            set
+            {
+                if (_playerTwoDeadPieces != value)
+                {
+                    _playerTwoDeadPieces = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
     }
 }
