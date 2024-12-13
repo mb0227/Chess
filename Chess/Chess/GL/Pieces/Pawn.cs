@@ -202,6 +202,12 @@ namespace Chess.GL
             IsEnPassantable = false;
         }
 
+        public void ResetPawn()
+        {
+            HasMoved = false;
+            IsEnPassantable = false;
+        }
+
         public void UndoMove()
         {
             IsEnPassantable = true;

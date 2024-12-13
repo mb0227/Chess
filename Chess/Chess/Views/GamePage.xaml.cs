@@ -746,7 +746,7 @@ namespace Chess.Views
         {
             if (Game.GetMovesStack().GetSize() > 0)
             {
-                Move move = Game.GetMovesStack().Pop();
+                Move move = Game.GetMovesStack().Peek();
                 if (move != null)
                 {
                     Piece killedPiece = null;
@@ -755,6 +755,18 @@ namespace Chess.Views
                     UndoMove(move.GetEndBlock(), move.GetStartBlock(), move.GetPieceMoved(), killedPiece, move.GetMoveType(), move.GetCastlingType());
                     Game.UndoMove(move);
                     RemoveHighlights();
+                    // if after undoing the move, player is in check
+                    if (Game.GetBoard().IsKingInCheck(move.GetPieceMoved().GetColor()))
+                    {
+                        Block kingBlock = Game.GetBoard().FindKing(move.GetPieceMoved().GetColor());
+                        isInCheck = true;
+                        HighlightSquares(kingBlock.GetRank(), kingBlock.GetFile(), Brushes.Red);
+                    }
+                    else
+                    {
+                        isInCheck = false;
+                        RemoveHighlights(Brushes.Red);
+                    }
                 }
             }
         }

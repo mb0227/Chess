@@ -479,6 +479,34 @@ namespace Chess.GL
             Piece capturedPiece = move.GetPieceKilled();
             MoveType moveType = move.GetMoveType();
 
+            if(moveType == MoveType.Normal || moveType == MoveType.Kill)
+            {
+                if (prevBlockPiece.GetPieceType() == PieceType.Rook || prevBlockPiece.GetPieceType() == PieceType.King || prevBlockPiece.GetPieceType() == PieceType.Pawn)
+                {
+                    if (prevBlockPiece.GetPieceType() == PieceType.Rook)
+                    {
+                        Rook rook = (Rook)prevBlockPiece;
+                        rook.UndoMove();
+                    }
+                    else if (prevBlockPiece.GetPieceType() == PieceType.Pawn
+                        && (prevBlockPiece.GetColor() == PieceColor.White && PlayerOne.GetColor() == PlayerColor.White && prevBlock.GetRank() == 6)
+                        || (prevBlockPiece.GetColor() == PieceColor.Black && PlayerOne.GetColor() == PlayerColor.White && prevBlock.GetRank() == 1)
+                        || (prevBlockPiece.GetColor() == PieceColor.Black && PlayerOne.GetColor() == PlayerColor.Black && prevBlock.GetRank() == 6)
+                        || (prevBlockPiece.GetColor() == PieceColor.White && PlayerOne.GetColor() == PlayerColor.Black && prevBlock.GetRank() == 1)
+                        )
+                    {
+                        Pawn pawn = (Pawn)prevBlockPiece;
+                        pawn.ResetPawn();
+                    }
+                    else if (prevBlockPiece.GetPieceType() == PieceType.King)
+                    {
+                        King king = (King)prevBlockPiece;
+                        king.UndoMove();
+                    }
+                }
+            }
+
+
             if (moveType == MoveType.Normal)
             {
                 if (capturedPiece == null)
@@ -488,6 +516,7 @@ namespace Chess.GL
                     newBlock.SetPiece(capturedPiece);
                     capturedPiece.Revive();
                 }
+
                 prevBlock.SetPiece(prevBlockPiece);
             }
             else if (moveType == MoveType.Kill)
@@ -508,6 +537,7 @@ namespace Chess.GL
                 prevBlock.SetPiece(prevBlockPiece);
                 King king = (King)Board.FindKing(CurrentMove.GetColor() == PlayerColor.Black ? PieceColor.White : PieceColor.Black).GetPiece();
                 king.SetCheck(false);
+                king.UndoMove();
             }
             else if (moveType == MoveType.Promotion || moveType == MoveType.PromotionCheck)
             {
@@ -582,6 +612,7 @@ namespace Chess.GL
             }
 
             MovesStack.Pop();
+            Moves.Pop();
 
             if (CurrentMove == PlayerOne)
             {
@@ -747,7 +778,9 @@ namespace Chess.GL
         // Check Status Functions
         public bool CheckThreeFoldRepeitetion()
         {
-            if (Moves.GetSize() < 3) return false;
+            if (Moves.GetSize() < 3 || MovesStack.GetSize() < 6) 
+                return false;
+
             // Checking for three fold repeitetion
             Move lastMove = MovesStack.Pop();
             Move secondLastMove = MovesStack.Pop();
