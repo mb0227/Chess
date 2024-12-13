@@ -151,10 +151,29 @@ namespace Chess.GL
 
             if (PieceMoved.GetPieceType() != PieceType.Pawn)
             {
+                Notation = GetPieceMovedString(PieceMoved.GetPieceType());
+                // Now we check if any any piece can move to same square
+                Piece otherPiece = Board.OtherPieceCanMove(PieceMoved, EndBlock);
+                if (otherPiece != null)
+                {
+                    if(Board.GetBlock(otherPiece).GetFile() != StartBlock.GetFile()) // if files are different write just file
+                    {
+                        Notation += GetFileString(StartBlock.GetFile());
+                    }
+                    else if(Board.GetBlock(otherPiece).GetFile() == StartBlock.GetFile() // if files are same but ranks are different write just rank
+                          && Board.GetBlock(otherPiece).GetRank() != StartBlock.GetRank())
+                    {
+                        Notation += Board.TranslateRank(StartBlock.GetRank());
+                    }
+                    else // if both are same write rank and file both
+                    {
+                        Notation += GetFileString(StartBlock.GetFile()) + Board.TranslateRank(StartBlock.GetRank());
+                    }
+                }
                 if (PieceKilled == null)
-                    Notation = GetPieceMovedString(PieceMoved.GetPieceType()) + GetFileString(EndBlock.GetFile());
-                else
-                    Notation = GetPieceMovedString(PieceMoved.GetPieceType());
+                {
+                    Notation += GetFileString(EndBlock.GetFile());
+                }
             }
             else
             {

@@ -262,6 +262,26 @@ namespace Chess.GL
             return rank >= 0 && rank < 8 && file >= 0 && file < 8;
         }
 
+        public Piece OtherPieceCanMove(Piece piece, Block endBlock)
+        {
+            // Now this function is used to check two pieces of the same types can move to
+            // same block, in parameter we are getting the actual piece that moved and 
+            // the second parameter is the end block where the piece is moved
+            foreach (Block block in Blocks.Values)
+            {
+                if(!block.IsEmpty() && block.GetPiece().GetColor() == piece.GetColor() 
+                    && block.GetPiece() != piece && block.GetPiece().GetPieceType() == piece.GetPieceType())
+                {
+                    Piece otherPiece = block.GetPiece();
+                    if(otherPiece.CanAttack(endBlock, this))
+                    {
+                        return otherPiece;
+                    }
+                }
+            }
+            return null;
+        }
+
         public int GetFileInInt(string file)
         {
             switch (file)
