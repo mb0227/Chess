@@ -1,5 +1,4 @@
-﻿using Chess.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Chess.GL
@@ -9,7 +8,7 @@ namespace Chess.GL
         public Queen(PieceColor color, PieceType type, bool alive) : base(color, type, alive)
         {
         }
-            List<Move> possibleMoves = new List<Move>();
+        List<Move> possibleMoves = new List<Move>();
 
         public override List<Move> GetPossibleMoves(Board board)
         {
@@ -92,7 +91,7 @@ namespace Chess.GL
             }
             else if (rank == targetRank || file == targetFile) // Horizontal or vertical movement
             {
-                return board.IsPathClear(rank, file, targetRank, targetFile); 
+                return board.IsPathClear(rank, file, targetRank, targetFile);
             }
 
             return false;

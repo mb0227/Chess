@@ -14,38 +14,6 @@
 \usepackage{longtable}
 \usepackage[dvipsnames]{xcolor}
 
-\lstset{
-    language=C++,
-    basicstyle=\ttfamily\small,
-    keywordstyle=\color{blue}\bfseries,
-    commentstyle=\color{green!60!black},
-    stringstyle=\color{red},
-    numbers=left,
-    numberstyle=\tiny\color{gray},
-    stepnumber=1,
-    showstringspaces=false,
-    tabsize=4,
-    breaklines=true,
-    breakatwhitespace=true
-}
-
-\lstset{
-    classoffset=1,
-    morekeywords={class, struct, typename}, 
-    keywordstyle=\color{teal}\bfseries,
-    classoffset=2,
-    morekeywords={int, float, double, bool, char, long, short, \$},
-    keywordstyle=\color{cyan},
-    classoffset=3, 
-    morekeywords={MessageBox, string, Move, Game, Stack, Queue, UI, Game, Board, Block, Player, List},
-    keywordstyle=\color{ForestGreen}\bfseries,
-    classoffset=4,
-    morekeywords={ Push, Pop, Enqueue, Flip, Dequeue,Add,Remove,GetSize,Size,GetBlock, GetBoard, GetRank, GetFile},
-    keywordstyle=\color{Tan}\bfseries, 
-    classoffset=0 
-}
-
-
 \geometry{top=3cm, bottom=3cm, left=2.5cm, right=2.5cm}
 
 \begin{document}
@@ -69,7 +37,7 @@
     {\Large\textbf {Supervised By: }}\\[0.6cm]
     {\large {Mr. Nazeef Ul Haq }}\\[0.4cm]
     {\large {Mr. Waseem }}\\[0.6cm]
-    {\Large\textbf {Course: } CSC-200L}\\[1.2cm]
+    {\Large\textbf {Course: } CSC-200}\\[1.2cm]
     {\LARGE \textbf{ Department of Computer Science}}\\[0.7cm]
     {\Huge \textbf{University of Engineering and}}\\[0.5cm]
     {\Huge \textbf{Technology, Lahore}}\\[0.5cm]
@@ -83,6 +51,18 @@
 \renewcommand{\contentsname}{Table of Contents}
 
 \tableofcontents
+
+\newpage
+
+\thispagestyle{empty}
+
+\listoffigures
+
+\newpage
+
+\thispagestyle{empty}
+
+\listoftables
 
 \newpage
 
@@ -303,5 +283,223 @@ This project aims to:
     \end{center} \\ 
     \hline
 \end{longtable}
+
+\section{Test Cases}
+
+\subsection{Test Case 1: Knight Valid Moves}
+\textbf{Description}: Ensure that White's Queenside Knight can move to valid squares.\\
+\textbf{Expected Outcome}: White's Queenside Knight can move to a3 and c3 from b1.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase1Img1.png}
+    \caption{On Clicking on the Knight}
+    \label{fig:BeforeKnightMove}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase1Img2.png}
+    \caption{On Clicking on the c3 square}
+    \label{fig:AfterKnightMove}
+\end{figure}
+
+\subsection{Test Case 2: En Passant}
+\textbf{Description}: Ensure that Black can perform En Passant capture on White's pawn.\\
+\textbf{Expected Outcome}: Black can capture White's pawn on g3 using En Passant.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase2Img1.png}
+    \caption{Moving White's Pawn}
+    \label{fig:WhiteMove}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase2Img2.png}
+    \caption{Before En Passant Capture}
+    \label{fig:BeforeEnPassant}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase2Img3.png}
+    \caption{After En Passant Capture}
+    \label{fig:AfterEnPassant}
+\end{figure}
+
+\subsection{Test Case 3: Check}
+\textbf{Description}: Ensure that the game detects when a king is in check.\\
+\textbf{Expected Outcome}: The game correctly highlights the check condition when the White King is threatened by the Black's Dark-Square Bishop.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase3Img1.png}
+    \caption{Before Check}
+    \label{fig:BeforeCheck}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase3Img2.png}
+    \caption{After Check}
+    \label{fig:AfterCheck}
+\end{figure}
+
+\subsection{Test Case 4: En Passant Undo}
+\textbf{Description}: Ensure that an En Passant move can be undone correctly.\\
+\textbf{Expected Outcome}: En Passant capture can be undone, and the pawn returns to its original position.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase4Img1.png}
+    \caption{Before Undoing En Passant}
+    \label{fig:BeforeEnPassantUndo}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase4Img2.png}
+    \caption{After Undoing En Passant}
+    \label{fig:AfterEnPassantUndo}
+\end{figure}
+
+\subsection{Test Case 5(Part 1): Notation for Promotion}
+\textbf{Description}: Ensure that the promotion notation is displayed correctly when a pawn reaches the 8th rank.\\
+\textbf{Expected Outcome}: The game displays the correct notation for the promotion of a White pawn to a Queen.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase5Part1Img1.png}
+    \caption{Before Promotion Notation}
+    \label{fig:BeforePromotionNotation}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase5Part1Img2.png}
+    \caption{After Promotion Notation}
+    \label{fig:AfterPromotionNotation}
+\end{figure}
+
+\subsection{Test Case 5(Part 2): Notation for Pieces Attacking Same Block}
+\textbf{Description}: Ensure that pieces attacking the same block are highlighted correctly.\\
+\textbf{Expected Outcome}: The game correctly highlights the squares where multiple pieces are attacking.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase5Part2Img1.png}
+    \caption{Before Pieces Attacking Same Block}
+    \label{fig:BeforeAttackingSameBlock}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase5Part2Img2.png}
+    \caption{After Pieces Attacking Same Block}
+    \label{fig:AfterAttackingSameBlock}
+\end{figure}
+
+\subsection{Test Case 6: Castling}
+\textbf{Description}: Ensure that Black can perform short castle with the king and rook.\\
+\textbf{Expected Outcome}: Black can castle by moving the King from e8 to g8 and the Rook from h8 to f8.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase6Img1.png}
+    \caption{Before Castling}
+    \label{fig:BeforeCastling}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase6Img2.png}
+    \caption{After Castling}
+    \label{fig:AfterCastling}
+\end{figure}
+
+\subsection{Test Case 7: Scholar's Mate}
+\textbf{Description}: Ensure that Scholar's Mate can be achieved by White in 4 moves.\\
+\textbf{Expected Outcome}: White delivers Scholar's Mate by moving the Queen to f3 and checkmates the Black King.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase7Img1.png}
+    \caption{Before Scholar's Mate}
+    \label{fig:BeforeScholarsMate}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase7Img2.png}
+    \caption{After Scholar's Mate}
+    \label{fig:AfterScholarsMate}
+\end{figure}
+
+\subsection{Test Case 8: Check by Castling}
+\textbf{Description}: Ensure that Check by castling is possible.\\
+\textbf{Expected Outcome}: The game detects that castling for an open d file leads to check by rook of opponent king.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase8Img1.png}
+    \caption{Before Check by Castling}
+    \label{fig:BeforeCheckByCastling}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase8Img2.png}
+    \caption{After Check by Castling}
+    \label{fig:AfterCheckByCastling}
+\end{figure}
+
+\subsection{Test Case 9: Promotion Check}
+\textbf{Description}: Ensure that a promotion results in check if the opponent's king is in danger.\\
+\textbf{Expected Outcome}: The promotion results in check if the opponent's king is in check.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase9Img1.png}
+    \caption{Before Promotion Check}
+    \label{fig:BeforePromotionCheck}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase9Img2.png}
+    \caption{After Promotion Check}
+    \label{fig:AfterPromotionCheck}
+\end{figure}
+
+\subsection{Test Case 10: Computer Move}
+\textbf{Description}: Ensure that the computer makes a valid move according to the chosen difficulty.\\
+\textbf{Expected Outcome}: The computer makes a valid move on the board for each difficulty level.\\
+\textbf{Result}: Requirement Satisfied.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase10Img1.png}
+    \caption{Before Computer Move}
+    \label{fig:BeforeComputerMove}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Test Cases/testCase10Img2.png}
+    \caption{After Computer Move}
+    \label{fig:AfterComputerMove}
+\end{figure}
 
 \end{document}

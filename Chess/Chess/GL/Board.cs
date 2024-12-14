@@ -48,7 +48,7 @@ namespace Chess.GL
 
             if (kingIndex == 4 && queenIndex == 3 && rank == whitePiecesRank)
             {
-                if(file == 4)
+                if (file == 4)
                     block.SetPiece(new King(PieceColor.White, PieceType.King, true));
                 if (file == 3)
                     block.SetPiece(new Queen(PieceColor.White, PieceType.Queen, true));
@@ -75,7 +75,7 @@ namespace Chess.GL
                     block.SetPiece(new Queen(PieceColor.Black, PieceType.Queen, true));
             }
 
-                if (rank == whitePiecesRank)
+            if (rank == whitePiecesRank)
             {
                 switch (file)
                 {
@@ -85,7 +85,7 @@ namespace Chess.GL
                     case 5: block.SetPiece(new Bishop(PieceColor.White, PieceType.Bishop, true)); break;
                     case 6: block.SetPiece(new Knight(PieceColor.White, PieceType.Knight, true)); break;
                     case 7: block.SetPiece(new Rook(PieceColor.White, PieceType.Rook, true)); break;
-                }                
+                }
             }
             else if (rank == whitePawnsRank)
             {
@@ -115,8 +115,8 @@ namespace Chess.GL
         // Getters
         public Block GetBlock(int rank, int file)
         {
-            if(WithinBounds(rank, file))
-                 return Blocks[GetBlockKey(rank, file)];
+            if (WithinBounds(rank, file))
+                return Blocks[GetBlockKey(rank, file)];
             return null;
         }
 
@@ -250,7 +250,7 @@ namespace Chess.GL
                 if (piece.GetColor() != pieceColor
                     && piece.GetPieceType() == PieceType.Pawn
                     && piece.IsAttackingKing(this, block))
-                        return false;
+                    return false;
 
                 if (piece.CanAttack(block, this))
                 {
@@ -293,11 +293,11 @@ namespace Chess.GL
             // the second parameter is the end block where the piece is moved
             foreach (Block block in Blocks.Values)
             {
-                if(!block.IsEmpty() && block.GetPiece().GetColor() == piece.GetColor() 
+                if (!block.IsEmpty() && block.GetPiece().GetColor() == piece.GetColor()
                     && block.GetPiece() != piece && block.GetPiece().GetPieceType() == piece.GetPieceType())
                 {
                     Piece otherPiece = block.GetPiece();
-                    if(otherPiece.CanAttack(endBlock, this))
+                    if (otherPiece.CanAttack(endBlock, this))
                     {
                         return otherPiece;
                     }

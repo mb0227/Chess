@@ -1,6 +1,5 @@
-﻿using System;
+﻿using Chess.Views;
 using System.Windows;
-using Chess.Views;
 
 namespace Chess
 {

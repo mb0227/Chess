@@ -18,7 +18,7 @@ namespace Chess.Views
             InitializeComponent();
             LoadImages();
             SelectedDifficulty = "Medium"; // Default
-            if(hideDifficultySection)
+            if (hideDifficultySection)
                 HideDifficultySection();
         }
 

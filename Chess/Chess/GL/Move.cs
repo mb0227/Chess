@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Chess.GL
+﻿namespace Chess.GL
 {
     public class Move
     {
@@ -30,7 +28,7 @@ namespace Chess.GL
             MoveType = MoveType.Normal;
             MakeNotation();
         }
-        
+
         public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, CastlingType castlingType) : this(startBlock, endBlock, pieceMoved, pieceKilled)
         {
             MoveType = MoveType.Castling;
@@ -45,7 +43,7 @@ namespace Chess.GL
             Notation = "";
             MakeNotation();
         }
-        
+
         public Move(Block startBlock, Block endBlock, Piece pieceMoved, Piece pieceKilled, MoveType moveType, PieceType promotedPieceType) : this(startBlock, endBlock, pieceMoved, pieceKilled, moveType)
         {
             PromotedPieceType = promotedPieceType;
@@ -115,7 +113,7 @@ namespace Chess.GL
 
         public void SetIsPromotion(bool isPromotion)
         {
-            if(isPromotion) MoveType = MoveType.Promotion;
+            if (isPromotion) MoveType = MoveType.Promotion;
         }
 
         public static void SetBoard(Board board)
@@ -156,11 +154,11 @@ namespace Chess.GL
                 Piece otherPiece = Board.OtherPieceCanMove(PieceMoved, EndBlock);
                 if (otherPiece != null)
                 {
-                    if(Board.GetBlock(otherPiece).GetFile() != StartBlock.GetFile()) // if files are different write just file
+                    if (Board.GetBlock(otherPiece).GetFile() != StartBlock.GetFile()) // if files are different write just file
                     {
                         Notation += GetFileString(StartBlock.GetFile());
                     }
-                    else if(Board.GetBlock(otherPiece).GetFile() == StartBlock.GetFile() // if files are same but ranks are different write just rank
+                    else if (Board.GetBlock(otherPiece).GetFile() == StartBlock.GetFile() // if files are same but ranks are different write just rank
                           && Board.GetBlock(otherPiece).GetRank() != StartBlock.GetRank())
                     {
                         Notation += Board.TranslateRank(StartBlock.GetRank());

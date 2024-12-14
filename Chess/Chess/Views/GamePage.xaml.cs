@@ -1,15 +1,15 @@
 ﻿using Chess.GL;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 
 namespace Chess.Views
@@ -627,7 +627,7 @@ namespace Chess.Views
             }
 
             GetGameStatus();
-            
+
             DisplayComputerMove();
 
             if (Game.CheckDraw())

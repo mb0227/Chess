@@ -1,5 +1,4 @@
-﻿using Chess.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Chess.GL
@@ -9,7 +8,7 @@ namespace Chess.GL
         public Bishop(PieceColor color, PieceType type, bool alive) : base(color, type, alive)
         {
         }
-        
+
         List<Move> possibleMoves = new List<Move>();
 
         public override List<Move> GetPossibleMoves(Board board)

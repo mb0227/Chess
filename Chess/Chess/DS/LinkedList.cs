@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Chess.GL;
 using System;
-using Chess.GL;
 
 namespace Chess.DS
 {

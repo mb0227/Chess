@@ -1,5 +1,4 @@
 ﻿using Chess.Interfaces;
-using System;
 using System.Collections.Generic;
 
 namespace Chess.GL
@@ -10,7 +9,7 @@ namespace Chess.GL
         protected PieceColor Color;
         protected PieceType PieceType;
         protected bool Alive;
-        
+
         public Piece(PieceColor color, PieceType type, bool alive)
         {
             Color = color;

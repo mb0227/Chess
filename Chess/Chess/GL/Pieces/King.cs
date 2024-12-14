@@ -1,5 +1,4 @@
-﻿using Chess.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Chess.GL
@@ -9,7 +8,7 @@ namespace Chess.GL
         private CastlingType CastlingType; // short or long
         private bool HasMoved;
         private bool InCheck;
-        
+
         public King(PieceColor color, PieceType type, bool alive) : base(color, type, alive)
         {
             CastlingType = CastlingType.None;
@@ -28,9 +27,9 @@ namespace Chess.GL
             int rank = currentBlock.GetRank();
             int file = currentBlock.GetFile();
 
-            if((board.GetFirstPlayerColor() != PlayerColor.Black && file != 4) || (board.GetFirstPlayerColor() != PlayerColor.White && file != 5))
+            if ((board.GetFirstPlayerColor() != PlayerColor.Black && file != 4) || (board.GetFirstPlayerColor() != PlayerColor.White && file != 5))
                 HasMoved = true;
-        
+
             int[][] directions = {
                 new int[] {-1, -1}, // Top-left
                 new int[] {-1, 0},  // Top
@@ -72,7 +71,7 @@ namespace Chess.GL
             {
                 Block rookBlock = board.GetBlock(rank, 7); // rook at file 7
                 Block castlingEndBlock = board.GetBlock(rank, file + 2); // king moves two squares right
-                if(board.GetFirstPlayerColor() != PlayerColor.White)
+                if (board.GetFirstPlayerColor() != PlayerColor.White)
                 {
                     rookBlock = board.GetBlock(rank, 0); // rook at file 0
                     castlingEndBlock = board.GetBlock(rank, file - 2); // king moves two squares left
@@ -99,7 +98,7 @@ namespace Chess.GL
             if (HasMoved) return false; // King has moved, no castling allowed
 
             int rookFile = isKingside ? 7 : 0; // kingside or queenside rook position
-            if(board.GetFirstPlayerColor() == PlayerColor.Black)
+            if (board.GetFirstPlayerColor() == PlayerColor.Black)
             {
                 rookFile = isKingside ? 0 : 7;
             }
@@ -120,7 +119,7 @@ namespace Chess.GL
             }
 
             int direction = isKingside ? 1 : -1; // Kingside moves right, queenside moves left
-            if(board.GetFirstPlayerColor() == PlayerColor.Black)
+            if (board.GetFirstPlayerColor() == PlayerColor.Black)
                 direction = isKingside ? -1 : 1;
 
             for (int i = 0; i <= 2; i++)

@@ -1,10 +1,6 @@
 ﻿using Chess.DS;
-using System.Windows.Documents;
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Xml.Linq;
-using System.Windows.Controls;
 
 namespace Chess.GL
 {
@@ -26,7 +22,7 @@ namespace Chess.GL
 
         // bool: true for add, false for remove
         public event Action<string, bool> MoveMade;
-        public event Action<string, bool> PlayerOneDeadPiecesChanged; 
+        public event Action<string, bool> PlayerOneDeadPiecesChanged;
         public event Action<string, bool> PlayerTwoDeadPiecesChanged;
 
         private static Game GameInstance;
@@ -65,7 +61,7 @@ namespace Chess.GL
             }
             return GameInstance;
         }
-        
+
         public static Game MakeGame(Player playerOne, Player playerTwo, int difficulty)
         {
             if (GameInstance == null)
@@ -262,8 +258,8 @@ namespace Chess.GL
                 {
                     AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
 
-                    if (moveType == MoveType.Promotion 
-                        && pieceAtPrev.GetPieceType() == PieceType.Pawn 
+                    if (moveType == MoveType.Promotion
+                        && pieceAtPrev.GetPieceType() == PieceType.Pawn
                         && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White && pieceAtPrev.GetColor() == PieceColor.White
                         || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.White && pieceAtPrev.GetColor() == PieceColor.Black
                         || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black && pieceAtPrev.GetColor() == PieceColor.White
@@ -483,7 +479,7 @@ namespace Chess.GL
             Piece capturedPiece = move.GetPieceKilled();
             MoveType moveType = move.GetMoveType();
 
-            if(moveType == MoveType.Normal || moveType == MoveType.Kill)
+            if (moveType == MoveType.Normal || moveType == MoveType.Kill)
             {
                 if (prevBlockPiece.GetPieceType() == PieceType.Rook || prevBlockPiece.GetPieceType() == PieceType.King || prevBlockPiece.GetPieceType() == PieceType.Pawn)
                 {
@@ -613,7 +609,7 @@ namespace Chess.GL
                 prevBlock.SetPiece(prevBlockPiece);
             }
 
-            if(SecondPlayerMove != null)
+            if (SecondPlayerMove != null)
             {
                 MoveMade?.Invoke(move.GetNotation(), false);
             }
@@ -785,7 +781,7 @@ namespace Chess.GL
         // Check Status Functions
         public bool CheckThreeFoldRepeitetion()
         {
-            if (Moves.GetSize() < 3 || MovesStack.GetSize() < 6) 
+            if (Moves.GetSize() < 3 || MovesStack.GetSize() < 6)
                 return false;
 
             // Checking for three fold repeitetion

@@ -1,6 +1,4 @@
-﻿using Chess.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace Chess.GL
 {
@@ -69,7 +67,7 @@ namespace Chess.GL
                     {
                         possibleMoves.Add(new Move(startBlock, endBlock, this, endBlock.GetPiece()));
                     }
-                } 
+                }
             }
         }
 

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Chess.Interfaces;
 
 namespace Chess.GL
 {
@@ -40,7 +39,7 @@ namespace Chess.GL
             Block oneStep = (board.WithinBounds(rank + direction, file)) ? board.GetBlock(rank + direction, file) : null;
             if (oneStep != null && oneStep.IsEmpty())
             {
-                if(board.IsSafeMove(this, oneStep))
+                if (board.IsSafeMove(this, oneStep))
                     moves.Add(new Move(currentBlock, oneStep, this, null));
                 if (!HasMoved)
                 {
@@ -107,7 +106,7 @@ namespace Chess.GL
             int enPassantRank = (GetColor() == PieceColor.White) ? 3 : 4;
 
             if (board.GetFirstPlayerColor() == PlayerColor.Black)
-                 enPassantRank = (GetColor() == PieceColor.White) ? 4 : 3;
+                enPassantRank = (GetColor() == PieceColor.White) ? 4 : 3;
 
             if (rank == enPassantRank)
             {
@@ -125,7 +124,7 @@ namespace Chess.GL
                         sideBlock.GetPiece().GetColor() != GetColor())
                     {
                         Block endBlock = board.GetBlock(rank + direction, file + offset);
-                        if(board.IsSafeMove(this, endBlock))
+                        if (board.IsSafeMove(this, endBlock))
                             moves.Add(new Move(currentBlock, endBlock, this, sideBlock.GetPiece()));
                     }
                 }
@@ -179,7 +178,7 @@ namespace Chess.GL
 
         public void PawnMoved(int rank)
         {
-            if (rank == 2) IsEnPassantable = true; 
+            if (rank == 2) IsEnPassantable = true;
         }
 
         public void SetPawnMoved()

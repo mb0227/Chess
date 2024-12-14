@@ -1,5 +1,4 @@
-﻿using Chess.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Chess.GL
