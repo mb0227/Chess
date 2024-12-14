@@ -20,3 +20,5 @@ C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.Propert
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.csproj.GenerateResource.cache
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.csproj.CoreCompileInputs.cache
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Chess.exe
+C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\AboutPage.baml
+C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Debug\Views\AboutPage.g.cs

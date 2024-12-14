@@ -58,6 +58,11 @@ namespace Chess.Views
                 NavigationService.Navigate(gamePage);
             }
         }
+        private void AboutClick(object sender, RoutedEventArgs e)
+        {
+            AboutPage aboutPage = new AboutPage();
+            NavigationService.Navigate(aboutPage);
+        }
 
         private int GetDifficulty()
         {

@@ -55,11 +55,8 @@
             <!-- VS Computer Button -->
             <Button Content="vs Computer" Click="VsComputerClick" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
 
-            <!-- Analysis Button -->
-            <Button Content="Analysis" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
-
             <!-- About Button -->
-            <Button Content="About" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
+            <Button Content="About" Click="AboutClick" Style="{StaticResource MenuButtonStyle}" Margin="0,5,0,5"/>
         </StackPanel>
 
         <!-- Footer -->
