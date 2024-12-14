@@ -29,7 +29,6 @@ namespace Chess.DS
             }
             else
             {
-                Console.WriteLine("Stack is empty, cannot pop.");
                 return null;
             }
         }
@@ -42,7 +41,6 @@ namespace Chess.DS
             }
             else
             {
-                Console.WriteLine("Stack is empty, cannot peek.");
                 return null;
             }
         }
@@ -51,7 +49,6 @@ namespace Chess.DS
         {
             if (count > Moves.Count)
             {
-                Console.WriteLine("Count is greater than the number of moves in the stack.");
                 return null;
             }
             return Moves[Moves.Count - count];
@@ -75,7 +72,6 @@ namespace Chess.DS
         {
             if (Moves.Count == 0)
             {
-                Console.WriteLine("No moves.");
                 return;
             }
             foreach (Move move in Moves)
@@ -115,7 +111,6 @@ namespace Chess.DS
             }
             else
             {
-                Console.WriteLine("Stack is empty, cannot pop.");
                 return null;
             }
         }
@@ -128,7 +123,6 @@ namespace Chess.DS
             }
             else
             {
-                Console.WriteLine("Stack is empty, cannot peek.");
                 return null;
             }
         }
@@ -147,7 +141,6 @@ namespace Chess.DS
         {
             if (MovesStack.Count == 0)
             {
-                Console.WriteLine("No moves.");
                 return;
             }
             foreach (string move in MovesStack)
@@ -165,7 +158,6 @@ namespace Chess.DS
             }
             else
             {
-                Console.WriteLine("Stack is empty, cannot peek.");
                 return null;
             }
         }
@@ -178,7 +170,6 @@ namespace Chess.DS
             }
             else
             {
-                Console.WriteLine("Stack is empty, cannot peek.");
                 return null;
             }
         }

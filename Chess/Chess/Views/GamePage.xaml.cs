@@ -462,7 +462,6 @@ namespace Chess.Views
 
             if (targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor() && Game.GetCurrentPlayer().GetPlayerType() != PlayerType.Computer)
             {
-                Console.WriteLine("Invalid move. Target block has a piece of the same color.");
                 return;
             }
 
@@ -600,7 +599,7 @@ namespace Chess.Views
             }
             else
             {
-                Console.WriteLine($"No piece found at Row: {previousRow}, Column: {previousCol}.");
+                // Console.WriteLine($"No piece found at Row: {previousRow}, Column: {previousCol}.");
             }
 
             PieceColor opponentPieceColor = Game.GetCurrentPlayer().GetColor() == PlayerColor.White ? PieceColor.White : PieceColor.Black;
@@ -721,6 +720,11 @@ namespace Chess.Views
                 Draw();
                 NavigateToHomePage();
             }
+        }
+
+        private void ExitClick(object sender, RoutedEventArgs e)
+        {
+            Application.Current.Shutdown();
         }
 
         private void GetGameStatus()

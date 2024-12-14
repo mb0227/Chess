@@ -9,7 +9,6 @@ namespace Chess
         {
             InitializeComponent();
             Main.Content = new Homepage();
-            //Main.Content = new GamePage(GL.PlayerColor.White, 5, 3);
         }
     }
 }

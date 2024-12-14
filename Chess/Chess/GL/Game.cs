@@ -109,7 +109,6 @@ namespace Chess.GL
             {
                 if (Board.GetBlock(prevRank, prevFile).IsEmpty())
                 {
-                    Console.WriteLine("No piece at the given position.");
                     return;
                 }
 
@@ -119,12 +118,10 @@ namespace Chess.GL
 
                 if (newBlock.GetPiece() != null && newBlock.GetPiece().GetColor() == pieceAtPrev.GetColor())
                 {
-                    Console.WriteLine("Cannot place pieces of same color on eachother.");
                     return;
                 }
                 if (pieceAtPrev.GetColor().ToString().Trim() != CurrentMove.GetColor().ToString().Trim())
                 {
-                    Console.WriteLine("It is not your turn.");
                     return;
                 }
 
@@ -167,9 +164,6 @@ namespace Chess.GL
                     King king = (King)Board.FindKing(CurrentMove.GetColor() == PlayerColor.Black ? PieceColor.Black : PieceColor.White).GetPiece();
                     king.SetCheck(false);
                 }
-
-                //Console.WriteLine("Board Before");
-                //Board.DisplayBoard();
                 if (moveType == MoveType.EnPassant && Board.GetBlock(enPassantTargetRow, newFile) != null)
                 {
                     Block targetBlock = Board.GetBlock(enPassantTargetRow, newFile);
@@ -212,7 +206,6 @@ namespace Chess.GL
 
                     if (!Board.WithinBounds(kingStartFile, kingEndFile) || !Board.WithinBounds(rookStartFile, rookEndFile))
                     {
-                        Console.WriteLine("Invalid castling move");
                         return;
                     }
 
@@ -315,8 +308,6 @@ namespace Chess.GL
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
                 }
-                //Console.WriteLine("Board After");
-                //Board.DisplayBoard();
                 if (CurrentMove.GetColor() == PlayerColor.White)
                 {
                     if ((moveType == MoveType.Check || moveType == MoveType.PromotionCheck) && Board.GetFinalStatus(PieceColor.Black)) // Scan for Checkmate
@@ -642,9 +633,19 @@ namespace Chess.GL
             }
 
             MovesStack.Pop();
-            Moves.Pop();
-            //Console.WriteLine("Board After Undo");
-            //Board.DisplayBoard();
+
+            if ((CurrentMove == PlayerTwo && PlayerOne.GetColor() == PlayerColor.White)
+               || CurrentMove == PlayerOne && PlayerTwo.GetColor() == PlayerColor.White)
+            {
+                Moves.Pop();
+            }
+            else
+            {
+                if (PlayerOne.GetColor() == PlayerColor.White)
+                    FirstPlayerMove.SetNotation(Moves.PeekWhite());
+                if (PlayerTwo.GetColor() == PlayerColor.White)
+                    SecondPlayerMove.SetNotation(Moves.PeekWhite());
+            }
         }
 
         // Control Functions

@@ -308,9 +308,10 @@
 
             <!-- Buttons Section -->
             <WrapPanel Grid.Row="7" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" ItemWidth="120" ItemHeight="35">
-                <Button Content="Resign" Style="{StaticResource ActionButtonStyle}" Width="90" Click="ResignClick" Height="27" FontSize="12"/>
-                <Button Content="Offer Draw" Style="{StaticResource ActionButtonStyle}" Width="90" Click="DrawClick" Height="24" FontSize="12"/>
-                <Button Content="Undo" Style="{StaticResource ActionButtonStyle}" Width="90" Click="UndoClick" Height="24" FontSize="12"/>
+                <Button Content="Resign" Style="{StaticResource ActionButtonStyle}" Width="90" Click="ResignClick" Height="25" FontSize="12" FontWeight="Bold" />
+                <Button Content="Offer Draw" Style="{StaticResource ActionButtonStyle}" Width="90" Click="DrawClick" Height="25" FontSize="12" FontWeight="Bold" />
+                <Button Content="Undo" Style="{StaticResource ActionButtonStyle}" Width="90" Click="UndoClick" Height="25" FontSize="12" FontWeight="Bold" />
+                <Button Content="Exit" Style="{StaticResource ActionButtonStyle}" Width="90" Click="ExitClick" Height="25" FontSize="12" FontWeight="Bold" />
             </WrapPanel>
         </Grid>
 

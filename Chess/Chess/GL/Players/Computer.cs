@@ -171,7 +171,6 @@ namespace Chess.GL
                 }
             }
 
-            Console.WriteLine("AI's move: " + bestMove.GetNotation());
             return bestMove;
         }
 
