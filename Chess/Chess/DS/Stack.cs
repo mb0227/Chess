@@ -88,7 +88,7 @@ namespace Chess.DS
 
     public class Stack
     {
-        public List<string> MovesStack; 
+        public List<string> MovesStack;
 
         public Stack()
         {
@@ -96,7 +96,7 @@ namespace Chess.DS
         }
 
         public void Push(Move whiteMove, Move blackMove = null)
-        { 
+        {
             int moveNumber = MovesStack.Count + 1;
             string formattedMove = blackMove == null
                 ? $"{moveNumber}. {whiteMove.GetNotation()}" // Only White's move
@@ -125,7 +125,7 @@ namespace Chess.DS
             if (MovesStack.Count > 0)
             {
                 return MovesStack[MovesStack.Count - 1];
-            } 
+            }
             else
             {
                 Console.WriteLine("Stack is empty, cannot peek.");
@@ -157,6 +157,31 @@ namespace Chess.DS
             Console.WriteLine();
         }
 
+        public string PeekWhite()
+        {
+            if (MovesStack.Count > 0)
+            {
+                return MovesStack[MovesStack.Count - 1].Split(' ')[1];
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty, cannot peek.");
+                return null;
+            }
+        }
+
+        public string PeekBlack()
+        {
+            if (MovesStack.Count > 0)
+            {
+                return MovesStack[MovesStack.Count - 1].Split(' ')[2];
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty, cannot peek.");
+                return null;
+            }
+        }
     }
 }
 

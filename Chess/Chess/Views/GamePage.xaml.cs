@@ -106,6 +106,7 @@ namespace Chess.Views
             {
                 Interval = TimeSpan.FromSeconds(1) // Tick every second
             };
+
             _countdownTimer.Tick += CountdownTimer_Tick;
 
             UpdateTimeDisplays();
@@ -625,9 +626,9 @@ namespace Chess.Views
                 StartPlayerTwoTurn();
             }
 
-            DisplayComputerMove();
-
             GetGameStatus();
+            
+            DisplayComputerMove();
 
             if (Game.CheckDraw())
             {
@@ -735,8 +736,8 @@ namespace Chess.Views
                 }
                 else if (Game.GetStatus() == GameStatus.STALEMATE)
                 {
-                    MessageBox.Show("Game is a draw by stalemate!", "Game Draw", MessageBoxButton.OK, MessageBoxImage.Information);
                     RemoveHighlights();
+                    MessageBox.Show("Game is a draw by stalemate!", "Game Draw", MessageBoxButton.OK, MessageBoxImage.Information);
                     NavigateToHomePage();
                 }
             }
@@ -855,7 +856,7 @@ namespace Chess.Views
                         {
                             if (moveType == MoveType.PromotionCheck)
                                 RemoveHighlights(Brushes.Red);
-                            promotedPiece = GetImage((pieceKilled.GetColor() == PieceColor.White ? PieceColor.Black : PieceColor.White).ToString().ToLower(), "pawn");
+                            promotedPiece = GetImage((endBlock.GetPiece().GetColor() == PieceColor.White ? PieceColor.White : PieceColor.Black).ToString().ToLower(), "pawn");
                         }
                         break;
                     }

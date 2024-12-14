@@ -115,7 +115,9 @@ namespace Chess.GL
         // Getters
         public Block GetBlock(int rank, int file)
         {
-           return Blocks[GetBlockKey(rank, file)];
+            if(WithinBounds(rank, file))
+                 return Blocks[GetBlockKey(rank, file)];
+            return null;
         }
 
         public Block GetBlock(Piece piece)

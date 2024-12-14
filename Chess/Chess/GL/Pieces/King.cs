@@ -28,6 +28,9 @@ namespace Chess.GL
             int rank = currentBlock.GetRank();
             int file = currentBlock.GetFile();
 
+            if((board.GetFirstPlayerColor() != PlayerColor.Black && file != 4) || (board.GetFirstPlayerColor() != PlayerColor.White && file != 5))
+                HasMoved = true;
+        
             int[][] directions = {
                 new int[] {-1, -1}, // Top-left
                 new int[] {-1, 0},  // Top
@@ -74,7 +77,6 @@ namespace Chess.GL
                     rookBlock = board.GetBlock(rank, 0); // rook at file 0
                     castlingEndBlock = board.GetBlock(rank, file - 2); // king moves two squares left
                 }
-                Console.WriteLine("Adding castling move");
                 moves.Add(new Move(kingBlock, castlingEndBlock, this, null));
             }
 
@@ -112,12 +114,8 @@ namespace Chess.GL
             // Check if the squares between the king and rook are empty
             int start = Math.Min(file, rookFile) + 1;
             int end = Math.Max(file, rookFile);
-            Console.WriteLine("Kingside: " + isKingside);
-            Console.WriteLine("Rook File: " + rookFile);
-            Console.WriteLine("Start: " + start + " End: " + end);
             for (int i = start; i < end; i++)
             {
-                Console.WriteLine("Checking block: " + rank + " " + i);
                 if (!board.GetBlock(rank, i).IsEmpty()) return false;
             }
 
@@ -128,8 +126,10 @@ namespace Chess.GL
             for (int i = 0; i <= 2; i++)
             {
                 int newFile = file + (i * direction);
+
+                if (!board.WithinBounds(rank, newFile)) break;
+
                 Block currentBlock = board.GetBlock(rank, newFile);
-                Console.WriteLine("Current Block in loop check: " + currentBlock?.ToString());
                 if (!board.IsSquareSafeForCastling(currentBlock, GetColor()))
                 {
                     return false;

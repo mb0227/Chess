@@ -23,9 +23,11 @@ namespace Chess.GL
 
             foreach (var block in Board.GetBlocks().Values)
             {
-                if (block.GetPiece()?.GetColor() == pieceColor)
+                var piece = block.GetPiece();
+                if (piece?.GetColor() == pieceColor)
                 {
-                    moves.AddRange(block.GetPiece().GetPossibleMoves(Board));
+                    var possibleMoves = piece.GetPossibleMoves(Board) ?? new List<Move>();
+                    moves.AddRange(possibleMoves);
                 }
             }
             return moves;

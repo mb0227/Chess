@@ -262,7 +262,12 @@ namespace Chess.GL
                 {
                     AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
 
-                    if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White) || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
+                    if (moveType == MoveType.Promotion 
+                        && pieceAtPrev.GetPieceType() == PieceType.Pawn 
+                        && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White && pieceAtPrev.GetColor() == PieceColor.White
+                        || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.White && pieceAtPrev.GetColor() == PieceColor.Black
+                        || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black && pieceAtPrev.GetColor() == PieceColor.White
+                        || prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.Black && pieceAtPrev.GetColor() == PieceColor.Black)))
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
                         pieceAtPrev = new Piece(pieceAtPrev.GetColor(), pieceType, true);
@@ -283,11 +288,11 @@ namespace Chess.GL
                     else
                         AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
 
-                    if ((moveType == MoveType.Promotion) && (prevBlock?.GetPiece().GetPieceType() == PieceType.Pawn
-                        && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White)
-                        || (prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.White)
-                        || prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.Black)
-                        || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black))
+                    if (moveType == MoveType.Promotion && prevBlock?.GetPiece().GetPieceType() == PieceType.Pawn
+                        && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White
+                        || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.White
+                        || prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.Black
+                        || prevBlock.GetRank() == 6 && PlayerOne.GetColor() == PlayerColor.Black)))
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
                         if (pieceType == PieceType.Queen)
@@ -324,7 +329,7 @@ namespace Chess.GL
                         Status = GameStatus.WHITE_WIN;
                         IsGameOver = true;
                     }
-                    else if (Board.GetFinalStatus(PieceColor.White)) // Scan for Stalemate
+                    else if (Board.GetFinalStatus(PieceColor.Black) && !Board.IsKingInCheck(PieceColor.Black)) // Scan for Stalemate
                     {
                         moveType = MoveType.Stalemate;
                         Status = GameStatus.STALEMATE;
@@ -339,7 +344,7 @@ namespace Chess.GL
                         Status = GameStatus.BLACK_WIN;
                         IsGameOver = true;
                     }
-                    else if (Board.GetFinalStatus(PieceColor.Black)) // Scan for Stalemate
+                    else if (Board.GetFinalStatus(PieceColor.White) && !Board.IsKingInCheck(PieceColor.White)) // Scan for Stalemate
                     {
                         moveType = MoveType.Stalemate;
                         Status = GameStatus.STALEMATE;
@@ -472,7 +477,6 @@ namespace Chess.GL
 
         public void UndoMove(Move move)
         {
-            MoveMade?.Invoke(move.GetNotation(), false);
             Block prevBlock = move.GetStartBlock();
             Block newBlock = move.GetEndBlock();
             Piece prevBlockPiece = move.GetPieceMoved();
@@ -489,11 +493,10 @@ namespace Chess.GL
                         rook.UndoMove();
                     }
                     else if (prevBlockPiece.GetPieceType() == PieceType.Pawn
-                        && (prevBlockPiece.GetColor() == PieceColor.White && PlayerOne.GetColor() == PlayerColor.White && prevBlock.GetRank() == 6)
+                        && ((prevBlockPiece.GetColor() == PieceColor.White && PlayerOne.GetColor() == PlayerColor.White && prevBlock.GetRank() == 6)
                         || (prevBlockPiece.GetColor() == PieceColor.Black && PlayerOne.GetColor() == PlayerColor.White && prevBlock.GetRank() == 1)
                         || (prevBlockPiece.GetColor() == PieceColor.Black && PlayerOne.GetColor() == PlayerColor.Black && prevBlock.GetRank() == 6)
-                        || (prevBlockPiece.GetColor() == PieceColor.White && PlayerOne.GetColor() == PlayerColor.Black && prevBlock.GetRank() == 1)
-                        )
+                        || (prevBlockPiece.GetColor() == PieceColor.White && PlayerOne.GetColor() == PlayerColor.Black && prevBlock.GetRank() == 1)))
                     {
                         Pawn pawn = (Pawn)prevBlockPiece;
                         pawn.ResetPawn();
@@ -505,7 +508,6 @@ namespace Chess.GL
                     }
                 }
             }
-
 
             if (moveType == MoveType.Normal)
             {
@@ -611,13 +613,13 @@ namespace Chess.GL
                 prevBlock.SetPiece(prevBlockPiece);
             }
 
-            MovesStack.Pop();
-            Moves.Pop();
-
+            if(SecondPlayerMove != null)
+            {
+                MoveMade?.Invoke(move.GetNotation(), false);
+            }
             if (CurrentMove == PlayerOne)
             {
                 CurrentMove = PlayerTwo;
-
                 if (capturedPiece != null)
                 {
                     Piece deadPiece = PlayerOne.GetLatestDeadPiece();
@@ -642,8 +644,11 @@ namespace Chess.GL
                     }
                 }
             }
-            Console.WriteLine("Board After Undo");
-            Board.DisplayBoard();
+
+            MovesStack.Pop();
+            Moves.Pop();
+            //Console.WriteLine("Board After Undo");
+            //Board.DisplayBoard();
         }
 
         // Control Functions
@@ -657,9 +662,9 @@ namespace Chess.GL
             if (tokens.Length == 3)
             {
                 if (PlayerOne.GetColor() == PlayerColor.White)
-                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.Black ? 1 : 2;
+                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.Black ? 2 : 1;
                 else
-                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.White ? 2 : 1;
+                    tokenForPlayer = CurrentMove.GetColor() == PlayerColor.White ? 1 : 2;
 
                 prevNotation = tokens[tokenForPlayer];
                 if (prevNotation.Length != 2) return;
