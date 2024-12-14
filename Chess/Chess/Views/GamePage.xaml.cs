@@ -815,12 +815,12 @@ namespace Chess.Views
                 else if (castlingType == CastlingType.QueenSideCastle && FirstPlayerSelectedColorWhite)
                 {
                     rookCurrentFile = 3;
-                    rookTargetFile = 7;
+                    rookTargetFile = 0;
                 }
                 else if (castlingType == CastlingType.QueenSideCastle && !FirstPlayerSelectedColorWhite)
                 {
                     rookCurrentFile = 4;
-                    rookTargetFile = 0;
+                    rookTargetFile = 7;
                 }
 
                 foreach (UIElement element in ChessGrid.Children)

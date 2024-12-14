@@ -69,6 +69,12 @@ namespace Chess.GL
             {
                 Block rookBlock = board.GetBlock(rank, 7); // rook at file 7
                 Block castlingEndBlock = board.GetBlock(rank, file + 2); // king moves two squares right
+                if(board.GetFirstPlayerColor() != PlayerColor.White)
+                {
+                    rookBlock = board.GetBlock(rank, 0); // rook at file 0
+                    castlingEndBlock = board.GetBlock(rank, file - 2); // king moves two squares left
+                }
+                Console.WriteLine("Adding castling move");
                 moves.Add(new Move(kingBlock, castlingEndBlock, this, null));
             }
 
@@ -77,6 +83,11 @@ namespace Chess.GL
             {
                 Block rookBlock = board.GetBlock(rank, 0); // rook at file 0
                 Block castlingEndBlock = board.GetBlock(rank, file - 2); // king moves two squares left
+                if (board.GetFirstPlayerColor() != PlayerColor.White)
+                {
+                    rookBlock = board.GetBlock(rank, 7); // rook at file 7
+                    castlingEndBlock = board.GetBlock(rank, file + 2); // king moves two squares RIGHT
+                }
                 moves.Add(new Move(kingBlock, castlingEndBlock, this, null));
             }
         }
@@ -86,6 +97,11 @@ namespace Chess.GL
             if (HasMoved) return false; // King has moved, no castling allowed
 
             int rookFile = isKingside ? 7 : 0; // kingside or queenside rook position
+            if(board.GetFirstPlayerColor() == PlayerColor.Black)
+            {
+                rookFile = isKingside ? 0 : 7;
+            }
+
             Block rookBlock = board.GetBlock(rank, rookFile);
 
             // Check if the rook exists, hasn't moved, and is the same color as the king
@@ -96,19 +112,29 @@ namespace Chess.GL
             // Check if the squares between the king and rook are empty
             int start = Math.Min(file, rookFile) + 1;
             int end = Math.Max(file, rookFile);
+            Console.WriteLine("Kingside: " + isKingside);
+            Console.WriteLine("Rook File: " + rookFile);
+            Console.WriteLine("Start: " + start + " End: " + end);
             for (int i = start; i < end; i++)
             {
+                Console.WriteLine("Checking block: " + rank + " " + i);
                 if (!board.GetBlock(rank, i).IsEmpty()) return false;
             }
 
             int direction = isKingside ? 1 : -1; // Kingside moves right, queenside moves left
+            if(board.GetFirstPlayerColor() == PlayerColor.Black)
+                direction = isKingside ? -1 : 1;
+
             for (int i = 0; i <= 2; i++)
             {
                 int newFile = file + (i * direction);
                 Block currentBlock = board.GetBlock(rank, newFile);
-                if (board.IsUnderAttack(currentBlock, GetColor())) return false;
+                Console.WriteLine("Current Block in loop check: " + currentBlock?.ToString());
+                if (!board.IsSquareSafeForCastling(currentBlock, GetColor()))
+                {
+                    return false;
+                }
             }
-
             return true;
         }
 

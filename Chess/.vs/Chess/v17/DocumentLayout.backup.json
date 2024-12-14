@@ -3,24 +3,32 @@
   "WorkspaceRootPath": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\",
   "Documents": [
     {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\chess\\gl\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\chess\\csc200f24pid168\\chess\\chess\\gl\\board.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\board.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\chess\\gl\\pieces\\pawn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\pieces\\pawn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\chess\\gl\\pieces\\king.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\pieces\\king.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\chess\\csc200f24pid168\\chess\\chess\\gl\\move.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\move.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
       "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\chess\\csc200f24pid168\\chess\\chess\\views\\gamepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\views\\gamepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\chess\\csc200f24pid168\\chess\\chess\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\chess\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\chess\\csc200f24pid168\\chess\\chess\\gl\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\chess\\csc200f24pid168\\chess\\chess\\gl\\pieces\\pawn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\pieces\\pawn.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\chess\\csc200f24pid168\\chess\\chess\\gl\\pieces\\king.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\pieces\\king.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -30,69 +38,95 @@
       "DocumentGroups": [
         {
           "DockedHeight": 337,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
+              "Title": "Move.cs",
+              "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Move.cs",
+              "RelativeDocumentMoniker": "Chess\\GL\\Move.cs",
+              "ToolTip": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Move.cs",
+              "RelativeToolTip": "Chess\\GL\\Move.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-14T01:04:21.886Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Board.cs",
+              "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Board.cs",
+              "RelativeDocumentMoniker": "Chess\\GL\\Board.cs",
+              "ToolTip": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Board.cs",
+              "RelativeToolTip": "Chess\\GL\\Board.cs",
+              "ViewState": "AgIAAPIAAAAAAAAAAAAAwPsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-14T00:30:09.345Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "Pawn.cs",
               "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Pieces\\Pawn.cs",
               "RelativeDocumentMoniker": "Chess\\GL\\Pieces\\Pawn.cs",
               "ToolTip": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Pieces\\Pawn.cs",
               "RelativeToolTip": "Chess\\GL\\Pieces\\Pawn.cs",
-              "ViewState": "AgIAALgAAAAAAAAAAAAjwM4AAAAdAAAAAAAAAA==",
+              "ViewState": "AgIAAIMAAAAAAAAAAAD4v48AAABGAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-13T17:19:22.499Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
               "Title": "MainWindow.xaml.cs",
               "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\MainWindow.xaml.cs",
               "RelativeDocumentMoniker": "Chess\\MainWindow.xaml.cs",
               "ToolTip": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\MainWindow.xaml.cs",
               "RelativeToolTip": "Chess\\MainWindow.xaml.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAbAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-13T17:09:55.081Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 3,
               "Title": "King.cs",
               "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Pieces\\King.cs",
               "RelativeDocumentMoniker": "Chess\\GL\\Pieces\\King.cs",
               "ToolTip": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Pieces\\King.cs",
               "RelativeToolTip": "Chess\\GL\\Pieces\\King.cs",
-              "ViewState": "AgIAAIoAAAAAAAAAAADwv5cAAAAfAAAAAAAAAA==",
+              "ViewState": "AgIAAHoAAAAAAAAAAAAkwIkAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-13T16:59:42.918Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 0,
               "Title": "Game.cs",
               "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Game.cs",
               "RelativeDocumentMoniker": "Chess\\GL\\Game.cs",
               "ToolTip": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Game.cs",
               "RelativeToolTip": "Chess\\GL\\Game.cs",
-              "ViewState": "AgIAAAkDAAAAAAAAAAAkwA4DAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAFgCAAAAAAAAAAAawFwCAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-13T16:59:09.881Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 5,
               "Title": "GamePage.xaml.cs",
               "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\Views\\GamePage.xaml.cs",
               "RelativeDocumentMoniker": "Chess\\Views\\GamePage.xaml.cs",
               "ToolTip": "C:\\Users\\bilal\\Desktop\\Chess\\CSC200F24PID168\\Chess\\Chess\\Views\\GamePage.xaml.cs",
               "RelativeToolTip": "Chess\\Views\\GamePage.xaml.cs",
-              "ViewState": "AgIAAO8CAAAAAAAAAAAAwAEDAAARAAAAAAAAAA==",
+              "ViewState": "AgIAACYDAAAAAAAAAAAmwDYDAAAmAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-12-13T16:52:14.256Z",
               "EditorCaption": ""

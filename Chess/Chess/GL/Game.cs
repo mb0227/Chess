@@ -588,12 +588,12 @@ namespace Chess.GL
                 else if (castlingType == CastlingType.QueenSideCastle && FirstPlayerSelectedColorWhite)
                 {
                     rookCurrentFile = 3;
-                    rookTargetFile = 7;
+                    rookTargetFile = 0;
                 }
                 else if (castlingType == CastlingType.QueenSideCastle && !FirstPlayerSelectedColorWhite)
                 {
                     rookCurrentFile = 4;
-                    rookTargetFile = 0;
+                    rookTargetFile = 7;
                 }
 
                 Block rookCurrentBlock = Board.GetBlock(newBlock.GetRank(), rookCurrentFile);
@@ -642,6 +642,8 @@ namespace Chess.GL
                     }
                 }
             }
+            Console.WriteLine("Board After Undo");
+            Board.DisplayBoard();
         }
 
         // Control Functions

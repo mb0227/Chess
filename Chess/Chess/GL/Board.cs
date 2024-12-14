@@ -236,6 +236,28 @@ namespace Chess.GL
             return false;
         }
 
+        public bool IsSquareSafeForCastling(Block block, PieceColor pieceColor)
+        {
+            Block kingBlock = FindKing(pieceColor);
+            foreach (var b in Blocks.Values)
+            {
+                Piece piece = b.GetPiece();
+                if (piece == null || piece.GetColor() == pieceColor)
+                    continue;
+
+                if (piece.GetColor() != pieceColor
+                    && piece.GetPieceType() == PieceType.Pawn
+                    && piece.IsAttackingKing(this, block))
+                        return false;
+
+                if (piece.CanAttack(block, this))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         public bool IsPathClear(int startRank, int startFile, int endRank, int endFile)
         {
             int rankStep = (endRank - startRank) != 0 ? (endRank - startRank) / Math.Abs(endRank - startRank) : 0;
