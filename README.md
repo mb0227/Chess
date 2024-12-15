@@ -25,6 +25,39 @@ This project is a Chess Game developed in WPF using C# with the .NET Framework (
 6. Ensure you have .NET Framework 4.8 installed.
 7. Build and run the solution to start the game.
 
+## Run without Visual Studio
+To run this project without installing the setup file follow these steps.
+
+### To play this game in Windows:
+1. Install the Chess.zip file from https://github.com/mb0227/Chess/releases/tag/Chess. It is also available in github repository of this project as a zip file named as Setup.zip, install from any one of these.
+2. Extract the folder.
+3. Do not delete the Images folder, doing so would result in application not working properly. I have used relative paths currently so it retrieves piece images by navigating back to the Images folder. If you delete it piece images would not load.
+4. Go To: Chess/Setup/ and then run Chess.exe, now you are Good to go!
+
+### To play this game in Linux:
+1. Install wine, wine-mono and it relevant dependencies.
+For Example: For Ubuntu
+```bash
+   sudo apt update
+   sudo apt install wine
+```
+
+Or if this does not work try:
+
+```bash
+sudo apt install --install-recommends winehq-stable
+```
+
+2. Install the Chess.zip file from https://github.com/mb0227/Chess/releases/tag/Chess. It is also available in github repository of this project as a zip file named as Setup.zip, install from any one of these.
+3. Extract the folder.
+4. Navigate to Chess\Setup\ and open terminal in that directory.
+5. Run command
+```bash
+   wine Chess.exe
+```
+6.  You are good to go!
+
+
 ## Gameplay
 1. **Multiplayer Mode**: Allows two players to play locally, taking turns.
 2. **Player vs Computer Mode**: Choose a difficulty level and play against the AI.
