@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Resources;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -30,7 +32,7 @@ namespace Chess.Views
 
         Game Game;
 
-        public GamePage(PlayerColor firstPlayerColor, int timeControl, int difficulty = -1)
+        public GamePage(PlayerColor firstPlayerColor, int timeControl, int difficulty = -1, bool is960 = false)
         {
             InitializeComponent();
 
@@ -54,22 +56,10 @@ namespace Chess.Views
             if (difficulty != -1)
                 Game = Game.MakeGame(new Human(FirstPlayerColor), new Computer(SecondPlayerColor), difficulty);
             else
-                Game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
+                Game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor), is960);
 
-            //if (FirstPlayerSelectedColorWhite)
-            //{
-            //    FirstPlayerColor = PlayerColor.White;
-            //    SecondPlayerColor = PlayerColor.Black;
-            //}
-            //else
-            //{
-            //    FirstPlayerColor = PlayerColor.Black;
-            //    SecondPlayerColor = PlayerColor.White;
-            //}
-
-            //Game = Game.MakeGame(new Human(FirstPlayerColor), new Human(SecondPlayerColor));
-
-            InitializeBoard();
+            InitializeBoard(Game.GetBoard());
+            AddRanksAndFilesLabels();
 
             DataContext = this;
             Moves = new ObservableCollection<string>();
@@ -110,77 +100,88 @@ namespace Chess.Views
             _countdownTimer.Tick += CountdownTimer_Tick;
 
             UpdateTimeDisplays();
-
             DisplayComputerMove(); // if computer is first
         }
 
         // UI Functions
-        private void InitializeBoard()
+        private void InitializeBoard(Board board)
         {
-            string[] pieces = { "rook", "knight", "bishop", "queen", "king", "bishop", "knight", "rook" };
-            if (!FirstPlayerSelectedColorWhite)
-            {
-                pieces = new string[] { "rook", "knight", "bishop", "king", "queen", "bishop", "knight", "rook" };
-            }
-            string imageFolderPath = "..\\..\\Images", color;
+            string[] pieces = GetPiecesInitialPositions(board);
+            string color = "";
             Image image;
 
-            // Placing pieces
             for (int row = 0; row < 8; row += 7) // Row 0 (White) and 7 (Black)
             {
-                if (FirstPlayerSelectedColorWhite) color = (row == 0) ? "black" : "white";
-                else color = (row == 0) ? "white" : "black";
+                color = (FirstPlayerSelectedColorWhite)
+                    ? ((row == 0) ? "black" : "white")
+                    : ((row == 0) ? "white" : "black");
 
                 for (int col = 0; col < 8; col++)
                 {
                     string piece = pieces[col];
-                    string imagePath = System.IO.Path.Combine(imageFolderPath, $"{color}-{piece}.png");
-                    imagePath = System.IO.Path.GetFullPath(imagePath);
+                    string resourceKey = $"{color}_{piece}";
+                    var imageSource = (System.Drawing.Bitmap)Properties.Resources.ResourceManager.GetObject(resourceKey);
 
-                    image = new Image
+                    if (imageSource != null)
                     {
-                        Width = 53,
-                        Height = 53,
-                        Margin = new Thickness(5),
-                        Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
-                        IsHitTestVisible = false,
-                        Name = $"{piece}"
-                    };
-                    Grid.SetRow(image, row);
-                    Grid.SetColumn(image, col);
-                    ChessGrid.Children.Add(image);
+                        image = new Image
+                        {
+                            Width = 53,
+                            Height = 53,
+                            Margin = new Thickness(5),
+                            Source = UtilityFunctions.BitmapToBitmapImage(imageSource),
+                            IsHitTestVisible = false,
+                            Name = $"{piece}"
+                        };
+
+                        Grid.SetRow(image, row);
+                        Grid.SetColumn(image, col);
+                        ChessGrid.Children.Add(image);
+                    }
                 }
             }
 
-            // Placing pawns
-            for (int row = 1; row <= 6; row += 5) // Rows 1 (White) and 6 (Black)
+            for (int row = 1; row <= 6; row += 5) // Row 1 (White pawns) and Row 6 (Black pawns)
             {
-                if (FirstPlayerSelectedColorWhite)
-                    color = (row == 1) ? "black" : "white";
-                else
-                    color = (row == 1) ? "white" : "black";
-
-                string piece = "pawn";
+                color = (FirstPlayerSelectedColorWhite)
+                    ? ((row == 1) ? "black" : "white")
+                    : ((row == 1) ? "white" : "black");
 
                 for (int col = 0; col < 8; col++)
                 {
-                    string imagePath = System.IO.Path.Combine(imageFolderPath, $"{color}-{piece}.png");
-                    imagePath = System.IO.Path.GetFullPath(imagePath);
-                    image = new Image
+                    string resourceKey = $"{color}_pawn";
+                    var imageSource = (System.Drawing.Bitmap)Properties.Resources.ResourceManager.GetObject(resourceKey);
+
+                    if (imageSource != null)
                     {
-                        Width = 53,
-                        Height = 53,
-                        Margin = new Thickness(5),
-                        Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
-                        IsHitTestVisible = false,
-                        Name = $"{piece}"
-                    };
-                    Grid.SetRow(image, row);
-                    Grid.SetColumn(image, col);
-                    ChessGrid.Children.Add(image);
+                        image = new Image
+                        {
+                            Width = 53,
+                            Height = 53,
+                            Margin = new Thickness(5),
+                            Source = UtilityFunctions.BitmapToBitmapImage(imageSource),
+                            IsHitTestVisible = false,
+                            Name = "pawn"
+                        };
+
+                        Grid.SetRow(image, row);
+                        Grid.SetColumn(image, col);
+                        ChessGrid.Children.Add(image);
+                    }
                 }
             }
             AddRanksAndFilesLabels();
+        }
+
+
+        private string[] GetPiecesInitialPositions(Board board)
+        {
+            string[] pieces = new string[8];
+            for(int file = 0; file < 8; file++)
+            {
+                 pieces[file] = board.GetBlock(0, file).GetPiece().GetPieceType().ToString().ToLower();
+            }
+            return pieces;
         }
 
         private void AddRanksAndFilesLabels()
@@ -197,7 +198,7 @@ namespace Chess.Views
                 TextBlock rankTextBlock = new TextBlock
                 {
                     Text = ranks[i],
-                    Foreground = Brushes.SaddleBrown,
+                    Foreground = Brushes.DarkRed,
                     HorizontalAlignment = HorizontalAlignment.Left,
                     VerticalAlignment = VerticalAlignment.Top,
                     Margin = new Thickness(5, 0, 0, 0),
@@ -210,7 +211,7 @@ namespace Chess.Views
                 TextBlock fileTextBlock = new TextBlock
                 {
                     Text = files[i],
-                    Foreground = Brushes.SaddleBrown,
+                    Foreground = Brushes.DarkRed,
                     HorizontalAlignment = HorizontalAlignment.Right,
                     VerticalAlignment = VerticalAlignment.Bottom,
                     Margin = new Thickness(0, 0, 5, 0),
@@ -227,7 +228,7 @@ namespace Chess.Views
         {
             if (brush == null)
             {
-                brush = Brushes.LightGreen;
+                brush = Brushes.DarkGreen;
             }
             Border border = new Border
             {
@@ -243,7 +244,7 @@ namespace Chess.Views
         {
             if (brush == null)
             {
-                brush = Brushes.LightGreen;
+                brush = Brushes.DarkGreen;
             }
             List<UIElement> elementsToRemove = new List<UIElement>();
             foreach (UIElement element in ChessGrid.Children)
@@ -266,7 +267,7 @@ namespace Chess.Views
 
             foreach (UIElement element in ChessGrid.Children)
             {
-                if (element is Border border && border.Background == Brushes.LightGreen)
+                if (element is Border border && border.Background == Brushes.DarkGreen)
                 {
                     int row = Grid.GetRow(border);
                     int col = Grid.GetColumn(border);
@@ -283,14 +284,13 @@ namespace Chess.Views
         private Image GetImage(string color, string piece)
         {
             Image image = null;
-            string imagePath = System.IO.Path.Combine("..\\..\\Images", $"{color}-{piece}.png");
-            imagePath = System.IO.Path.GetFullPath(imagePath);
+            var imageSource = (System.Drawing.Bitmap)Properties.Resources.ResourceManager.GetObject($"{color}_{piece}");
             image = new Image
             {
                 Width = 53,
                 Height = 53,
                 Margin = new Thickness(5),
-                Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
+                Source = UtilityFunctions.BitmapToBitmapImage(imageSource),
                 IsHitTestVisible = false,
                 Name = $"{piece}"
             };
@@ -303,6 +303,12 @@ namespace Chess.Views
         }
 
         // Move Handling Functions
+        private int RookCurrentFile;
+        private int KingCurrentFile;
+        private int RookTargetFile;
+        private int KingTargetFile;
+        private CastlingType castlingType;
+        private bool Castle960;
         private void Chessboard_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             var clickedElement = sender as Border;
@@ -328,6 +334,8 @@ namespace Chess.Views
                 if (IsMoving)
                 {
                     IsMoving = false;
+                    if (Game.GetBoard().is960 && col == KingTargetFile && SelectedCol == KingCurrentFile && castlingPossible)
+                        Castle960 = true;
                     MakeMove(SelectedRow, SelectedCol, row, col);
                     RemoveHighlights();
                     return;
@@ -338,7 +346,7 @@ namespace Chess.Views
                 {
                     if (Grid.GetRow(element) == SelectedRow && Grid.GetColumn(element) == SelectedCol && element is Image)
                     {
-                        Block block = Game.GetBoard().GetBlock(SelectedRow, SelectedCol);
+                        GL.Block block = Game.GetBoard().GetBlock(SelectedRow, SelectedCol);
                         if (block.GetPiece() != null)
                         {
                             if (block.GetPiece().GetPieceType() == PieceType.Pawn)
@@ -425,6 +433,15 @@ namespace Chess.Views
                                         {
                                             castlingPossible = true;
                                         }
+                                        else if(Game.GetBoard().is960 && move.GetMoveType() == MoveType.Castling)
+                                        {
+                                            KingCurrentFile = move.GetStartBlock().GetFile();
+                                            KingTargetFile = move.GetEndBlock().GetFile();
+                                            RookCurrentFile = move.RookStartBlock.GetFile();
+                                            RookTargetFile = move.RookEndBlock.GetFile();
+                                            castlingType = move.GetCastlingType();
+                                            castlingPossible = true;
+                                        }
                                         HighlightSquares(move.GetEndBlock().GetRank(), move.GetEndBlock().GetFile());
                                     }
                                 }
@@ -445,7 +462,7 @@ namespace Chess.Views
 
             if (isInCheck && Game.GetBoard().IsKingInCheck(currentPieceColor))
             {
-                Block kingBlock = Game.GetBoard().FindKing(currentPieceColor);
+                GL.Block kingBlock = Game.GetBoard().FindKing(currentPieceColor);
                 isInCheck = false;
                 RemoveHighlights(Brushes.Red);
             }
@@ -453,14 +470,14 @@ namespace Chess.Views
             Image pieceToMove = null;
             Image capturedPiece = null;
 
-            Block prevBlock = Game.GetBoard().GetBlock(previousRow, previousCol);
-            Block targetBlock = Game.GetBoard().GetBlock(targetRow, targetCol);
+            GL.Block prevBlock = Game.GetBoard().GetBlock(previousRow, previousCol);
+            GL.Block targetBlock = Game.GetBoard().GetBlock(targetRow, targetCol);
 
             string optionSelected = null;
             int enPassantTargetRow = -1;
             int castlingTargetFileRook = -1, rookCurrentFile = -1;
 
-            if (targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor() && Game.GetCurrentPlayer().GetPlayerType() != PlayerType.Computer)
+            if (!castlingPossible && !Game.GetBoard().is960 && targetBlock.GetPiece() != null && targetBlock.GetPiece().GetColor() == prevBlock.GetPiece().GetColor() && Game.GetCurrentPlayer().GetPlayerType() != PlayerType.Computer)
             {
                 return;
             }
@@ -490,7 +507,7 @@ namespace Chess.Views
                 else if (!FirstPlayerSelectedColorWhite && targetRow == 5) enPassantTargetRow = 4;
             }
 
-            if (castlingPossible)
+            if (castlingPossible && !Game.GetBoard().is960)
             {
                 if (Game.GetPlayerOne().GetColor() == PlayerColor.White && targetCol == 6) // short castle 
                 {
@@ -513,17 +530,13 @@ namespace Chess.Views
                     rookCurrentFile = 7;
                 }
             }
+            else if(castlingPossible && Game.GetBoard().is960 && Castle960)
+            {
+                rookCurrentFile = RookCurrentFile;
+                castlingTargetFileRook = RookTargetFile;
+            }
 
             Image rookImageForCastling = null;
-
-            foreach (UIElement element in ChessGrid.Children)
-            {
-                if (Grid.GetRow(element) == previousRow && Grid.GetColumn(element) == previousCol && element is Image)
-                {
-                    pieceToMove = (Image)element;
-                    break;
-                }
-            }
 
             if (castlingPossible)
             {
@@ -536,6 +549,16 @@ namespace Chess.Views
                     }
                 }
             }
+
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (Grid.GetRow(element) == previousRow && Grid.GetColumn(element) == previousCol && element is Image)
+                {
+                    pieceToMove = (Image)element;
+                    break;
+                }
+            }
+
 
             foreach (UIElement element in ChessGrid.Children)
             {
@@ -573,14 +596,14 @@ namespace Chess.Views
 
                 if (optionSelected != null)
                 {
-                    string imagePath = System.IO.Path.Combine("..\\..\\Images", $"{Game.GetCurrentPlayer().GetColor().ToString().ToLower()}-{optionSelected}.png");
-                    imagePath = System.IO.Path.GetFullPath(imagePath);
+                    var imageSource = (System.Drawing.Bitmap)Properties.Resources.ResourceManager.GetObject($"{Game.GetCurrentPlayer().GetColor().ToString().ToLower()}_{optionSelected}");
+
                     pieceToMove = new Image
                     {
                         Width = 53,
                         Height = 53,
                         Margin = new Thickness(5),
-                        Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
+                        Source = UtilityFunctions.BitmapToBitmapImage(imageSource),
                         IsHitTestVisible = false,
                         Name = $"{optionSelected}"
                     };
@@ -589,7 +612,8 @@ namespace Chess.Views
                 Grid.SetRow(pieceToMove, targetRow);
                 Grid.SetColumn(pieceToMove, targetCol);
 
-                if (optionSelected != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Promotion, UtilityFunctions.GetPieceTypeByString(optionSelected));
+                if (Castle960) Game.MakeMove(previousCol, targetCol, rookCurrentFile, castlingTargetFileRook, MoveType.Castling, PieceType.King, -1, castlingType);
+                else if (optionSelected != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Promotion, UtilityFunctions.GetPieceTypeByString(optionSelected));
                 else if (enPassantTargetRow != -1) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.EnPassant, PieceType.Pawn, enPassantTargetRow);
                 else if (capturedPiece != null) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Kill);
                 else if (rookImageForCastling != null && (targetCol == 6 || targetCol == 1)) Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Castling, PieceType.King, -1, CastlingType.KingSideCastle);
@@ -597,15 +621,11 @@ namespace Chess.Views
                 else Game.MakeMove(previousRow, previousCol, targetRow, targetCol, MoveType.Normal);
                 ChessGrid.Children.Add(pieceToMove);
             }
-            else
-            {
-                // Console.WriteLine($"No piece found at Row: {previousRow}, Column: {previousCol}.");
-            }
 
             PieceColor opponentPieceColor = Game.GetCurrentPlayer().GetColor() == PlayerColor.White ? PieceColor.White : PieceColor.Black;
             if (Game.GetBoard().IsKingInCheck(opponentPieceColor))
             {
-                Block kingBlock = Game.GetBoard().FindKing(opponentPieceColor);
+                GL.Block kingBlock = Game.GetBoard().FindKing(opponentPieceColor);
                 isInCheck = true;
                 HighlightSquares(kingBlock.GetRank(), kingBlock.GetFile(), Brushes.Red);
             }
@@ -614,6 +634,7 @@ namespace Chess.Views
             if (PromotionPossible) PromotionPossible = false;
             if (IsMoving) IsMoving = false;
             if (castlingPossible) castlingPossible = false;
+            if (Castle960) Castle960 = false;
 
 
             if (Game.GetCurrentPlayer() == Game.GetPlayerOne())
@@ -663,13 +684,13 @@ namespace Chess.Views
 
         private bool CanEnPassant(int targetRow, int targetCol)
         {
-            Block block = Game.GetBoard().GetBlock(targetRow, targetCol);
+            GL.Block block = Game.GetBoard().GetBlock(targetRow, targetCol);
             if ((FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White && targetRow == 2)
                || (FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 5)
                || (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White && targetRow == 5)
                || (!FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.Black && targetRow == 2))
             {
-                Block blockToCheckForPawn;
+                GL.Block blockToCheckForPawn;
 
                 if (FirstPlayerSelectedColorWhite && Game.GetCurrentPlayer().GetColor() == PlayerColor.White)
                     blockToCheckForPawn = Game.GetBoard().GetBlock(targetRow + 1, targetCol);
@@ -757,13 +778,23 @@ namespace Chess.Views
                     Piece killedPiece = null;
                     if (move.GetNotation().Contains("x"))
                         killedPiece = move.GetPieceKilled();
-                    UndoMove(move.GetEndBlock(), move.GetStartBlock(), move.GetPieceMoved(), killedPiece, move.GetMoveType(), move.GetCastlingType());
+                    if (Game.GetBoard().is960 && move.GetMoveType() == MoveType.Castling)
+                        Undo960Castle(move);
+                    else
+                        UndoMove(move.GetEndBlock(), move.GetStartBlock(), move.GetPieceMoved(), killedPiece, move.GetMoveType(), move.GetCastlingType());
                     Game.UndoMove(move);
                     RemoveHighlights();
-                    // if after undoing the move, player is in check
+                    if (_isPlayerOneTurn)
+                    {
+                        StartPlayerTwoTurn();
+                    }
+                    else
+                    {
+                        StartPlayerOneTurn();
+                    }
                     if (Game.GetBoard().IsKingInCheck(move.GetPieceMoved().GetColor()))
                     {
-                        Block kingBlock = Game.GetBoard().FindKing(move.GetPieceMoved().GetColor());
+                        GL.Block kingBlock = Game.GetBoard().FindKing(move.GetPieceMoved().GetColor());
                         isInCheck = true;
                         HighlightSquares(kingBlock.GetRank(), kingBlock.GetFile(), Brushes.Red);
                     }
@@ -776,7 +807,48 @@ namespace Chess.Views
             }
         }
 
-        private void UndoMove(Block endBlock, Block startBlock, Piece piece, Piece pieceKilled, MoveType moveType, CastlingType castlingType)
+        private void Undo960Castle(Move move)
+        {
+            GL.Block kingPrevBlock = move.GetStartBlock();
+            GL.Block kingEndBlock = move.GetEndBlock();
+            GL.Block rookPrevBlock = move.RookStartBlock;
+            GL.Block rookEndBlock = move.RookEndBlock;
+
+            Image kingImage = null;
+            Image rookImage = null;
+
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (Grid.GetRow(element) == kingEndBlock.GetRank() && Grid.GetColumn(element) == kingEndBlock.GetFile() && element is Image)
+                {
+                    kingImage = (Image)element;
+                    break;
+                }
+            }
+
+            foreach (UIElement element in ChessGrid.Children)
+            {
+                if (Grid.GetRow(element) == rookEndBlock.GetRank() && Grid.GetColumn(element) == rookEndBlock.GetFile() && element is Image)
+                {
+                    rookImage = (Image)element;
+                    break;
+                }
+            }
+
+            ChessGrid.Children.Remove(rookImage);
+            ChessGrid.Children.Remove(kingImage);
+
+            Grid.SetRow(rookImage, rookPrevBlock.GetRank());
+            Grid.SetColumn(rookImage, rookPrevBlock.GetFile());
+            ChessGrid.Children.Add(rookImage);
+
+            Grid.SetRow(kingImage, kingPrevBlock.GetRank());
+            Grid.SetColumn(kingImage, kingPrevBlock.GetFile());
+            ChessGrid.Children.Add(kingImage);
+        }
+
+
+        private void UndoMove(GL.Block endBlock, GL.Block startBlock, Piece piece, Piece pieceKilled, MoveType moveType, CastlingType castlingType)
         {
             int prevRank = endBlock.GetRank();
             int prevFile = endBlock.GetFile();
@@ -1016,6 +1088,7 @@ namespace Chess.Views
                 {
                     _countdownTimer.Stop();
                     PlayerOneTimeTextBox.Text = "Time's Up!";
+                    PlayerOneTimeControl.Text = "00:00";
                     DisplayLoseMessage(FirstPlayerSelectedColorWhite ? PlayerColor.White : PlayerColor.Black, " on Time!!");
                     return;
                 }
@@ -1027,6 +1100,7 @@ namespace Chess.Views
                 {
                     _countdownTimer.Stop();
                     PlayerTwoTimeTextBox.Text = "Time's Up!";
+                    PlayerTwoTimeControl.Text = "00:00";
                     DisplayLoseMessage(FirstPlayerSelectedColorWhite ? PlayerColor.Black : PlayerColor.White, " on Time!!");
                     return;
                 }

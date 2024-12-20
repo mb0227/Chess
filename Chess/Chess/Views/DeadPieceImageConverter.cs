@@ -1,4 +1,5 @@
 ﻿using System;
+using Chess.GL;
 using System.Globalization;
 using System.Windows.Data;
 using System.Windows.Media.Imaging;
@@ -11,8 +12,9 @@ namespace Chess.Views
         {
             if (value.ToString() != "")
             {
-                string imagePath = System.IO.Path.Combine("..\\..\\Images", $"{value}.png");
-                return new BitmapImage(new Uri(System.IO.Path.GetFullPath(imagePath), UriKind.Absolute));
+                var imageSource = (System.Drawing.Bitmap)Properties.Resources.ResourceManager.GetObject(value.ToString());
+                BitmapImage bitmapImage = UtilityFunctions.BitmapToBitmapImage(imageSource);
+                return bitmapImage;
             }
             return null;
         }

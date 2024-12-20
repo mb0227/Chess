@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Windows;
 
 namespace Chess.GL
 {
@@ -27,7 +28,7 @@ namespace Chess.GL
             int rank = currentBlock.GetRank();
             int file = currentBlock.GetFile();
 
-            if ((board.GetFirstPlayerColor() != PlayerColor.Black && file != 4) || (board.GetFirstPlayerColor() != PlayerColor.White && file != 5))
+            if (!board.is960 && (board.GetFirstPlayerColor() != PlayerColor.Black && file != 4) || (board.GetFirstPlayerColor() == PlayerColor.Black && file != 3))
                 HasMoved = true;
 
             int[][] directions = {
@@ -56,7 +57,8 @@ namespace Chess.GL
                 }
             }
 
-            AddCastlingMoves(possibleMoves, board, currentBlock);
+            if (!board.is960) AddCastlingMoves(possibleMoves, board, currentBlock);
+            else AddChess960CastlingMoves(possibleMoves, board, currentBlock);
 
             return possibleMoves;
         }
@@ -137,6 +139,8 @@ namespace Chess.GL
             return true;
         }
 
+        // Helper function to find the rook in Chess960
+
         public override bool CanAttack(Block targetBlock, Board board)
         {
             Block currentBlock = board.GetBlock(this);
@@ -182,6 +186,98 @@ namespace Chess.GL
         public void UndoMove()
         {
             HasMoved = false;
+        }
+
+        public void AddChess960CastlingMoves(List<Move> moves, Board board, Block kingBlock)
+        {
+            int rank = kingBlock.GetRank();
+            int file = kingBlock.GetFile();
+            // king side check
+            Can960Castle(board, moves, kingBlock, rank, file, true);
+            // queen side check
+            Can960Castle(board, moves, kingBlock, rank, file, false);
+        }
+
+        private bool Can960Castle(Board board, List<Move> possibleMoves, Block kingBlock, int rank, int file, bool isKingside)
+        {
+            Block rookBlock = null;
+
+            if (HasMoved || InCheck) return false; // King has moved or is in check
+
+            rookBlock = board.FindRookUsingOpeningState(isKingside, GetColor());
+
+            if (rookBlock == null || rookBlock.IsEmpty() || rookBlock.GetPiece().GetPieceType() != PieceType.Rook) return false;
+            if (rookBlock.GetPiece().GetColor() != GetColor() || ((Rook)rookBlock.GetPiece()).GetHasMoved()) return false;
+            // Calculate the king's end position and validate the path
+            int kingTargetFile, rookTargetFile;
+            if (board.GetFirstPlayerColor() == PlayerColor.White && isKingside)
+                (kingTargetFile, rookTargetFile) = (6, 5);
+            else if (board.GetFirstPlayerColor() == PlayerColor.White && !isKingside)
+                (kingTargetFile, rookTargetFile) = (2, 3);
+            else if (board.GetFirstPlayerColor() == PlayerColor.Black && isKingside)
+                (kingTargetFile, rookTargetFile) = (1, 2);
+            else
+                (kingTargetFile, rookTargetFile) = (5, 4);
+
+            if (kingBlock.GetFile() == kingTargetFile && rookBlock.GetFile() == rookTargetFile) return false;
+
+            if (!IsPathClear(board, rank, file, rookBlock.GetFile())) return false;
+            if (!IsKingPathSafe(board, rank, file, kingTargetFile, isKingside)) return false;
+            if (!AreTargetSquaresClear(board, rank, isKingside, kingBlock, rookBlock)) return false;
+
+            possibleMoves.Add(new Move(kingBlock, board.GetBlock(rank, kingTargetFile), rookBlock, board.GetBlock(rank, rookTargetFile), isKingside ? CastlingType.KingSideCastle: CastlingType.QueenSideCastle));
+
+            return true;
+        }
+
+        private bool IsPathClear(Board board, int rank, int kingFile, int rookFile)
+        {
+            int startFile = Math.Min(kingFile, rookFile) + 1;
+            int endFile = Math.Max(kingFile, rookFile) - 1;
+
+            for (int file = startFile; file <= endFile; file++)
+            {
+                if (!board.GetBlock(rank, file).IsEmpty())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool AreTargetSquaresClear(Board board, int rank, bool isKingSide, Block kingBlock, Block rookBlock)
+        {
+            int[] files;
+            if(board.GetFirstPlayerColor() == PlayerColor.White)
+                files = isKingSide ? new int[] { 6, 5 } : new int[] { 2, 3};
+            else
+                files = isKingSide ? new int[] { 1, 2 } :new int[] { 5, 4 };
+            foreach (var file in files)
+            {
+                Block block = board.GetBlock(rank, file);
+                if (kingBlock == block || rookBlock == block) continue;
+                if (!block.IsEmpty())
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        private bool IsKingPathSafe(Board board, int rank, int kingFile, int kingTargetFile, bool isKingside)
+        {
+            int direction = isKingside ? 1 : -1;
+
+            for (int file = kingFile; file != kingTargetFile + direction; file += direction)
+            {
+                if (!board.WithinBounds(rank, file)) continue;
+                Block currentBlock = board.GetBlock(rank, file);
+                if (!board.IsSquareSafeForCastling(currentBlock, GetColor()))
+                {
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }

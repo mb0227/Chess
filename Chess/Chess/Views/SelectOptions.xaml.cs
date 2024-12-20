@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Chess.GL;
+using System;
 using System.IO;
+using System.Resources;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -26,13 +28,11 @@ namespace Chess.Views
         {
             try
             {
-                string whiteKingImagePath = Path.Combine("..\\..\\Images", "white-king.png");
-                whiteKingImagePath = Path.GetFullPath(whiteKingImagePath);
-                string blackKingImagePath = Path.Combine("..\\..\\Images", "black-king.png");
-                blackKingImagePath = Path.GetFullPath(blackKingImagePath);
+                var whiteKingImagePath = (System.Drawing.Bitmap)Properties.Resources.ResourceManager.GetObject("white_king");
+                var blackKingImagePath = (System.Drawing.Bitmap)Properties.Resources.ResourceManager.GetObject("black_king");
 
-                WhiteKingImage.Source = new BitmapImage(new Uri(whiteKingImagePath, UriKind.Absolute));
-                BlackKingImage.Source = new BitmapImage(new Uri(blackKingImagePath, UriKind.Absolute));
+                WhiteKingImage.Source = UtilityFunctions.BitmapToBitmapImage(whiteKingImagePath);
+                BlackKingImage.Source = UtilityFunctions.BitmapToBitmapImage(blackKingImagePath);
             }
             catch (Exception ex)
             {

@@ -28,11 +28,11 @@ namespace Chess.GL
         private static Game GameInstance;
 
         // Constructors
-        private Game(Player playerOne, Player playerTwo)
+        private Game(Player playerOne, Player playerTwo, bool is960)
         {
             PlayerOne = playerOne;
             PlayerTwo = playerTwo;
-            Board = new Board(playerOne.GetColor());
+            Board = new Board(playerOne.GetColor(), is960);
             Moves = new Stack();
             MovesStack = new MovesStack();
             IsGameOver = false;
@@ -42,22 +42,22 @@ namespace Chess.GL
             Computer.SetBoard(Board);
         }
 
-        private Game(Player playerOne, Player playerTwo, int difficulty) : this(playerOne, playerTwo)
+        private Game(Player playerOne, Player playerTwo, int difficulty) : this(playerOne, playerTwo, false)
         {
             Difficulty = difficulty;
         }
 
         // Game Initiazlize Methods
-        public static Game MakeGame(Player playerOne, Player playerTwo) //Singleton Pattern
+        public static Game MakeGame(Player playerOne, Player playerTwo, bool is960) //Singleton Pattern
         {
             if (GameInstance == null)
             {
-                GameInstance = new Game(playerOne, playerTwo);
+                GameInstance = new Game(playerOne, playerTwo, is960);
             }
             else
             {
                 RestartGame();
-                GameInstance = new Game(playerOne, playerTwo);
+                GameInstance = new Game(playerOne, playerTwo, is960);
             }
             return GameInstance;
         }
@@ -104,27 +104,27 @@ namespace Chess.GL
                 MovesStack.Push(move);
                 return;
             }
-
             if (!IsGameOver && Status == GameStatus.ACTIVE && Board.WithinBounds(prevRank, prevFile) && Board.WithinBounds(newRank, newFile))
             {
-                if (Board.GetBlock(prevRank, prevFile).IsEmpty())
+                if (Board.GetBlock(prevRank, prevFile).IsEmpty() && moveType != MoveType.Castling)
                 {
                     return;
                 }
-
+                
                 Block prevBlock = Board.GetBlock(prevRank, prevFile);
                 Piece pieceAtPrev = prevBlock.GetPiece();
                 Block newBlock = Board.GetBlock(newRank, newFile);
 
-                if (newBlock.GetPiece() != null && newBlock.GetPiece().GetColor() == pieceAtPrev.GetColor())
+                if(moveType == MoveType.Castling && GetBoard().is960)
                 {
-                    return;
+                    int rank = (CurrentMove.GetColor() == PlayerColor.White) ? 7 : 0;
+                    if (PlayerOne.GetColor() == PlayerColor.Black)
+                    {
+                        rank = (CurrentMove.GetColor() == PlayerColor.White) ? 0 : 7;
+                    }
+                    prevBlock = Board.GetBlock(rank, prevRank);
+                    pieceAtPrev = prevBlock.GetPiece();
                 }
-                if (pieceAtPrev.GetColor().ToString().Trim() != CurrentMove.GetColor().ToString().Trim())
-                {
-                    return;
-                }
-
 
                 if (moveType == MoveType.Promotion && pieceAtPrev.GetPieceType() == PieceType.Pawn)
                 {
@@ -164,6 +164,7 @@ namespace Chess.GL
                     King king = (King)Board.FindKing(CurrentMove.GetColor() == PlayerColor.Black ? PieceColor.Black : PieceColor.White).GetPiece();
                     king.SetCheck(false);
                 }
+
                 if (moveType == MoveType.EnPassant && Board.GetBlock(enPassantTargetRow, newFile) != null)
                 {
                     Block targetBlock = Board.GetBlock(enPassantTargetRow, newFile);
@@ -188,31 +189,60 @@ namespace Chess.GL
                 }
                 else if (moveType == MoveType.Castling)
                 {
-                    AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
-
-                    int rank = (CurrentMove.GetColor() == PlayerColor.White) ? 7 : 0;
-                    int kingStartFile = prevFile;
-                    int rookStartFile = (castlingType == CastlingType.KingSideCastle) ? 7 : 0;
-                    int kingEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile + 2 : kingStartFile - 2;
-                    int rookEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile + 1 : kingStartFile - 1;
-
-                    if (PlayerOne.GetColor() == PlayerColor.Black)
+                    int rank, kingStartFile, kingEndFile, rookStartFile, rookEndFile;
+                    if (!GetBoard().is960)
                     {
-                        rank = (CurrentMove.GetColor() == PlayerColor.White) ? 0 : 7;
-                        rookStartFile = (castlingType == CastlingType.KingSideCastle) ? 0 : 7;
-                        kingEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile - 2 : kingStartFile + 2;
-                        rookEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile - 1 : kingStartFile + 1;
+                        AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
+                        rank = (CurrentMove.GetColor() == PlayerColor.White) ? 7 : 0;
+                        kingStartFile = prevFile;
+                        rookStartFile = (castlingType == CastlingType.KingSideCastle) ? 7 : 0;
+                        kingEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile + 2 : kingStartFile - 2;
+                        rookEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile + 1 : kingStartFile - 1;
+
+                        if (PlayerOne.GetColor() == PlayerColor.Black)
+                        {
+                            rank = (CurrentMove.GetColor() == PlayerColor.White) ? 0 : 7;
+                            rookStartFile = (castlingType == CastlingType.KingSideCastle) ? 0 : 7;
+                            kingEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile - 2 : kingStartFile + 2;
+                            rookEndFile = (castlingType == CastlingType.KingSideCastle) ? kingStartFile - 1 : kingStartFile + 1;
+                        }
+
+                        if (!Board.is960 && !Board.WithinBounds(kingStartFile, kingEndFile) || !Board.WithinBounds(rookStartFile, rookEndFile))
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        // now there is a slight change in logic and variables used here
+                        // if the board is 960 instead of passing the rank before and after move
+                        // I instead passed king's before and after file and rook's before and after file
+                        // prevRank is king's current file, prevFile is king's target file, targetRank is rook's current file and targetFile is rook's target file
+                        rank = (CurrentMove.GetColor() == PlayerColor.White) ? 7 : 0;
+                        if (PlayerOne.GetColor() == PlayerColor.Black)
+                        {
+                            rank = (CurrentMove.GetColor() == PlayerColor.White) ? 0 : 7;
+                        }
+                        kingStartFile = prevRank;
+                        kingEndFile = prevFile;
+                        rookStartFile = newRank;
+                        rookEndFile = newFile;
+                        pieceAtPrev = Board.GetBlock(rank, prevRank).GetPiece();
                     }
 
-                    if (!Board.WithinBounds(kingStartFile, kingEndFile) || !Board.WithinBounds(rookStartFile, rookEndFile))
-                    {
-                        return;
-                    }
+                    Block rookStartBlock = Board.GetBlock(rank, rookStartFile);
+                    Block rookEndBlock = Board.GetBlock(rank, rookEndFile);
+                    Block kingStartBlock = Board.GetBlock(rank, kingStartFile);
+                    Block kingEndBlock = Board.GetBlock(rank, kingEndFile);
 
-                    Board.GetBlock(rank, rookEndFile).SetPiece(Board.GetBlock(rank, rookStartFile).GetPiece());
+                    Add960CastleMove(kingStartBlock, kingEndBlock, rookStartBlock, rookEndBlock, castlingType);
+
+                    Piece rook = Board.GetBlock(rank, rookStartFile).GetPiece();
+                    Piece king = Board.GetBlock(rank, kingStartFile).GetPiece();
                     Board.GetBlock(rank, rookStartFile).SetPiece(null);
-                    Board.GetBlock(rank, kingEndFile).SetPiece(pieceAtPrev);
-                    Board.GetBlock(prevRank, prevFile).SetPiece(null);
+                    Board.GetBlock(rank, kingStartFile).SetPiece(null);
+                    Board.GetBlock(rank, rookEndFile).SetPiece(rook);
+                    Board.GetBlock(rank, kingEndFile).SetPiece(king);
                 }
                 else if (moveType == MoveType.PromotionCheck)
                 {
@@ -249,7 +279,7 @@ namespace Chess.GL
                 }
                 else if (newBlock.GetPiece() == null && moveType != MoveType.EnPassant) // if the target block is empty
                 {
-                    AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
+                    if(moveType != MoveType.Promotion)AddMove(prevBlock, newBlock, moveType, pieceAtPrev);
 
                     if (moveType == MoveType.Promotion
                         && pieceAtPrev.GetPieceType() == PieceType.Pawn
@@ -259,8 +289,25 @@ namespace Chess.GL
                         || prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.Black && pieceAtPrev.GetColor() == PieceColor.Black)))
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
-                        pieceAtPrev = new Piece(pieceAtPrev.GetColor(), pieceType, true);
+                        if (pieceType == PieceType.Queen)
+                        {
+                            pieceAtPrev = new Queen(pieceAtPrev.GetColor(), PieceType.Queen, true);
+                        }
+                        else if (pieceType == PieceType.Bishop)
+                        {
+                            pieceAtPrev = new Bishop(pieceAtPrev.GetColor(), PieceType.Bishop, true);
+                        }
+                        else if (pieceType == PieceType.Rook)
+                        {
+                            pieceAtPrev = new Rook(pieceAtPrev.GetColor(), PieceType.Rook, true);
+                        }
+                        else if (pieceType == PieceType.Knight)
+                        {
+                            pieceAtPrev = new Knight(pieceAtPrev.GetColor(), PieceType.Knight, true);
+                        }
                     }
+
+                    if(moveType == MoveType.Promotion) AddMove(prevBlock, newBlock, moveType, pieceAtPrev, null, pieceType);
 
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
@@ -274,8 +321,7 @@ namespace Chess.GL
 
                     if (moveType != MoveType.Promotion)
                         AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew);
-                    else
-                        AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
+
 
                     if (moveType == MoveType.Promotion && prevBlock?.GetPiece().GetPieceType() == PieceType.Pawn
                         && ((prevBlock.GetRank() == 1 && PlayerOne.GetColor() == PlayerColor.White
@@ -285,13 +331,21 @@ namespace Chess.GL
                     {
                         Pawn pawn = (Pawn)prevBlock.GetPiece();
                         if (pieceType == PieceType.Queen)
+                        {
                             pieceAtPrev = new Queen(pieceAtPrev.GetColor(), PieceType.Queen, true);
+                        }
                         else if (pieceType == PieceType.Bishop)
+                        {
                             pieceAtPrev = new Bishop(pieceAtPrev.GetColor(), PieceType.Bishop, true);
+                        }
                         else if (pieceType == PieceType.Rook)
+                        {
                             pieceAtPrev = new Rook(pieceAtPrev.GetColor(), PieceType.Rook, true);
+                        }
                         else if (pieceType == PieceType.Knight)
+                        {
                             pieceAtPrev = new Knight(pieceAtPrev.GetColor(), PieceType.Knight, true);
+                        }
                     };
 
                     if (CurrentMove == PlayerOne)
@@ -304,6 +358,9 @@ namespace Chess.GL
                         PlayerOne.KillPiece(pieceAtNew);
                         PlayerOneDeadPiecesChanged?.Invoke(PlayerOne.GetFirstDeadPiece(), true);
                     }
+
+                    if(moveType == MoveType.Promotion)
+                        AddMove(prevBlock, newBlock, moveType, pieceAtPrev, pieceAtNew, pieceType);
 
                     Board.GetBlock(newRank, newFile).SetPiece(pieceAtPrev);
                     Board.GetBlock(prevRank, prevFile).SetPiece(null);
@@ -381,7 +438,7 @@ namespace Chess.GL
                     CurrentMove = PlayerTwo;
                     MovesStack.Push(FirstPlayerMove);
                 }
-                DisplayMoves();
+                //DisplayMoves();
                 //MovesStack.Display();
             }
         }
@@ -456,6 +513,15 @@ namespace Chess.GL
                 move = new Move(prevBlock, newBlock, prevBlockPiece, capturedPiece, moveType, promotedPieceType);
             }
 
+            if (CurrentMove == PlayerOne)
+                FirstPlayerMove = move;
+            else
+                SecondPlayerMove = move;
+        }
+
+        public void Add960CastleMove(Block kingPrevBlock, Block kingTargetBlock, Block rookPrevBlock, Block rookEndBlock, CastlingType castlingType)
+        {
+            Move move = new Move(kingPrevBlock, kingTargetBlock, rookPrevBlock, rookEndBlock, castlingType);
             if (CurrentMove == PlayerOne)
                 FirstPlayerMove = move;
             else
@@ -557,7 +623,7 @@ namespace Chess.GL
                 pawn.UndoMove();
                 Board.GetBlock(prevBlock.GetRank(), newBlock.GetFile()).SetPiece(capturedPiece);
             }
-            else if (moveType == MoveType.Castling)
+            else if (moveType == MoveType.Castling && !GetBoard().is960)
             {
                 int rookTargetFile = -1;
                 int rookCurrentFile = -1;
@@ -599,6 +665,24 @@ namespace Chess.GL
                 kingBlock.SetPiece(null);
                 prevBlock.SetPiece(prevBlockPiece);
             }
+            else if(moveType == MoveType.Castling && GetBoard().is960)
+            {
+                Block kingPrevBlock = move.GetStartBlock();
+                Block kingEndBlock = move.GetEndBlock();
+                Block rookPrevBlock = move.RookStartBlock;
+                Block rookEndBlock = move.RookEndBlock;
+
+                King king = (King)kingEndBlock.GetPiece();
+                Rook rook = (Rook)rookEndBlock.GetPiece();
+
+                king.UndoMove();
+                rook.UndoMove();
+
+                kingEndBlock.SetPiece(null);
+                rookEndBlock.SetPiece(null);
+                kingPrevBlock.SetPiece(king);
+                rookPrevBlock.SetPiece(rook);
+            }
 
             if (SecondPlayerMove != null)
             {
@@ -612,7 +696,7 @@ namespace Chess.GL
                     Piece deadPiece = PlayerOne.GetLatestDeadPiece();
                     if (deadPiece != null)
                     {
-                        string piece = deadPiece.GetColor().ToString().ToLower() + "-" + deadPiece.GetPieceType().ToString().ToLower();
+                        string piece = deadPiece.GetColor().ToString().ToLower() + "_" + deadPiece.GetPieceType().ToString().ToLower();
                         PlayerOneDeadPiecesChanged?.Invoke(piece, false);
                     }
                 }
@@ -626,7 +710,7 @@ namespace Chess.GL
                     Piece deadPiece = PlayerTwo.GetLatestDeadPiece();
                     if (deadPiece != null)
                     {
-                        string piece = deadPiece.GetColor().ToString().ToLower() + "-" + deadPiece.GetPieceType().ToString().ToLower();
+                        string piece = deadPiece.GetColor().ToString().ToLower() + "_" + deadPiece.GetPieceType().ToString().ToLower();
                         PlayerTwoDeadPiecesChanged?.Invoke(piece, false);
                     }
                 }

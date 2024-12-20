@@ -65,7 +65,7 @@ namespace Chess.GL
 
         public virtual List<Move> GetPossibleMoves(Board board)
         {
-            return null;
+            return new List<Move>();
         }
 
         public virtual bool CanAttack(Block targetBlock, Board board)

@@ -51,6 +51,26 @@
             MakeNotation();
         }
 
+        // special constructor for castling in 960
+        // I will pass castling type as none while getting moves from king.
+        // usually I assign move type after making the move but in this case i need to assign it before making the move 
+        // so I can access this particular move in the front-end
+        public Block RookStartBlock;
+        public Block RookEndBlock;
+        public Move(Block kingStartBlock, Block kingEndBlock, Block rookStartBlock, Block rookEndBlock, CastlingType castlingType)
+        {
+            StartBlock = kingStartBlock;
+            EndBlock = kingEndBlock;
+            RookStartBlock = rookStartBlock;
+            RookEndBlock = rookEndBlock;
+            PieceMoved = Board.GetBlock(kingStartBlock.GetRank(), kingStartBlock.GetFile()).GetPiece();
+            PieceKilled = null;
+            MoveType = MoveType.Castling;
+            CastlingType = castlingType;
+            if(castlingType == CastlingType.KingSideCastle) Notation = "O-O";
+            else Notation = "O-O-O";
+        }
+
         private string GetPieceMovedString(PieceType p)
         {
             if (p == PieceType.King) return "K";

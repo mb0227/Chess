@@ -1,6 +1,9 @@
-﻿using System;
+﻿using Chess.GL;
+using System;
+using System.Resources;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
 namespace Chess.Views
@@ -19,17 +22,16 @@ namespace Chess.Views
         {
             // List of piece names
             string[] pieceNames = { "Queen", "Rook", "Bishop", "Knight" };
-            string[] pieceFileNames = { "white-queen.png", "white-rook.png", "white-bishop.png", "white-knight.png" };
+            string[] pieceFileNames = { "white_queen", "white_rook", "white_bishop", "white_knight" };
 
             for (int i = 0; i < pieceNames.Length; i++)
             {
                 Button pieceButton = (Button)this.FindName($"{pieceNames[i]}Button");
-                string imagePath = System.IO.Path.Combine("..\\..\\Images", $"{pieceFileNames[i]}");
-                imagePath = System.IO.Path.GetFullPath(imagePath);
+                var imageSource = (System.Drawing.Bitmap)Properties.Resources.ResourceManager.GetObject(pieceFileNames[i]);
 
                 Image pieceImage = new Image
                 {
-                    Source = new BitmapImage(new Uri(imagePath, UriKind.Absolute)),
+                    Source = UtilityFunctions.BitmapToBitmapImage(imageSource),
                     Width = 60,
                     Height = 60
                 };

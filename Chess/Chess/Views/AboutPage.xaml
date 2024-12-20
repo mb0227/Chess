@@ -55,10 +55,10 @@
         <ScrollViewer Grid.Row="1" Margin="10,20" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <TextBlock Text="Developer Description:" FontSize="22" FontWeight="SemiBold" Foreground="#ECF0F1" />
-                <TextBlock Text="I (Bilal) made this project for my learning of my Data Structures knowledge" 
+                <TextBlock Text="I (Bilal) made this project for my learning of Data Structures in practical" 
                    FontSize="18" 
                    Foreground="#ECF0F1" HorizontalAlignment="Left" Margin="0,10" />
-                <TextBlock Text="enchancement and for my admiration for chess game." FontSize="18" 
+                <TextBlock Text="world and for my admiration for chess game." FontSize="18" 
                 Foreground="#ECF0F1" Margin="0,0,0,0" />
             </StackPanel>
         </ScrollViewer>
@@ -70,13 +70,13 @@
                            FontSize="18" Foreground="#BDC3C7" Margin="10,5,10,0"/>
                 <TextBlock Text="• Player vs Computer: Challenge an AI opponent with 3 difficulty levels." 
                            FontSize="18" Foreground="#BDC3C7" Margin="10,5,10,0"/>
+                <TextBlock Text="• Chess 960 (Fischer Random Chess)." 
+                           FontSize="18" Foreground="#BDC3C7" Margin="10,5,10,0"/>
                 <TextBlock Text="• Time Controls: Play with 1m, 3m, 5m, or 10m time options." 
                            FontSize="18" Foreground="#BDC3C7" Margin="10,5,10,0"/>
                 <TextBlock Text="• FIDE Rules: Adheres strictly to official chess rules." 
                            FontSize="18" Foreground="#BDC3C7" Margin="10,5,10,0"/>
                 <TextBlock Text="• Undo Functionality: Allows players to undo their last move." 
-                           FontSize="18" Foreground="#BDC3C7" Margin="10,5,10,0"/>
-                <TextBlock Text="• Offer Draw: Provides an option for players to propose a draw." 
                            FontSize="18" Foreground="#BDC3C7" Margin="10,5,10,0"/>
             </StackPanel>
         </ScrollViewer>

@@ -43,8 +43,6 @@ This document provides comprehensive details on the development of a GUI-based C
 
 \newpage
 
-% all the contents table, figures and tables must have no text on heder footer 
-
 \renewcommand{\contentsname}{Table of Contents}
 
 \tableofcontents
@@ -67,12 +65,12 @@ This document provides comprehensive details on the development of a GUI-based C
 \fancyhf{}
 \fancyhead[L]{\textbf{Chess Project}}
 \fancyfoot[R]{{\thepage}}
-\fancyfoot[L]{{MOHAMMAD BILAL}}
+\fancyfoot[L]{{Bilal Yaseen}}
 
 \section{Project Overview}
 
 \subsection{Description}
-This project is a Chess Game developed using the WPF framework in C\#. It leverages the .NET Framework version v4.8 and provides an engaging platform for both multiplayer and single-player modes. The single-player mode offers three difficulty levels: easy, medium, and hard. Additionally, the game adheres strictly to FIDE rules, includes time controls (1m, 3m, 5m, and 10m), and supports advanced features like Undo functionality, offering a draw, and move validation. 
+This project is a Chess Game developed using the WPF framework in C\#. It leverages the .NET Framework version v4.8 and provides an engaging platform for both multiplayer and single-player modes. The single-player mode offers three difficulty levels: easy, medium, and hard. Additionally, the game adheres strictly to FIDE rules, includes time controls (1m, 3m, 5m, and 10m), and supports advanced features like Undo functionality, offering a draw, resign, and move validation. In multiplayer mode, it offers the users to play either regular Chess or Chess960 (Fischer Random Chess).
 
 \subsection{Motivation}
 The motivation for creating this project stemmed from two key factors:
@@ -106,6 +104,8 @@ This project aims to:
     \hline
     Multiplayer Mode & Allows two human players to play against each other on a same device. \\
     \hline
+    Chess960 & Fischer Random or Chess960 also available for multiplayer gameplay. \\
+    \hline
     Notation & Proper Display of Moves Notation (according to FIDE rules) for ease of users. \\
     \hline
     Player vs. Computer Mode & Enables a single player to compete against the AI with three difficulty levels: easy, medium, and hard. \\
@@ -116,9 +116,9 @@ This project aims to:
     \hline
     Undo Functionality & Allows players to undo their last move. \\
     \hline
-    Offer Draw & Players can offer a draw during the game and if the other player accepts the offer the game results in a draw. \\
+    Offer Draw & Players can offer a draw during the game. \\
     \hline
-    Resign & Players can resign during the game if they don't want to continue. \\
+    Resign & Players can also resign during the game. \\
     \hline
 \end{longtable}
 
@@ -195,7 +195,7 @@ This project aims to:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{Images/Use Cases/multiplayerPage.png}
+    \includegraphics[width=0.8\linewidth]{Images/Use Cases/multiplayerPage.png}
     \caption{Multi-Player Page}
     \label{fig:multiPlayerPage}
 \end{figure}
@@ -235,11 +235,30 @@ This project aims to:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.7\linewidth]{Images/Use Cases/multiplayerProgress.png}
+    \includegraphics[width=0.8\linewidth]{Images/Use Cases/multiplayerProgress.png}
     \caption{Multi-Player Progress}
     \label{fig:multiplayerProgress}
 \end{figure}
-    
+
+\subsection{Chess960 Page}
+
+\begin{longtable}{|m{0.25\textwidth}|m{0.7\textwidth}|}
+    \caption{Chess960 Initial Setup} \\
+    \hline
+    Name & Chess960 \\
+    \hline
+    Actor & Player \\
+    \hline
+        Description & It displays random initial setup of the Chess960 game.\\ 
+    \hline
+\end{longtable}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\linewidth]{Images/Use Cases/chess960setup.png}
+    \caption{Chess960 setup}
+    \label{fig:chess960Setup}
+\end{figure}
 
 \subsection{Vs Computer Select Options}
 
@@ -897,7 +916,7 @@ It is also available in github repository of this project as a zip file named as
 \section{Conclusion}
 
 \subsection{Summary}
-This Chess Game Project is designed to understand the practical application of data structures in real-world projects. The game was developed using WPF and the .NET Framework, specifically .NETFramework, Version=v4.8. It supports both Multiplayer and Player Vs Computer modes, with three levels of AI difficulty: Easy, Medium, and Hard. The project also features time controls, allowing users to choose between 1-minute, 3-minute, 5-minute, or 10-minute time limits. The game follows the FIDE rules, including specialized moves like En Passant and Castling, and offers Undo functionality along with the ability to draw. 
+This Chess Game Project is designed to understand the practical application of data structures in real-world projects. The game was developed using WPF and the .NET Framework, specifically .NETFramework, Version=v4.8. It supports both Multiplayer (regular and Chess960) and Player Vs Computer modes, with three levels of AI difficulty: Easy, Medium, and Hard. The project also features time controls, allowing users to choose between 1-minute, 3-minute, 5-minute, or 10-minute time limits. The game follows the FIDE rules, including specialized moves like En Passant and Castling, and offers Undo functionality along with the ability to draw. 
 
 This project helped me deepen my understanding of implementing data structures, like stacks, linked lists, and graphs, in complex scenarios. It also provided a comprehensive view of how to manage game logic and UI components, and how various design patterns can be applied to create a smooth gaming experience.
 
@@ -908,24 +927,24 @@ This project helped me deepen my understanding of implementing data structures, 
     \item Debugging special moves like En Passant and Castling, especially when ensuring that the first player could select either White or Black.
     \item Ensuring that the board accurately reflected moves and changes in dead pieces in the UI. This required seamless integration of game logic and the user interface.
     \item Another big challenge was while undoing a move, especially in the moves in which a piece was killed, removing it from the UI was quite a challenge but with a lot of research I overcame it. 
+    \item But the challenge which was really hard to overcome was implementing Chess960. Initial setup of Fischer Random was pretty straight-forward as most of the code was already in good structure, but coding the castling part in Chess960 was really hectic and challenging.
 \end{itemize}
 
 \subsection{Project's Weaknesses}
 \begin{itemize}
-    \item A logical error occurs when trying to manage notations after undoing a move, causing the game to lose track of the correct move notation.
-    \item The AI functionality is somewhat weak, as it only evaluates moves based on two factors: positional value and piece value. This limited evaluation results in a less challenging AI opponent.
+    \item Sometimes a logical error occurs when trying castle in Chess960, but mostly it works fine.
+    \item The AI functionality is somewhat weak, as it only evaluates moves based on three factors: king safety, positional value and piece value. This limited evaluation results in a less challenging AI opponent.
     \item Introducing additional evaluation conditions causes stack overflow errors, indicating the AI’s evaluation logic needs to be improved.
 \end{itemize}
 
 \subsection{Future Enhancements}
 \begin{itemize}
     \item Add Redo move functionality, allowing players to redo moves after undoing them.
-    \item Implement Pre-Move functionality, enabling players to plan their moves in advance.
+    \item Implement Pre-Move functionality using Queue data structure, enabling players to plan their moves in advance.
     \item Integrate the game with the internet, as it is currently set up locally.
     \item Improve the UI, including displaying move notations simultaneously for both players, instead of after both players have made their moves which is the current implementation.
     \item Enhance the AI by evaluating the board in greater depth, considering more factors for better move determination.
     \item Use of data structures like Trees to do best move analysis.
-    \item Implementing Chess 960 which is personally my favourite mode of Chess.
 \end{itemize}
 
 \section{References}

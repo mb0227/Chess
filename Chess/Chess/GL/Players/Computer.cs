@@ -44,10 +44,12 @@ namespace Chess.GL
                     Piece piece = block.GetPiece();
                     int pieceValue = GetPieceValue(piece.GetPieceType());
                     int positionalBonus = GetPositionalValue(piece, block);
+                    int kingSafety = (piece.GetPieceType() == PieceType.King) ? GetKingSafetyValue(piece, block) : 0;
+
 
                     score += (piece.GetColor().ToString() == aiColor.ToString())
-                             ? (pieceValue + positionalBonus)
-                             : -(pieceValue + positionalBonus);
+                             ? (pieceValue + positionalBonus + kingSafety)
+                             : -(pieceValue + positionalBonus + kingSafety);
                 }
             }
             return score;
@@ -91,6 +93,41 @@ namespace Chess.GL
                     return 0;
             }
         }
+
+        private int GetKingSafetyValue(Piece piece, Block block)
+        {
+            int rank = block.GetRank();
+            int file = block.GetFile();
+
+            // Simple heuristic: Penalize the king being away from edges in early game
+            if (rank > 1 && rank < 6 && file > 1 && file < 6)
+                return -20; // Penalty for unsafe central king position
+
+            // Bonus for being surrounded by pawns
+            int safetyBonus = 0;
+            for (int dr = -1; dr <= 1; dr++)
+            {
+                for (int df = -1; df <= 1; df++)
+                {
+                    if (dr == 0 && df == 0) continue;
+
+                    int neighborRank = rank + dr;
+                    int neighborFile = file + df;
+
+                    if (neighborRank >= 0 && neighborRank < 8 && neighborFile >= 0 && neighborFile < 8)
+                    {
+                        var neighborPiece = Board.GetBlock(neighborRank, neighborFile)?.GetPiece();
+                        if (neighborPiece?.GetPieceType() == PieceType.Pawn && neighborPiece.GetColor() == piece.GetColor())
+                        {
+                            safetyBonus += 5;
+                        }
+                    }
+                }
+            }
+
+            return safetyBonus;
+        }
+
 
         private void SimulateMove(Block startBlock, Block endBlock, out Piece capturedPiece)
         {

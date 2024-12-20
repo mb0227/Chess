@@ -29,6 +29,23 @@ namespace Chess.Views
             }
         }
 
+        private void Chess960Click(object sender, RoutedEventArgs e)
+        {
+            SelectOptions options = new SelectOptions(true);
+            if (options.ShowDialog() == true)
+            {
+                selectedColor = options.SelectedColor;
+                selectedTimeControl = options.SelectedTimeControl;
+            }
+            if (selectedColor != null && selectedTimeControl != null)
+            {
+                GL.PlayerColor playerColor = selectedColor == "White" ? GL.PlayerColor.White : GL.PlayerColor.Black;
+                int timeControl = int.Parse(selectedTimeControl.Replace("m", ""));
+                GamePage gamePage = new GamePage(playerColor, timeControl, -1, true); // true means 960
+                NavigationService.Navigate(gamePage);
+            }
+        }
+
         private void VsComputerClick(object sender, RoutedEventArgs e)
         {
             SelectOptions options = new SelectOptions(false);
@@ -47,6 +64,8 @@ namespace Chess.Views
                 NavigationService.Navigate(gamePage);
             }
         }
+
+
         private void AboutClick(object sender, RoutedEventArgs e)
         {
             AboutPage aboutPage = new AboutPage();

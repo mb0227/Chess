@@ -62,7 +62,7 @@ namespace Chess.DS
         {
             if (Head == null)
                 return null;
-            return Head.Piece.GetColor().ToString().ToLower() + "-" + Head.Piece.GetPieceType().ToString().ToLower();
+            return Head.Piece.GetColor().ToString().ToLower() + "_" + Head.Piece.GetPieceType().ToString().ToLower();
         }
 
         public int GetSize()

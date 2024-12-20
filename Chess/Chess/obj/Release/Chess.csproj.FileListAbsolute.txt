@@ -1,3 +1,4 @@
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Release\Chess.csproj.AssemblyReference.cache
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Release\Chess.Properties.Resources.resources
 C:\Users\bilal\Desktop\Chess\CSC200F24PID168\Chess\Chess\obj\Release\Chess.csproj.GenerateResource.cache
+C:\Users\bilal\Desktop\Projects\Chess\CSC200F24PID168\Chess\Chess\obj\Release\Chess.csproj.AssemblyReference.cache

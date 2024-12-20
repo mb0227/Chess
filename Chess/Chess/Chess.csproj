@@ -145,6 +145,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -165,6 +166,30 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Images\white-rook.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\black-bishop.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\black-king.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\black-knight.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\black-pawn.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\black-queen.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\black-rook.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\white-king.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Images\white-pawn.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
