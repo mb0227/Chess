@@ -25,7 +25,7 @@ namespace Chess.GL
                InitializeChess960Board();
                OpeningState = this;
                AssignRookPositions();
-           }
+            }
            else
            {
                InitializeStandardChessBoard();
@@ -108,73 +108,73 @@ namespace Chess.GL
             }
         }
 
-       private Block CreateChess960BlockAtPosition(int rank, int file, int[] backRankPositions)
-       {
-           Block block = new Block(rank, file);
-           PieceColor whiteColor = FirstPlayerColor == PlayerColor.White ? PieceColor.White : PieceColor.Black;
-           PieceColor blackColor = FirstPlayerColor == PlayerColor.White ? PieceColor.Black : PieceColor.White;
+        private Block CreateChess960BlockAtPosition(int rank, int file, int[] backRankPositions)
+        {
+            Block block = new Block(rank, file);
+            PieceColor whiteColor = PieceColor.White;
+            PieceColor blackColor = PieceColor.Black;
 
-           int whitePawnsRank = FirstPlayerColor == PlayerColor.White ? 6 : 1;
-           int whitePiecesRank = FirstPlayerColor == PlayerColor.White ? 7 : 0;
-           int blackPawnsRank = FirstPlayerColor == PlayerColor.White ? 1 : 6;
-           int blackPiecesRank = FirstPlayerColor == PlayerColor.White ? 0 : 7;
+            int whitePawnsRank = FirstPlayerColor == PlayerColor.White ? 6 : 1;
+            int whitePiecesRank = FirstPlayerColor == PlayerColor.White ? 7 : 0;
+            int blackPawnsRank = FirstPlayerColor == PlayerColor.White ? 1 : 6;
+            int blackPiecesRank = FirstPlayerColor == PlayerColor.White ? 0 : 7;
 
-           if (rank == whitePiecesRank)
-           {
-               switch ((PieceType)backRankPositions[file])
-               {
-                   case PieceType.Rook:
-                       block.SetPiece(new Rook(whiteColor, PieceType.Rook, true));
-                       break;
-                   case PieceType.Knight:
-                       block.SetPiece(new Knight(whiteColor, PieceType.Knight, true));
-                       break;
-                   case PieceType.Bishop:
-                       block.SetPiece(new Bishop(whiteColor, PieceType.Bishop, true));
-                       break;
-                   case PieceType.Queen:
-                       block.SetPiece(new Queen(whiteColor, PieceType.Queen, true));
-                       break;
-                   case PieceType.King:
-                       block.SetPiece(new King(whiteColor, PieceType.King, true));
-                       break;
-               }
-           }
-           else if (rank == blackPiecesRank)
-           {
-               switch ((PieceType)backRankPositions[file])
-               {
-                   case PieceType.Rook:
-                       block.SetPiece(new Rook(blackColor, PieceType.Rook, true));
-                       break;
-                   case PieceType.Knight:
-                       block.SetPiece(new Knight(blackColor, PieceType.Knight, true));
-                       break;
-                   case PieceType.Bishop:
-                       block.SetPiece(new Bishop(blackColor, PieceType.Bishop, true));
-                       break;
-                   case PieceType.Queen:
-                       block.SetPiece(new Queen(blackColor, PieceType.Queen, true));
-                       break;
-                   case PieceType.King:
-                       block.SetPiece(new King(blackColor, PieceType.King, true));
-                       break;
-               }
-           }
-           // Place pawns
-           else if (rank == whitePawnsRank)
-           {
-               block.SetPiece(new Pawn(whiteColor, PieceType.Pawn, true));
-           }
-           else if (rank == blackPawnsRank)
-           {
-               block.SetPiece(new Pawn(blackColor, PieceType.Pawn, true));
-           }
+            if (rank == whitePiecesRank)
+            {
+                switch ((PieceType)backRankPositions[file])
+                {
+                    case PieceType.Rook:
+                        block.SetPiece(new Rook(whiteColor, PieceType.Rook, true));
+                        break;
+                    case PieceType.Knight:
+                        block.SetPiece(new Knight(whiteColor, PieceType.Knight, true));
+                        break;
+                    case PieceType.Bishop:
+                        block.SetPiece(new Bishop(whiteColor, PieceType.Bishop, true));
+                        break;
+                    case PieceType.Queen:
+                        block.SetPiece(new Queen(whiteColor, PieceType.Queen, true));
+                        break;
+                    case PieceType.King:
+                        block.SetPiece(new King(whiteColor, PieceType.King, true));
+                        break;
+                }
+            }
+            else if (rank == blackPiecesRank)
+            {
+                switch ((PieceType)backRankPositions[file])
+                {
+                    case PieceType.Rook:
+                        block.SetPiece(new Rook(blackColor, PieceType.Rook, true));
+                        break;
+                    case PieceType.Knight:
+                        block.SetPiece(new Knight(blackColor, PieceType.Knight, true));
+                        break;
+                    case PieceType.Bishop:
+                        block.SetPiece(new Bishop(blackColor, PieceType.Bishop, true));
+                        break;
+                    case PieceType.Queen:
+                        block.SetPiece(new Queen(blackColor, PieceType.Queen, true));
+                        break;
+                    case PieceType.King:
+                        block.SetPiece(new King(blackColor, PieceType.King, true));
+                        break;
+                }
+            }
+            else if (rank == whitePawnsRank)
+            {
+                block.SetPiece(new Pawn(whiteColor, PieceType.Pawn, true));
+            }
+            else if (rank == blackPawnsRank)
+            {
+                block.SetPiece(new Pawn(blackColor, PieceType.Pawn, true));
+            }
 
-           return block;
-       }
+            return block;
+        }
 
-       private void InitializeStandardChessBoard()
+
+        private void InitializeStandardChessBoard()
        {
            int blackPawnsRank, blackPiecesRank, whitePawnsRank, whitePiecesRank;
            int kingIndex, queenIndex;

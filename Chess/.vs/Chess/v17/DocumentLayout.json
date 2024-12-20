@@ -1,15 +1,40 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\projects\\chess\\csc200f24pid168\\chess\\chess\\gl\\board.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\board.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\projects\\chess\\csc200f24pid168\\chess\\chess\\views\\gamepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\views\\gamepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\projects\\chess\\csc200f24pid168\\chess\\chess\\gl\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\gl\\game.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\projects\\chess\\csc200f24pid168\\chess\\chess\\views\\homepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\views\\homepage.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\projects\\chess\\csc200f24pid168\\chess\\chess\\views\\selectoptions.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\views\\selectoptions.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|c:\\users\\bilal\\desktop\\projects\\chess\\csc200f24pid168\\chess\\chess\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{9FC32F1E-1988-4BD3-9396-6026D5379F91}|Chess\\Chess.csproj|solutionrelative:chess\\mainwindow.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 1,
       "VerticalTabListWidth": 256,
       "DocumentGroups": [
         {
-          "DockedHeight": 316,
-          "SelectedChildIndex": -1,
+          "DockedHeight": 293,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -18,6 +43,94 @@
             {
               "$type": "Bookmark",
               "Name": "ST:5:0:{e8034f19-ab72-4f06-83fd-f6832b41aa63}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Board.cs",
+              "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Board.cs",
+              "RelativeDocumentMoniker": "Chess\\GL\\Board.cs",
+              "ToolTip": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Board.cs",
+              "RelativeToolTip": "Chess\\GL\\Board.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAQwBsAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-20T01:24:18.348Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GamePage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\Views\\GamePage.xaml.cs",
+              "RelativeDocumentMoniker": "Chess\\Views\\GamePage.xaml.cs",
+              "ToolTip": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\Views\\GamePage.xaml.cs",
+              "RelativeToolTip": "Chess\\Views\\GamePage.xaml.cs",
+              "ViewState": "AgIAADIBAAAAAAAAAAAowEUBAABSAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-20T01:19:19.332Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Game.cs",
+              "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Game.cs",
+              "RelativeDocumentMoniker": "Chess\\GL\\Game.cs",
+              "ToolTip": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\GL\\Game.cs",
+              "RelativeToolTip": "Chess\\GL\\Game.cs",
+              "ViewState": "AgIAABEAAAAAAAAAAAAAwBwAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-20T01:18:55.443Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Homepage.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\Views\\Homepage.xaml.cs",
+              "RelativeDocumentMoniker": "Chess\\Views\\Homepage.xaml.cs",
+              "ToolTip": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\Views\\Homepage.xaml.cs",
+              "RelativeToolTip": "Chess\\Views\\Homepage.xaml.cs",
+              "ViewState": "AgIAABgAAAAAAAAAAAAYwCsAAAAsAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-20T01:18:22.315Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "SelectOptions.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\Views\\SelectOptions.xaml.cs",
+              "RelativeDocumentMoniker": "Chess\\Views\\SelectOptions.xaml.cs",
+              "ToolTip": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\Views\\SelectOptions.xaml.cs",
+              "RelativeToolTip": "Chess\\Views\\SelectOptions.xaml.cs",
+              "ViewState": "AgIAADIAAAAAAAAAAAAswEUAAABWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-20T01:18:02.519Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "Chess\\MainWindow.xaml.cs",
+              "ToolTip": "C:\\Users\\bilal\\Desktop\\Projects\\Chess\\CSC200F24PID168\\Chess\\Chess\\MainWindow.xaml.cs",
+              "RelativeToolTip": "Chess\\MainWindow.xaml.cs",
+              "ViewState": "AgIAAAcAAAAAAAAAAAAIwA4AAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-12-20T01:04:24.524Z",
+              "EditorCaption": ""
+            }
+          ]
+        },
+        {
+          "DockedHeight": 195,
+          "SelectedChildIndex": -1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{34e76e81-ee4a-11d0-ae2e-00a0c90fffc3}"
             }
           ]
         }
